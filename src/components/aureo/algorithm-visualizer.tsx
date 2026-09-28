@@ -1,0 +1,284 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
+import { motion } from "motion/react";
+import { RotateCcw } from "lucide-react";
+
+export function AlgorithmVisualizer() {
+  const [activeStep, setActiveStep] = useState(2);
+  const [isSimulating, setIsSimulating] = useState(true);
+
+  // Left input nodes
+  const leftNodes = [
+    { id: "L1", val: 10, y: 15 },
+    { id: "L2", val: 25, y: 29 },
+    { id: "L3", val: 44, y: 44, highlight: true },
+    { id: "L4", val: 15, y: 58 },
+    { id: "L5", val: 50, y: 72 },
+    { id: "L6", val: 35, y: 86 },
+  ];
+
+  // Middle layer nodes
+  const midNodesTop = [
+    { id: "M1", val: 10, y: 12 },
+    { id: "M2", val: 22, y: 20 },
+    { id: "M3", val: 76, y: 28 },
+    { id: "M4", val: 29, y: 36 },
+    { id: "M5", val: 87, y: 44 },
+    { id: "M6", val: 81, y: 52 },
+    { id: "M7", val: 83, y: 60 },
+  ];
+
+  const midNodesBottom = [
+    { id: "M8", val: 19, y: 68 },
+    { id: "M9", val: 26, y: 74 },
+    { id: "M10", val: 37, y: 80 },
+    { id: "M11", val: 38, y: 86 },
+    { id: "M12", val: 59, y: 91 },
+    { id: "M13", val: 90, y: 95 },
+    { id: "M14", val: 83, y: 99 },
+  ];
+
+  // Right cluster target nodes
+  const rightClusters = [
+    { id: "R1", label: "TK08", y: 35, color: "#BE123C" },
+    { id: "R2", label: "2008", y: 65, color: "#7C3AED" },
+  ];
+
+  // Auto-pulse simulation timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev >= 3 ? 1 : prev + 1));
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="relative w-full max-w-lg select-none">
+      {/* Glow aura under the card */}
+      <div className="absolute -inset-3 bg-gradient-to-r from-purple-600/15 via-rose-600/10 to-indigo-600/10 rounded-2xl blur-xl opacity-50 pointer-events-none" />
+
+      {/* MAIN CARD: ALGORITMA SORTING - Minimalist Dark Glass */}
+      <div className="relative z-10 bg-[#0F0B1E]/95 text-white rounded-2xl p-3 sm:p-3.5 border border-purple-500/20 shadow-lg backdrop-blur-2xl">
+        {/* Card Header Bar - Minimalist */}
+        <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-white/5">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
+            <h3 className="font-sans font-bold text-[11px] sm:text-xs tracking-wider text-slate-200 uppercase whitespace-nowrap">
+              Simulasi Algoritma
+            </h3>
+            <span className="text-[9px] font-mono text-purple-300 bg-purple-950/70 px-1.5 py-0.5 rounded border border-purple-800/40 shrink-0">
+              O(n log n)
+            </span>
+          </div>
+
+          {/* Step Progress & Interactive Toggle */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
+              <span>Step</span>
+              <div className="w-10 h-1 bg-slate-800 rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-gradient-to-r from-rose-500 to-purple-500 rounded-full"
+                  animate={{ width: `${(activeStep / 3) * 100}%` }}
+                  transition={{ duration: 0.5 }}
+                />
+              </div>
+              <span className="text-purple-300 font-semibold">{activeStep}/3</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveStep((prev) => (prev >= 3 ? 1 : prev + 1))}
+              className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white text-[9px] font-mono transition-colors cursor-pointer"
+              title="Next Step"
+            >
+              <RotateCcw size={9} />
+              <span>Next</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Visualizer Canvas Area: Bipartite Bezier Network */}
+        <div className="relative w-full h-[115px] sm:h-[125px] bg-[#070510]/95 rounded-xl border border-white/5 overflow-hidden p-2">
+          <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 480 240" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="curveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#E11D48" stopOpacity="0.8" />
+                <stop offset="50%" stopColor="#A855F7" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#6366F1" stopOpacity="0.8" />
+              </linearGradient>
+              <linearGradient id="curveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#9E1B32" stopOpacity="0.7" />
+                <stop offset="70%" stopColor="#C084FC" stopOpacity="0.5" />
+                <stop offset="100%" stopColor="#BE123C" stopOpacity="0.9" />
+              </linearGradient>
+            </defs>
+
+            {/* Connecting Bezier Ribbons from Left to Middle */}
+            {leftNodes.map((ln) => {
+              const startX = 55;
+              const startY = (ln.y / 100) * 240;
+              return midNodesTop.slice(0, 4).map((mn, idx) => {
+                const endX = 220;
+                const endY = (mn.y / 100) * 240;
+                const cp1X = startX + 70;
+                const cp1Y = startY;
+                const cp2X = endX - 70;
+                const cp2Y = endY;
+                const isPrimary = ln.id === "L3";
+
+                return (
+                  <path
+                    key={`conn-${ln.id}-${mn.id}`}
+                    d={`M ${startX} ${startY} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${endX} ${endY}`}
+                    fill="none"
+                    stroke={isPrimary ? "url(#curveGrad1)" : "rgba(168, 85, 247, 0.12)"}
+                    strokeWidth={isPrimary ? 1.8 : 0.8}
+                    className="transition-all duration-700"
+                  />
+                );
+              });
+            })}
+
+            {/* Connecting Bezier Ribbons from Left to Middle Bottom */}
+            {leftNodes.slice(2).map((ln) => {
+              const startX = 55;
+              const startY = (ln.y / 100) * 240;
+              return midNodesBottom.slice(0, 4).map((mn) => {
+                const endX = 220;
+                const endY = (mn.y / 100) * 240;
+                const cp1X = startX + 70;
+                const cp1Y = startY;
+                const cp2X = endX - 70;
+                const cp2Y = endY;
+                return (
+                  <path
+                    key={`conn-bot-${ln.id}-${mn.id}`}
+                    d={`M ${startX} ${startY} C ${cp1X} ${cp1Y}, ${cp2X} ${cp2Y}, ${endX} ${endY}`}
+                    fill="none"
+                    stroke="rgba(225, 29, 72, 0.14)"
+                    strokeWidth={0.8}
+                  />
+                );
+              });
+            })}
+
+            {/* Connecting Ribbons from Mid to Right Clusters (TK08 and 2008) */}
+            {midNodesTop.map((mn) => {
+              const startX = 230;
+              const startY = (mn.y / 100) * 240;
+              const endX = 390;
+              const endY = 85; // TK08
+              return (
+                <path
+                  key={`mid-tk-${mn.id}`}
+                  d={`M ${startX} ${startY} C ${startX + 60} ${startY}, ${endX - 60} ${endY}, ${endX} ${endY}`}
+                  fill="none"
+                  stroke="rgba(192, 132, 252, 0.2)"
+                  strokeWidth={0.9}
+                />
+              );
+            })}
+
+            {midNodesBottom.map((mn) => {
+              const startX = 230;
+              const startY = (mn.y / 100) * 240;
+              const endX = 390;
+              const endY = 160; // 2008
+              return (
+                <path
+                  key={`mid-2008-${mn.id}`}
+                  d={`M ${startX} ${startY} C ${startX + 60} ${startY}, ${endX - 60} ${endY}, ${endX} ${endY}`}
+                  fill="none"
+                  stroke="rgba(225, 29, 72, 0.25)"
+                  strokeWidth={0.9}
+                />
+              );
+            })}
+
+            {/* Animated Pulses flowing into TK08 and 2008 */}
+            <motion.circle
+              r="2.5"
+              fill="#E11D48"
+              animate={{
+                cx: [55, 135, 225, 390],
+                cy: [105, 105, 75, 85],
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{
+                duration: 2.4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+            <motion.circle
+              r="2.5"
+              fill="#C084FC"
+              animate={{
+                cx: [55, 140, 225, 390],
+                cy: [105, 120, 190, 160],
+                opacity: [0, 1, 1, 0],
+              }}
+              transition={{
+                duration: 2.8,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.8,
+              }}
+            />
+          </svg>
+
+          {/* Left Column Nodes (HTML Overlay for crisp typography) */}
+          <div className="absolute left-3 sm:left-4 top-2 bottom-2 flex flex-col justify-between py-1 z-10">
+            {leftNodes.map((n) => (
+              <div key={n.id} className="flex items-center gap-2 group cursor-pointer">
+                <span className={`text-[10px] sm:text-xs font-mono w-4 text-right transition-colors ${n.highlight ? 'text-rose-400 font-bold' : 'text-slate-400'}`}>
+                  {n.val}
+                </span>
+                <span className={`w-2 h-2 rounded-full transition-transform ${n.highlight ? 'bg-rose-500 ring-4 ring-rose-500/30 scale-125' : 'bg-slate-700 group-hover:bg-slate-500'}`} />
+              </div>
+            ))}
+          </div>
+
+          {/* Middle Column Nodes */}
+          <div className="absolute left-[44%] sm:left-[46%] top-2 bottom-2 flex flex-col justify-between py-1 z-10 pointer-events-none">
+            <div className="flex flex-col gap-1">
+              {midNodesTop.slice(0, 5).map((m) => (
+                <span key={m.id} className="text-[9px] font-mono text-purple-300/80">
+                  {m.val}
+                </span>
+              ))}
+            </div>
+            <div className="flex flex-col gap-1">
+              {midNodesBottom.slice(0, 5).map((m) => (
+                <span key={m.id} className="text-[9px] font-mono text-rose-300/80">
+                  {m.val}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Right Clusters: TK08 & 2008 */}
+          <div className="absolute right-4 sm:right-6 top-0 bottom-0 flex flex-col justify-around z-10">
+            {rightClusters.map((c) => (
+              <motion.div
+                key={c.id}
+                whileHover={{ scale: 1.1 }}
+                className="flex items-center gap-2 group cursor-pointer"
+              >
+                <div 
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] font-bold font-mono text-white shadow-lg"
+                  style={{
+                    backgroundColor: c.color,
+                    boxShadow: `0 0 16px ${c.color}60`,
+                  }}
+                >
+                  {c.label}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
