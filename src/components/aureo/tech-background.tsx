@@ -34,27 +34,54 @@ export function TechBackground() {
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
-      {/* Soft Ambient Radial Lights */}
-      <div className="absolute -top-[10%] -left-[5%] w-[45vw] h-[45vw] rounded-full bg-gradient-to-br from-purple-200/40 via-rose-100/30 to-transparent blur-[120px]" />
-      <div className="absolute top-[30%] -right-[10%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-bl from-rose-200/35 via-purple-100/30 to-transparent blur-[140px]" />
-      <div className="absolute -bottom-[10%] left-[20%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tr from-indigo-100/40 to-transparent blur-[110px]" />
+      {/* Soft Ambient Floating Animated Radial Lights (Ethereal Aurora Drift) */}
+      <motion.div
+        animate={{
+          x: [0, 25, -20, 0],
+          y: [0, -30, 15, 0],
+          scale: [1, 1.1, 0.95, 1],
+        }}
+        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute -top-[10%] -left-[5%] w-[48vw] h-[48vw] rounded-full bg-gradient-to-br from-purple-300/30 via-rose-200/25 to-transparent blur-[130px]"
+      />
+      <motion.div
+        animate={{
+          x: [0, -30, 25, 0],
+          y: [0, 25, -20, 0],
+          scale: [1, 1.15, 0.92, 1],
+        }}
+        transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute top-[25%] -right-[8%] w-[58vw] h-[58vw] rounded-full bg-gradient-to-bl from-rose-300/25 via-purple-200/25 to-indigo-200/20 blur-[150px]"
+      />
+      <motion.div
+        animate={{
+          x: [0, 20, -15, 0],
+          y: [0, 20, -25, 0],
+        }}
+        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        className="absolute -bottom-[15%] left-[25%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-tr from-indigo-200/30 via-rose-100/20 to-transparent blur-[120px]"
+      />
 
       {/* SVG PCB Circuit Micro-traces (Right-side signature matching reference) */}
       <svg
-        className="absolute top-0 right-0 w-[55vw] h-full min-w-[500px] opacity-45 overflow-visible"
+        className="absolute top-0 right-0 w-[55vw] h-full min-w-[500px] opacity-50 overflow-visible"
         viewBox="0 0 800 900"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
           <linearGradient id="traceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#9E1B32" stopOpacity="0.4" />
-            <stop offset="40%" stopColor="#6366F1" stopOpacity="0.3" />
-            <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0.7" />
+            <stop offset="0%" stopColor="#9E1B32" stopOpacity="0.45" />
+            <stop offset="40%" stopColor="#7C3AED" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0.75" />
           </linearGradient>
-          <linearGradient id="pulseDotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#BE123C" />
-            <stop offset="100%" stopColor="#8B5CF6" />
+          <linearGradient id="pulseDotGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#E11D48" />
+            <stop offset="100%" stopColor="#9333EA" />
+          </linearGradient>
+          <linearGradient id="pulseDotGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#38BDF8" />
+            <stop offset="100%" stopColor="#6366F1" />
           </linearGradient>
         </defs>
 
@@ -79,7 +106,7 @@ export function TechBackground() {
           <path d="M 320 390 L 320 330 L 280 290" />
         </g>
 
-        {/* Via Pads (Circular PCB drill pads with concentric rings) */}
+        {/* Via Pads */}
         {[
           { cx: 60, cy: 400 },
           { cx: 140, cy: 430 },
@@ -101,10 +128,10 @@ export function TechBackground() {
           </g>
         ))}
 
-        {/* Animated Data Packets / Pulses traveling through traces */}
+        {/* Animated Data Packets / Pulses traveling through traces (Multiple Waves) */}
         <motion.circle
-          r="3"
-          fill="url(#pulseDotGrad)"
+          r="3.5"
+          fill="url(#pulseDotGrad1)"
           initial={{ cx: 800, cy: 240, opacity: 0 }}
           animate={{
             cx: [800, 640, 580, 420, 360, 220, 180, 60],
@@ -112,16 +139,33 @@ export function TechBackground() {
             opacity: [0, 1, 1, 1, 1, 1, 1, 0],
           }}
           transition={{
-            duration: 6,
+            duration: 5,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 0.5,
+            delay: 0.2,
           }}
         />
 
         <motion.circle
           r="3"
-          fill="url(#pulseDotGrad)"
+          fill="url(#pulseDotGrad2)"
+          initial={{ cx: 800, cy: 280, opacity: 0 }}
+          animate={{
+            cx: [800, 680, 620, 490, 440, 320, 280, 140],
+            cy: [280, 280, 340, 340, 390, 390, 430, 430],
+            opacity: [0, 1, 1, 1, 1, 1, 1, 0],
+          }}
+          transition={{
+            duration: 5.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1.8,
+          }}
+        />
+
+        <motion.circle
+          r="3.5"
+          fill="url(#pulseDotGrad1)"
           initial={{ cx: 800, cy: 360, opacity: 0 }}
           animate={{
             cx: [800, 720, 670, 560, 510, 400, 360, 250],
@@ -129,10 +173,27 @@ export function TechBackground() {
             opacity: [0, 1, 1, 1, 1, 1, 1, 0],
           }}
           transition={{
-            duration: 7,
+            duration: 6.2,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: 2.2,
+            delay: 3.2,
+          }}
+        />
+
+        <motion.circle
+          r="3"
+          fill="url(#pulseDotGrad2)"
+          initial={{ cx: 800, cy: 480, opacity: 0 }}
+          animate={{
+            cx: [800, 740, 700, 580, 540, 420, 380, 290],
+            cy: [480, 480, 520, 520, 560, 560, 600, 600],
+            opacity: [0, 1, 1, 1, 1, 1, 1, 0],
+          }}
+          transition={{
+            duration: 6.8,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 4.5,
           }}
         />
       </svg>
