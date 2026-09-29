@@ -28,57 +28,63 @@ export default function Home() {
       {/* Background Micro-Circuitry & Ambient Particles (Dynamic moving elements) */}
       <TechBackground />
 
-      {/* TOP NAVBAR - Sleek & Minimalist */}
-      <header className="relative z-30 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-3 sm:py-4 shrink-0 flex items-center justify-between">
-        <EdmLogo className="h-7 sm:h-8" />
+      {/* Ambient Ethereal Radial Lights for High-End Depth */}
+      <div className="absolute top-[15%] left-[5%] w-[38vw] h-[38vw] rounded-full bg-gradient-to-tr from-purple-200/35 via-rose-100/25 to-transparent blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-[10%] right-[10%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-bl from-rose-200/30 via-indigo-100/25 to-transparent blur-[140px] pointer-events-none" />
 
-        {/* Right Navigation */}
-        <nav className="flex items-center gap-3 sm:gap-6">
-          <div className="flex items-center gap-4 sm:gap-6">
-            <button
-              type="button"
-              onClick={() => setActiveModal("modul")}
-              className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-[#9E1B32] transition-colors cursor-pointer"
-            >
-              Modul
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveModal("tentang")}
-              className="text-xs font-semibold uppercase tracking-wider text-slate-700 hover:text-[#9E1B32] transition-colors cursor-pointer"
-            >
-              Tentang
-            </button>
-          </div>
+      {/* TOP NAVBAR - Floating Island Pill Architecture */}
+      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-3 sm:pt-4 shrink-0">
+        <div className="mx-auto px-5 sm:px-6 py-2.5 rounded-full bg-white/75 backdrop-blur-xl border border-white/80 shadow-[0_8px_32px_rgba(25,10,45,0.06)] flex items-center justify-between transition-all">
+          <EdmLogo className="h-6 sm:h-7" />
 
-          {/* Quick Login Button */}
-          <a
-            href="#login-section"
-            className="bg-[#1F0D3D] hover:bg-[#341368] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg shadow-2xs transition-all active:scale-95 flex items-center gap-1.5"
-          >
-            <span>Masuk</span>
-          </a>
-        </nav>
+          {/* Right Navigation */}
+          <nav className="flex items-center gap-4 sm:gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
+              <button
+                type="button"
+                onClick={() => setActiveModal("modul")}
+                className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-[#9E1B32] transition-colors cursor-pointer"
+              >
+                Modul
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveModal("tentang")}
+                className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-[#9E1B32] transition-colors cursor-pointer"
+              >
+                Tentang
+              </button>
+            </div>
+
+            {/* Quick Login Pill Button */}
+            <a
+              href="#login-section"
+              className="bg-gradient-to-r from-[#9E1B32] via-[#7B1238] to-[#250B47] hover:from-[#B51E3A] hover:via-[#8E1542] hover:to-[#38106A] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Masuk</span>
+            </a>
+          </nav>
+        </div>
       </header>
 
-      {/* HERO & MAIN INTERACTIVE SECTION - Fits perfectly inside viewport */}
-      <section className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-2 sm:py-3 flex-1 min-h-0 flex items-center">
+      {/* HERO & MAIN INTERACTIVE SECTION - Fits cleanly in 1 viewport */}
+      <section className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-1.5 sm:py-2.5 flex-1 min-h-0 flex items-center">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
           
-          {/* LEFT COLUMN: Headings, Call to Action, and Dynamic Visualizer */}
-          <div className="lg:col-span-7 flex flex-col space-y-3.5 sm:space-y-4">
+          {/* LEFT COLUMN: Fluid Typography, Tactile CTAs, and Visualizer */}
+          <div className="lg:col-span-7 flex flex-col space-y-3 sm:space-y-3.5">
             
             {/* Headlines */}
-            <div className="space-y-2 sm:space-y-2.5">
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-rose-50/90 border border-rose-200/80 text-[10px] sm:text-[11px] font-mono font-bold text-[#9E1B32] w-fit">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-rose-200/70 shadow-[0_2px_12px_rgba(158,27,50,0.06)] text-[10px] sm:text-[11px] font-mono font-bold text-[#9E1B32] backdrop-blur-md w-fit">
                 <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
                 SISTEM OPERASIONAL INTERNAL LABORATORIUM
               </div>
 
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.45rem] font-black tracking-tight text-[#0F172A] leading-[1.12]">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.65rem] font-black tracking-tight text-[#0F172A] leading-[1.12]">
                 SELAMAT DATANG,
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9E1B32] via-[#581C87] to-[#1F0D3D]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9E1B32] via-[#6B21A8] to-[#1E1B4B]">
                   ASISTEN PRAKTIKUM
                 </span>
                 <br />
@@ -91,34 +97,38 @@ export default function Home() {
 
               {/* Minimalist Meta Chips */}
               <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-[10px] font-mono">
-                <span className="bg-slate-100/90 text-slate-700 font-semibold px-2 py-0.5 rounded-md border border-slate-200/70">
+                <span className="bg-white/80 backdrop-blur-md text-slate-700 font-semibold px-2.5 py-0.5 rounded-lg border border-slate-200/70 shadow-2xs">
                   Telkom University
                 </span>
-                <span className="bg-purple-50/90 text-purple-800 font-bold px-2 py-0.5 rounded-md border border-purple-200/70">
+                <span className="bg-purple-50/80 backdrop-blur-md text-purple-900 font-bold px-2.5 py-0.5 rounded-lg border border-purple-200/70 shadow-2xs">
                   Angkatan 2026 (SI&apos;50)
                 </span>
-                <span className="bg-rose-50/90 text-[#9E1B32] font-bold px-2 py-0.5 rounded-md border border-rose-200/70">
+                <span className="bg-rose-50/80 backdrop-blur-md text-[#9E1B32] font-bold px-2.5 py-0.5 rounded-lg border border-rose-200/70 shadow-2xs">
                   15 Kelas Aktif
                 </span>
               </div>
             </div>
 
-            {/* Primary Action Buttons */}
+            {/* Primary Action Buttons — Button-in-Button Trailing Icon Architecture */}
             <div className="flex flex-wrap items-center gap-2.5 pt-0.5">
               <button
                 type="button"
                 onClick={() => setActiveModal("modul")}
-                className="bg-[#1D0C38] hover:bg-[#2F1359] text-white font-bold text-xs uppercase tracking-wider px-4 sm:px-5 py-2.5 rounded-xl shadow-xs transition-all active:scale-95 flex items-center gap-2 group cursor-pointer"
+                className="rounded-full pl-5 pr-2 py-2 bg-gradient-to-r from-[#1A0B36] to-[#2E1256] hover:from-[#250E4C] hover:to-[#3B1770] text-white font-bold text-xs uppercase tracking-wider shadow-[0_10px_25px_-5px_rgba(30,10,60,0.3)] transition-all active:scale-95 flex items-center gap-3 group cursor-pointer"
               >
-                <BookOpen size={14} />
-                <span>Silabus Modul</span>
-                <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
+                <div className="flex items-center gap-2">
+                  <BookOpen size={14} />
+                  <span>Silabus Modul</span>
+                </div>
+                <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
+                  <ArrowRight size={13} />
+                </div>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveModal("tentang")}
-                className="bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs uppercase tracking-wider px-3.5 sm:px-4 py-2.5 rounded-xl border border-slate-200 shadow-2xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+                className="rounded-full px-5 py-2.5 bg-white/80 hover:bg-white text-slate-700 font-bold text-xs uppercase tracking-wider border border-slate-200/80 shadow-2xs backdrop-blur-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer"
               >
                 <Info size={14} className="text-[#9E1B32]" />
                 <span>Tentang Lab</span>
@@ -126,12 +136,12 @@ export default function Home() {
             </div>
 
             {/* Dynamic Visualizer Canvas (Interactive Moving Particle & Graph Network) */}
-            <div className="pt-1">
+            <div className="pt-0.5">
               <AlgorithmVisualizer />
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Floating Authentication Console (Minimalist, Roomy & Balanced) */}
+          {/* RIGHT COLUMN: Floating Authentication Console (Double-Bezel & Balanced) */}
           <div id="login-section" className="lg:col-span-5 flex justify-center lg:justify-end">
             <LoginForm />
           </div>

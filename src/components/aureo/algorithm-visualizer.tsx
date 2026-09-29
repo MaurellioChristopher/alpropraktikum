@@ -54,13 +54,14 @@ export function AlgorithmVisualizer() {
   }, []);
 
   return (
-    <div className="relative w-full max-w-lg select-none">
+    <div className="relative w-full max-w-lg select-none group">
       {/* Glow aura under the card */}
-      <div className="absolute -inset-3 bg-gradient-to-r from-purple-600/15 via-rose-600/10 to-indigo-600/10 rounded-2xl blur-xl opacity-50 pointer-events-none" />
+      <div className="absolute -inset-2.5 bg-gradient-to-r from-purple-600/20 via-rose-600/15 to-indigo-600/15 rounded-[1.8rem] blur-xl opacity-60 group-hover:opacity-85 transition-opacity pointer-events-none" />
 
-      {/* MAIN CARD: ALGORITMA SORTING - Minimalist Dark Glass */}
-      <div className="relative z-10 bg-[#0F0B1E]/95 text-white rounded-2xl p-3 sm:p-3.5 border border-purple-500/20 shadow-lg backdrop-blur-2xl">
-        {/* Card Header Bar - Minimalist */}
+      {/* Double Bezel Outer Shell with Frosted Rim */}
+      <div className="relative z-10 rounded-[1.6rem] p-1 bg-gradient-to-b from-white/40 via-white/15 to-white/10 backdrop-blur-2xl border border-white/40 shadow-[0_16px_36px_-10px_rgba(20,5,35,0.2)]">
+        <div className="bg-[#0C081D]/95 text-white rounded-[1.35rem] p-3 sm:p-3.5 border border-purple-500/25">
+          {/* Card Header Bar - Minimalist */}
         <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-white/5">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse shrink-0" />
@@ -280,5 +281,6 @@ export function AlgorithmVisualizer() {
         </div>
       </div>
     </div>
+  </div>
   );
 }
