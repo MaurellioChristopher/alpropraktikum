@@ -36,6 +36,7 @@ import {
   Menu,
   Home,
   BookOpen,
+  Package,
 } from "lucide-react";
 
 export default function AssistantDashboard() {
