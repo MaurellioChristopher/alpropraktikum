@@ -33,12 +33,22 @@ export default function Home() {
       <div className="absolute bottom-[10%] right-[10%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-bl from-rose-200/30 via-indigo-100/25 to-transparent blur-[140px] pointer-events-none" />
 
       {/* TOP NAVBAR - Floating Island Pill Architecture */}
-      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-3 sm:pt-4 shrink-0">
-        <div className="mx-auto px-5 sm:px-6 py-2.5 rounded-full bg-white/75 backdrop-blur-xl border border-white/80 shadow-[0_8px_32px_rgba(25,10,45,0.06)] flex items-center justify-between transition-all">
-          <EdmLogo className="h-6 sm:h-7" />
+      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-3.5 sm:pt-4 shrink-0">
+        <motion.div 
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="relative overflow-hidden mx-auto px-5 sm:px-6 py-2.5 rounded-full bg-white/80 backdrop-blur-xl border border-white/90 shadow-[0_8px_32px_rgba(25,10,45,0.06)] flex items-center justify-between transition-all"
+        >
+          {/* Subtle Nav Sheen */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-full">
+            <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-white/40 to-transparent transform -skew-x-20 animate-shimmer" />
+          </div>
+
+          <EdmLogo className="h-6 sm:h-7 relative z-10" />
 
           {/* Right Navigation */}
-          <nav className="flex items-center gap-5 sm:gap-7">
+          <nav className="flex items-center gap-5 sm:gap-7 relative z-10">
             <button
               type="button"
               onClick={() => setActiveModal("modul")}
@@ -54,7 +64,7 @@ export default function Home() {
               Tentang
             </button>
           </nav>
-        </div>
+        </motion.div>
       </header>
 
       {/* HERO & MAIN INTERACTIVE SECTION - Fits cleanly in 1 viewport with optimal spacing */}
@@ -66,15 +76,15 @@ export default function Home() {
             
             {/* Headlines with Animated Gradient */}
             <motion.div 
-              initial={{ opacity: 0, y: 16 }}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, ease: "easeOut" }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-3"
             >
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.9rem] xl:text-[3.25rem] font-black tracking-tight text-[#0F172A] leading-[1.08]">
                 SELAMAT DATANG,
                 <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9E1B32] via-[#701A75] to-[#1E1B4B]">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9E1B32] via-[#701A75] via-[#9E1B32] to-[#1E1B4B] animate-gradient-flow inline-block">
                   ASISTEN PRAKTIKUM
                 </span>
                 <br />
@@ -118,31 +128,41 @@ export default function Home() {
             <motion.div 
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
               className="flex flex-wrap items-center gap-3 pt-0.5"
             >
-              <button
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setActiveModal("modul")}
-                className="rounded-full pl-5 pr-2 py-2 bg-gradient-to-r from-[#1A0B36] via-[#2A0E4E] to-[#40126E] hover:from-[#250E4C] hover:to-[#551896] text-white font-bold text-xs uppercase tracking-wider shadow-[0_12px_28px_-6px_rgba(40,15,75,0.35)] hover:shadow-[0_16px_36px_-6px_rgba(40,15,75,0.45)] transition-all active:scale-95 flex items-center gap-3 group cursor-pointer"
+                className="relative overflow-hidden rounded-full pl-5 pr-2 py-2 bg-gradient-to-r from-[#1A0B36] via-[#2A0E4E] to-[#40126E] hover:from-[#250E4C] hover:to-[#551896] text-white font-bold text-xs uppercase tracking-wider shadow-[0_12px_28px_-6px_rgba(40,15,75,0.35)] hover:shadow-[0_16px_36px_-6px_rgba(40,15,75,0.45)] transition-all flex items-center gap-3 group cursor-pointer"
               >
-                <div className="flex items-center gap-2">
+                {/* Button specular sheen */}
+                <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform -skew-x-20 animate-shimmer" />
+                </div>
+                <div className="relative z-10 flex items-center gap-2">
                   <BookOpen size={14} className="text-purple-300" />
                   <span>Silabus Modul</span>
                 </div>
-                <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
+                <div className="relative z-10 w-7 h-7 rounded-full bg-white/15 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
                   <ArrowRight size={13} />
                 </div>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setActiveModal("tentang")}
-                className="rounded-full px-5 py-2.5 bg-white/85 hover:bg-white text-slate-700 font-bold text-xs uppercase tracking-wider border border-slate-200 shadow-2xs hover:shadow-xs backdrop-blur-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer hover:border-slate-300"
+                className="rounded-full px-5 py-2.5 bg-white/85 hover:bg-white text-slate-700 font-bold text-xs uppercase tracking-wider border border-slate-200/90 shadow-2xs hover:shadow-xs backdrop-blur-md transition-all flex items-center gap-2 cursor-pointer hover:border-slate-300"
               >
                 <Info size={14} className="text-[#9E1B32]" />
                 <span>Tentang Lab EDM</span>
-              </button>
+              </motion.button>
             </motion.div>
 
             {/* Dynamic Visualizer Canvas (Interactive Moving Particle & Graph Network) */}

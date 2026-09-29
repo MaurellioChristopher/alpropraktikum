@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { loginAction } from "@/app/(auth)/actions/auth";
 import { useActionState } from "react";
+import { motion } from "motion/react";
 import {
   Eye,
   EyeOff,
@@ -39,8 +40,13 @@ export function LoginForm() {
       {/* Soft Ambient Diffuse Glow behind the glass card */}
       <div className="absolute -inset-4 bg-gradient-to-tr from-rose-500/25 via-purple-600/25 to-indigo-500/20 rounded-[2.4rem] blur-2xl opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
-      {/* High-End Double-Bezel Hardware Enclosure */}
-      <div className="relative z-10 rounded-[2.15rem] p-1.5 bg-gradient-to-b from-white/95 via-white/80 to-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.16)]">
+      {/* High-End Double-Bezel Hardware Enclosure with Specular Glint */}
+      <div className="relative z-10 rounded-[2.15rem] p-1.5 bg-gradient-to-b from-white/95 via-white/80 to-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.16)] overflow-hidden">
+        
+        {/* Subtle Specular Sheen across glass surface */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.15rem]">
+          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-20 animate-shimmer" />
+        </div>
         <div className="rounded-[1.8rem] p-5 sm:p-6 lg:p-6 bg-white/80 backdrop-blur-xl border border-white/60 space-y-4">
           
           {/* Brand Logo & Console Title Header */}
@@ -82,7 +88,10 @@ export function LoginForm() {
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <button
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setAssistantPreset("GWAN", "ASPRAK")}
                 className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
@@ -98,9 +107,12 @@ export function LoginForm() {
                 <div className={`text-[10px] font-mono leading-tight truncate ${identifier === "GWAN" ? "text-purple-200" : "text-slate-500"}`}>
                   Andi P. (Asprak)
                 </div>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setAssistantPreset("IZIN", "KOMDIS")}
                 className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
@@ -116,9 +128,12 @@ export function LoginForm() {
                 <div className={`text-[10px] font-mono leading-tight truncate ${identifier === "IZIN" ? "text-rose-200 font-semibold" : "text-rose-600 font-bold"}`}>
                   M. Izin (Komdis)
                 </div>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setAssistantPreset("LEVI", "SEKBEN")}
                 className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
@@ -134,7 +149,7 @@ export function LoginForm() {
                 <div className={`text-[10px] font-mono leading-tight truncate ${identifier === "LEVI" ? "text-indigo-200 font-semibold" : "text-indigo-600 font-bold"}`}>
                   Levina (Sekben)
                 </div>
-              </button>
+              </motion.button>
             </div>
           </div>
 
@@ -232,11 +247,18 @@ export function LoginForm() {
             )}
 
             {/* Action Button — Fluid Pill with Nested Trailing Icon */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.015 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isPending}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-[#9E1B32] via-[#7B1238] to-[#250B47] hover:from-[#B51E3A] hover:via-[#8E1542] hover:to-[#351065] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase pl-6 pr-2 py-2.5 rounded-2xl shadow-[0_16px_36px_-8px_rgba(158,27,50,0.38)] active:scale-[0.98] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-1.5"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-[#9E1B32] via-[#7B1238] to-[#250B47] hover:from-[#B51E3A] hover:via-[#8E1542] hover:to-[#351065] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase pl-6 pr-2 py-2.5 rounded-2xl shadow-[0_16px_36px_-8px_rgba(158,27,50,0.38)] hover:shadow-[0_20px_42px_-8px_rgba(158,27,50,0.48)] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-1.5"
             >
+              {/* Dynamic Button Sheen on Hover */}
+              <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform -skew-x-20 animate-shimmer" />
+              </div>
+
               {isPending ? (
                 <div className="flex items-center justify-center gap-2 w-full py-1">
                   <Loader2 size={16} className="animate-spin" />
@@ -244,13 +266,13 @@ export function LoginForm() {
                 </div>
               ) : (
                 <>
-                  <span>Masuk ke Dashboard ({selectedRole})</span>
-                  <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1.5 group-hover:scale-105 shrink-0">
+                  <span className="relative z-10">Masuk ke Dashboard ({selectedRole})</span>
+                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1.5 group-hover:scale-105 shrink-0">
                     <ArrowRight size={15} />
                   </div>
                 </>
               )}
-            </button>
+            </motion.button>
           </form>
 
           {/* Informative Security Strip */}

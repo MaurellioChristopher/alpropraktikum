@@ -5,10 +5,32 @@ import { motion } from "motion/react";
 
 export function TechBackground() {
   const [mounted, setMounted] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
     setMounted(true);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      // Normalize mouse coordinates for subtle fluid spotlight
+      setMousePos({
+        x: Math.round((e.clientX / window.innerWidth) * 100) / 100,
+        y: Math.round((e.clientY / window.innerHeight) * 100) / 100,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    return () => window.removeEventListener("mousemove", handleMouseMove);
   }, []);
+
+  // Floating Computer Science Code Glints (High-end ambient depth)
+  const codeRunes = [
+    { text: "0x7FFEE4", x: "8%", y: "22%", delay: 0, duration: 14 },
+    { text: "O(n log n)", x: "42%", y: "15%", delay: 2, duration: 18 },
+    { text: "*ptr -> next", x: "28%", y: "82%", delay: 4, duration: 16 },
+    { text: "AVL::balance", x: "88%", y: "25%", delay: 1, duration: 20 },
+    { text: "0b1011001", x: "80%", y: "86%", delay: 3, duration: 15 },
+    { text: "&head_node", x: "65%", y: "12%", delay: 5, duration: 17 },
+  ];
 
   // Generate dot matrix grid wave coordinates for particle field with deterministic rounding
   const dots = useMemo(() => {
@@ -34,29 +56,64 @@ export function TechBackground() {
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden select-none z-0">
+      {/* Interactive Cursor Fluid Spotlight (Soft Glass Refraction) */}
+      {mounted && (
+        <motion.div
+          animate={{
+            x: mousePos.x * (typeof window !== "undefined" ? window.innerWidth : 1200) - 300,
+            y: mousePos.y * (typeof window !== "undefined" ? window.innerHeight : 800) - 300,
+          }}
+          transition={{ type: "spring", damping: 35, stiffness: 120, mass: 0.8 }}
+          className="absolute top-0 left-0 w-[600px] h-[600px] rounded-full bg-gradient-to-tr from-rose-500/12 via-purple-600/10 to-indigo-500/8 blur-[100px] pointer-events-none"
+        />
+      )}
+
+      {/* Floating Ethereal Code Rune Glints */}
+      {mounted &&
+        codeRunes.map((rune, idx) => (
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0 }}
+            animate={{
+              y: [0, -14, 0],
+              opacity: [0.15, 0.35, 0.15],
+            }}
+            transition={{
+              duration: rune.duration,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: rune.delay,
+            }}
+            style={{ left: rune.x, top: rune.y }}
+            className="absolute font-mono text-[10px] tracking-widest text-[#701A75]/50 select-none pointer-events-none font-semibold"
+          >
+            {rune.text}
+          </motion.div>
+        ))}
+
       {/* Soft Ambient Floating Animated Radial Lights (Ethereal Aurora Drift) */}
       <motion.div
         animate={{
-          x: [0, 25, -20, 0],
-          y: [0, -30, 15, 0],
-          scale: [1, 1.1, 0.95, 1],
+          x: [0, 30, -25, 0],
+          y: [0, -35, 20, 0],
+          scale: [1, 1.12, 0.95, 1],
         }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
         className="absolute -top-[10%] -left-[5%] w-[48vw] h-[48vw] rounded-full bg-gradient-to-br from-purple-300/30 via-rose-200/25 to-transparent blur-[130px]"
       />
       <motion.div
         animate={{
-          x: [0, -30, 25, 0],
-          y: [0, 25, -20, 0],
-          scale: [1, 1.15, 0.92, 1],
+          x: [0, -35, 30, 0],
+          y: [0, 30, -25, 0],
+          scale: [1, 1.18, 0.92, 1],
         }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }}
         className="absolute top-[25%] -right-[8%] w-[58vw] h-[58vw] rounded-full bg-gradient-to-bl from-rose-300/25 via-purple-200/25 to-indigo-200/20 blur-[150px]"
       />
       <motion.div
         animate={{
-          x: [0, 20, -15, 0],
-          y: [0, 20, -25, 0],
+          x: [0, 25, -20, 0],
+          y: [0, 25, -30, 0],
         }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 4 }}
         className="absolute -bottom-[15%] left-[25%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-tr from-indigo-200/30 via-rose-100/20 to-transparent blur-[120px]"

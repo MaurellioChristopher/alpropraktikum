@@ -57,7 +57,36 @@ body {
   50% { opacity: 0.7; transform: scale(1.05); }
 }
 
+@keyframes shimmerSweep {
+  0% { transform: translateX(-150%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes softFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
 .animate-pulse-glow {
   animation: pulseGlow 4s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmerSweep 4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+.animate-gradient-flow {
+  background-size: 250% 250%;
+  animation: gradientFlow 9s ease infinite;
+}
+
+.animate-soft-float {
+  animation: softFloat 6s ease-in-out infinite;
 }
 
