@@ -37,6 +37,10 @@ import {
   Home,
   BookOpen,
   Package,
+  Cpu,
+  Activity,
+  Layers,
+  Search,
 } from "lucide-react";
 
 export default function AssistantDashboard() {
@@ -151,11 +155,11 @@ export default function AssistantDashboard() {
       <div className="flex-1 w-full min-w-0 space-y-5">
         
         {/* MOBILE & TABLET TOP ACTION BAR (< lg) */}
-        <div className="lg:hidden bg-white rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 shadow-xs space-y-3">
+        <div className="lg:hidden bg-white dark:bg-[#0e071a] rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-3 transition-colors">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase shrink-0">Menu:</span>
-              <span className="text-xs font-bold text-[#250B47] bg-[#EDE7F6] px-2.5 py-1 rounded-lg truncate">
+              <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-neutral-400 uppercase shrink-0">Menu:</span>
+              <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 border border-purple-200/60 dark:border-purple-800/60 px-2.5 py-1 rounded-lg truncate">
                 {activeTab === "dashboard" ? "🏠 Dashboard Operasional" :
                  activeTab === "modul" ? "📖 Modul & Silabus" :
                  activeTab === "absensi" ? "📋 Presensi & Kehadiran" :
@@ -170,7 +174,7 @@ export default function AssistantDashboard() {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold font-mono shadow-xs hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-neutral-800 text-white text-xs font-bold font-mono shadow-xs hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
             >
               <Menu size={15} />
               <span>Semua Menu</span>
@@ -195,8 +199,8 @@ export default function AssistantDashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-[#250B47] text-white shadow-xs"
-                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                      ? "bg-[#7C3AED] text-white shadow-xs"
+                      : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
                   }`}
                 >
                   <Icon size={13} />
@@ -207,317 +211,371 @@ export default function AssistantDashboard() {
           </div>
         </div>
         
-        {/* 1. DASHBOARD TAB (6-CARD BENTO GRID MATCHING REFERENCE + SI'50 SELECTOR) */}
+        {/* 1. DASHBOARD TAB: HIGH-CRAFT OBSERVABILITY & MISSION CONTROL */}
         {activeTab === "dashboard" && (
           <div className="space-y-5">
-            {/* TOP CLASS SELECTION BAR */}
-            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-purple-100 text-[#250B47] flex items-center justify-center font-bold">
-                  <GraduationCap size={22} className="text-[#9E1B32]" />
+            {/* TOP COMMAND BAR: COHORT IDENTITY & UNIFIED CLASS SELECTOR */}
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-4 sm:p-5 border border-purple-100/80 dark:border-purple-950/60 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition-colors">
+              <div className="flex items-center gap-3.5">
+                <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/60 dark:border-purple-800/40 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
+                  <GraduationCap size={22} />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
-                    <h1 className="text-base font-bold text-slate-900 leading-tight">
-                      S1 Sistem Informasi — Angkatan 2026 (SI&apos;50)
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                      S1 Sistem Informasi 2026 (SI&apos;50)
                     </h1>
-                    <span className="text-[10px] font-mono bg-rose-50 text-rose-700 font-bold px-2 py-0.5 rounded-full border border-rose-200/60">
-                      15 Kelas
+                    <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800/50">
+                      15 Kelas Terdaftar
                     </span>
                   </div>
-                  <p className="text-xs text-slate-500 font-mono mt-0.5">
-                    EDM Laboratory • Telkom University • Praktikum Algoritma & Pemrograman
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
+                    EDM Laboratory • Praktikum Algoritma & Pemrograman
                   </p>
                 </div>
               </div>
 
-              {/* Class Dropdown */}
-              <div className="flex items-center gap-3">
-                <div className="text-right hidden sm:block">
-                  <span className="text-[10px] font-mono text-slate-400 uppercase">Jadwal Shift:</span>
-                  <div className="text-xs font-mono font-semibold text-slate-800">
-                    {selectedClass.defaultShift}
+              {/* Single, Unified Class Selector Strip */}
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 scrollbar-none">
+                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-400 font-semibold shrink-0 mr-1 hidden sm:inline-block">
+                  Pilih Kelas:
+                </span>
+                <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-neutral-900/90 rounded-xl border border-slate-200/70 dark:border-neutral-800">
+                  {SI50_CLASSES.map((cls) => {
+                    const isSelected = selectedClassCode === cls.code;
+                    return (
+                      <button
+                        key={cls.code}
+                        type="button"
+                        onClick={() => setSelectedClassCode(cls.code)}
+                        className={`shrink-0 text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-[#7C3AED] text-white shadow-xs"
+                            : "text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/70 dark:hover:bg-neutral-800/70"
+                        }`}
+                      >
+                        {cls.code}
+                        {cls.type === "Internasional" && <span className="text-purple-200 ml-0.5">★</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* LIVE SHIFT COMMAND STRIP */}
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-6 border border-purple-200/80 dark:border-purple-900/40 shadow-xs relative overflow-hidden transition-colors">
+              <div className="absolute -top-12 -right-12 w-64 h-64 bg-purple-500/10 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-3">
+                  {/* Status Pills */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/60 px-3 py-1 rounded-full">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-600" />
+                      </span>
+                      SHIFT AKTIF SEKARANG
+                    </span>
+                    <span className="text-[11px] font-mono font-semibold text-slate-700 dark:text-neutral-300 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/70 dark:border-neutral-700/60 px-2.5 py-1 rounded-full">
+                      Modul 4: Sorting & Binary Search Tree
+                    </span>
+                    <span className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                      Ruang Lab EDM Lt. 3
+                    </span>
+                  </div>
+
+                  {/* Heading & Details */}
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+                      Shift Aktif: Kelas {selectedClass.code} ({selectedClass.name})
+                    </h2>
+                    <p className="text-xs font-mono text-slate-500 dark:text-neutral-400 mt-1">
+                      Jadwal: <strong className="text-slate-800 dark:text-neutral-200">{selectedClass.defaultShift} WIB</strong> • Terdaftar: <strong className="text-slate-800 dark:text-neutral-200">{selectedClass.totalStudents} Mahasiswa SI&apos;50</strong>
+                    </p>
+                  </div>
+
+                  {/* Squad on Duty */}
+                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-mono">
+                    <span className="text-slate-400 dark:text-neutral-500 text-[11px] uppercase tracking-wider font-semibold">
+                      Tim Asisten Jaga:
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/40 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">PIC</span>
+                      <strong>IZIN</strong>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Tutor</span>
+                      <strong>GWAN</strong>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Validator</span>
+                      <strong>LEVI</strong>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Logistik</span>
+                      <strong>AL-04</strong>
+                    </span>
                   </div>
                 </div>
 
-                <div className="relative">
-                  <select
-                    value={selectedClassCode}
-                    onChange={(e) => setSelectedClassCode(e.target.value)}
-                    className="bg-slate-50 border border-slate-300 rounded-xl pl-3.5 pr-8 py-2 text-xs font-mono font-bold text-[#250B47] focus:outline-none focus:ring-2 focus:ring-rose-500/30 cursor-pointer appearance-none shadow-xs"
+                {/* Quick Actions */}
+                <div className="flex sm:flex-row lg:flex-col gap-2.5 shrink-0 pt-2 lg:pt-0">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("absensi")}
+                    className="flex-1 sm:flex-none px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase tracking-wider shadow-sm hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    {SI50_CLASSES.map((cls) => (
-                      <option key={cls.code} value={cls.code}>
-                        {cls.code} ({cls.name}) {cls.type === "Internasional" ? "★ INT" : ""}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                    <CheckSquare size={15} />
+                    <span>Presensi Shift Ini</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("penilaian")}
+                    className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-800 dark:text-neutral-200 rounded-xl text-xs font-bold font-mono uppercase tracking-wider border border-slate-200 dark:border-neutral-700/80 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <BarChart3 size={15} />
+                    <span>Input Nilai Praktikan</span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Quick 15 Class Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase shrink-0 mr-1">
-                Pilih Kelas:
-              </span>
-              {SI50_CLASSES.map((cls) => (
-                <button
-                  key={cls.code}
-                  type="button"
-                  onClick={() => setSelectedClassCode(cls.code)}
-                  className={`shrink-0 text-[11px] font-mono font-semibold px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
-                    selectedClassCode === cls.code
-                      ? "bg-[#250B47] text-white shadow-xs"
-                      : cls.type === "Internasional"
-                      ? "bg-purple-100 text-purple-900 border border-purple-300/80 hover:bg-purple-200"
-                      : "bg-white text-slate-600 border border-slate-200/80 hover:bg-slate-100"
-                  }`}
-                >
-                  {cls.code}
-                  {cls.type === "Internasional" && <span className="text-amber-500 ml-1">★</span>}
-                </button>
-              ))}
-            </div>
-
-            {/* OPERATIONAL INFORMATION CENTER */}
-            
-            {/* 1. LIVE SHIFT STATUS HERO CARD */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <span className="flex items-center gap-1.5 text-xs font-mono font-bold text-rose-700 bg-rose-50 border border-rose-200/80 px-2.5 py-1 rounded-full">
-                    <span className="w-2 h-2 rounded-full bg-rose-600 animate-pulse" />
-                    SHIFT SEDANG BERJALAN
-                  </span>
-                  <span className="text-xs font-mono text-purple-900 bg-purple-50 px-2.5 py-1 rounded-full font-bold border border-purple-200/80">
-                    Modul 4: Sorting & Binary Search Tree
-                  </span>
-                  <span className="text-xs font-mono text-slate-500">
-                    Ruang Lab EDM Lt. 3
-                  </span>
-                </div>
-
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
-                    Shift Aktif: Kelas {selectedClass.code} ({selectedClass.name})
-                  </h2>
-                  <p className="text-xs text-slate-500 font-mono mt-1">
-                    Jadwal: {selectedClass.defaultShift} WIB • Total Terdaftar: {selectedClass.totalStudents} Mahasiswa SI&apos;50
-                  </p>
-                </div>
-
-                {/* Team on duty */}
-                <div className="flex flex-wrap items-center gap-4 pt-1 text-xs font-mono">
-                  <span className="text-slate-400">Tim Asisten Jaga:</span>
-                  <span className="text-slate-700 font-semibold">Lead PIC: <strong className="text-slate-900">IZIN</strong></span>
-                  <span className="text-slate-700 font-semibold">Tutor: <strong className="text-slate-900">GWAN</strong></span>
-                  <span className="text-slate-700 font-semibold">Validator: <strong className="text-slate-900">LEVI</strong></span>
-                  <span className="text-slate-700 font-semibold">Logistik: <strong className="text-slate-900">AL-04</strong></span>
-                </div>
-              </div>
-
-              {/* Quick Action Buttons for active shift */}
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("absensi")}
-                  className="px-5 py-2.5 bg-gradient-to-r from-[#9E1B32] to-[#250B47] text-white rounded-xl text-xs font-bold font-mono uppercase tracking-wider shadow-sm hover:opacity-95 transition-opacity flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <CheckSquare size={15} />
-                  <span>Presensi Kelas Ini</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("penilaian")}
-                  className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold font-mono uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <BarChart3 size={15} />
-                  <span>Input Nilai Praktikan</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 2. 4 OPERATIONAL KPI SUMMARY CARDS */}
+            {/* 4 TELEMETRY OBSERVABILITY METRIC CARDS */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-wider">
-                  Total Praktikan SI&apos;50
-                </span>
-                <div className="text-2xl font-bold font-mono text-slate-900">615 Mahasiswa</div>
-                <div className="text-[11px] font-mono text-emerald-600 font-semibold flex items-center gap-1">
-                  <span>● 15 Kelas Terdaftar (100%)</span>
+              {/* Metric 1 */}
+              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
+                      Total Praktikan
+                    </span>
+                    <Users size={16} className="text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
+                    615 <span className="text-xs font-normal text-slate-400">Mhs</span>
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-purple-700 dark:text-purple-300 font-semibold">15 Kelas Aktif</span>
+                    <span className="text-slate-400">100%</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#7C3AED] rounded-full w-full" />
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-wider">
-                  Presensi Rata-Rata
-                </span>
-                <div className="text-2xl font-bold font-mono text-purple-900">97.2% Hadir</div>
-                <div className="text-[11px] font-mono text-slate-500">
-                  598 Tepat Waktu • 17 Terlambat
+              {/* Metric 2 */}
+              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
+                      Tingkat Kehadiran
+                    </span>
+                    <CheckCircle2 size={16} className="text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold font-mono text-purple-700 dark:text-purple-400 pt-1">
+                    97.2%
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-slate-700 dark:text-neutral-300 font-medium">598 Tepat Waktu</span>
+                  <span className="text-slate-400 dark:text-neutral-400">17 Dispensasi</span>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-wider">
-                  Antrean Penilaian
-                </span>
-                <div className="text-2xl font-bold font-mono text-[#9E1B32]">42 Pending</div>
-                <div className="text-[11px] font-mono text-slate-500">
-                  Modul 4 • Auto-Save Aktif
+              {/* Metric 3 */}
+              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
+                      Antrean Validasi
+                    </span>
+                    <BarChart3 size={16} className="text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
+                    42 <span className="text-xs font-normal text-slate-400">Pending</span>
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 flex items-center justify-between text-[11px] font-mono">
+                  <span className="text-purple-700 dark:text-purple-300 font-medium">Modul 4</span>
+                  <span className="text-slate-400 dark:text-neutral-400">Batas Sinkron H+2</span>
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-1">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold tracking-wider">
-                  Kesiapan Hardware Lab
-                </span>
-                <div className="text-2xl font-bold font-mono text-slate-900">43 / 45 PC</div>
-                <div className="text-[11px] font-mono text-emerald-600 font-semibold">
-                  ● 2 Unit PC Maintenance
+              {/* Metric 4 */}
+              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
+                      Workstation Lab EDM
+                    </span>
+                    <Cpu size={16} className="text-purple-600 dark:text-purple-400" />
+                  </div>
+                  <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
+                    43 <span className="text-base font-normal text-slate-400">/ 45 PC</span>
+                  </div>
+                </div>
+                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 space-y-1.5">
+                  <div className="flex items-center justify-between text-[11px] font-mono">
+                    <span className="text-slate-700 dark:text-neutral-300 font-semibold">95.5% Siap</span>
+                    <span className="text-slate-400">2 Maintenance</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#7C3AED] rounded-full w-[95.5%]" />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* 3. PAPAN PENGUMUMAN & INSTRUKSI OPERASIONAL LAB */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2">
-                  <Info size={18} className="text-[#9E1B32]" />
-                  <h3 className="font-bold text-slate-900 text-sm tracking-wide uppercase">
-                    Papan Informasi & Pengumuman Operasional Lab EDM
-                  </h3>
+            {/* DIRECTIVES & WEEKLY SCHEDULE MATRIX SPLIT */}
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
+              {/* LEFT (xl:col-span-5): OPERATIONAL DIRECTIVES */}
+              <div className="xl:col-span-5 bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400 flex items-center justify-center">
+                      <Info size={15} />
+                    </div>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm tracking-wide uppercase">
+                      Instruksi & Pengumuman Lab
+                    </h3>
+                  </div>
+                  <span className="text-[10px] font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full font-semibold border border-purple-200/60 dark:border-purple-800/60">
+                    Live Feed
+                  </span>
                 </div>
-                <span className="text-[11px] font-mono text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-full font-semibold">
-                  Update Harian
-                </span>
+
+                <div className="space-y-3">
+                  {/* Directive 1 */}
+                  <div className="p-3.5 rounded-xl border border-purple-200/60 dark:border-purple-900/40 bg-purple-50/30 dark:bg-purple-950/20 space-y-1.5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-mono font-bold text-purple-800 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/50 px-2 py-0.5 rounded uppercase">
+                        Komdis Lab • Disiplin
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">Hari ini</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                      Tata Tertib Pakaian & Toleransi Keterlambatan
+                    </h4>
+                    <p className="text-[11px] text-slate-600 dark:text-neutral-400 leading-relaxed">
+                      Praktikan wajib mengenakan kemeja berkerah rapi dan sepatu tertutup. Toleransi terlambat maksimal 10 menit, setelahnya wajib melapor ke meja Komdis.
+                    </p>
+                  </div>
+
+                  {/* Directive 2 */}
+                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900/40 space-y-1.5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-mono font-bold text-slate-700 dark:text-neutral-300 bg-slate-200 dark:bg-neutral-800 px-2 py-0.5 rounded uppercase">
+                        Akademik • Nilai
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">Kemarin</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                      Deadline Entri Nilai Modul 4 (Sorting & BST)
+                    </h4>
+                    <p className="text-[11px] text-slate-600 dark:text-neutral-400 leading-relaxed">
+                      Asisten validator wajib menyelesaikan penilaian TP, Jurnal Guided, dan Mandiri maksimal H+2 setelah shift berakhir untuk sinkronisasi nilai ke sistem.
+                    </p>
+                  </div>
+
+                  {/* Directive 3 */}
+                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900/40 space-y-1.5 transition-colors">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] font-mono font-bold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded uppercase">
+                        Infrastruktur • GCC-01
+                      </span>
+                      <span className="text-[10px] font-mono text-slate-400">3 hari lalu</span>
+                    </div>
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
+                      Server Autocheck GCC 14.2 Online
+                    </h4>
+                    <p className="text-[11px] text-slate-600 dark:text-neutral-400 leading-relaxed">
+                      Server compiler lokal beroperasi stabil dengan latensi 4ms. Mendukung eksekusi recursive sorting hingga 100.000 stack frame.
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-4 rounded-xl border border-rose-200/80 bg-rose-50/40 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded uppercase">
-                      Komdis Lab • Penting
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">Hari ini</span>
+              {/* RIGHT (xl:col-span-7): JADWAL SHIFT PRAKTIKUM */}
+              <div className="xl:col-span-7 bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-neutral-800 pb-3">
+                  <div>
+                    <h3 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm tracking-wide uppercase">
+                      Jadwal Shift Praktikum Mingguan
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono">
+                      15 Kelas S1 Sistem Informasi • Modul 4
+                    </p>
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-snug">
-                    Penegakan Tata Tertib Pakaian & Toleransi Keterlambatan
-                  </h4>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Praktikan wajib mengenakan kemeja berkerah rapi dan bersepatu tertutup. Keterlambatan maksimal 10 menit, lewat dari batas wajib melapor ke meja Komdis.
-                  </p>
+                  <span className="text-[11px] font-mono text-slate-400 dark:text-neutral-400">
+                    Telkom University
+                  </span>
                 </div>
 
-                <div className="p-4 rounded-xl border border-purple-200/80 bg-purple-50/40 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-purple-800 bg-purple-100 px-2 py-0.5 rounded uppercase">
-                      Akademik • Pengumpulan Nilai
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">Kemarin</span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-snug">
-                    Deadline Input Nilai Modul 4 (Sorting & BST)
-                  </h4>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Seluruh asisten validator diwajibkan menyelesaikan entri nilai TP, Jurnal Guided, dan Jurnal Mandiri maksimal H+2 setelah shift berakhir untuk sinkronisasi ke iGracias.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-xl border border-indigo-200/80 bg-indigo-50/40 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-indigo-800 bg-indigo-100 px-2 py-0.5 rounded uppercase">
-                      Sekben • Logistik Ruangan
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">2 hari lalu</span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-snug">
-                    Checklist Kebersihan Meja & Penataan Mouse/Keyboard
-                  </h4>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Asisten shift penutup wajib mengunggah foto dokumentasi ruangan dan memastikan seluruh stopkontak PC telah dimatikan sebelum mengunci lab.
-                  </p>
-                </div>
-
-                <div className="p-4 rounded-xl border border-emerald-200/80 bg-emerald-50/40 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded uppercase">
-                      Infrastruktur • Server GCC
-                    </span>
-                    <span className="text-[10px] font-mono text-slate-400">3 hari lalu</span>
-                  </div>
-                  <h4 className="text-xs font-bold text-slate-900 leading-snug">
-                    Server Compiler Lokal EDM-GCC-01 Online
-                  </h4>
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
-                    Server autocheck kode praktikan telah dioptimasi dengan latensi 4ms. Compiler GCC 14.2 mendukung eksekusi algoritma rekursif hingga kedalaman 100.000 stack frame.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* 4. JADWAL SHIFT PRAKTIKUM 15 KELAS SI'50 */}
-            <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm tracking-wide uppercase">
-                    Jadwal Shift Praktikum Mingguan (15 Kelas SI&apos;50)
-                  </h3>
-                  <p className="text-xs text-slate-500 font-mono mt-0.5">
-                    Modul 4: Sorting & Binary Search Tree • Semester Ganjil 2026
-                  </p>
-                </div>
-                <span className="text-xs font-mono text-slate-500">
-                  Telkom University • Fakultas Rekayasa Industri
-                </span>
-              </div>
-
-              <div className="border border-slate-200 rounded-xl overflow-x-auto scrollbar-thin">
-                <table className="w-full text-left text-xs whitespace-nowrap min-w-[650px]">
-                  <thead className="bg-[#140827] text-white text-[10px] font-mono uppercase tracking-wider">
-                    <tr>
-                      <th className="px-5 py-3">Kelas</th>
-                      <th className="px-5 py-3">Tipe</th>
-                      <th className="px-5 py-3">Jadwal Shift</th>
-                      <th className="px-5 py-3">Praktikan</th>
-                      <th className="px-5 py-3">Asisten Jaga (PIC)</th>
-                      <th className="px-5 py-3 text-center">Status Sesi</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    {SI50_CLASSES.slice(0, 7).map((cls, idx) => (
-                      <tr key={cls.code} className="hover:bg-slate-50 transition-colors">
-                        <td className="px-5 py-3 font-mono font-bold text-slate-900">{cls.code}</td>
-                        <td className="px-5 py-3">
-                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                            cls.type === 'Internasional' ? 'bg-purple-100 text-purple-900' : 'bg-slate-100 text-slate-700'
-                          }`}>
-                            {cls.type}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3 font-mono text-slate-600">{cls.defaultShift}</td>
-                        <td className="px-5 py-3 font-mono text-slate-600">{cls.totalStudents} Mhs</td>
-                        <td className="px-5 py-3 font-mono font-semibold text-slate-800">
-                          {idx === 0 ? "IZIN (Lead) & GWAN" : idx === 1 ? "GWAN & LEVI" : "LEVI & AL-04"}
-                        </td>
-                        <td className="px-5 py-3 text-center">
-                          <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
-                            idx === 0 
-                              ? "bg-rose-100 text-rose-800 border border-rose-200 animate-pulse" 
-                              : idx === 1 
-                              ? "bg-purple-100 text-purple-800" 
-                              : "bg-slate-100 text-slate-600"
-                          }`}>
-                            {idx === 0 ? "● Sedang Berjalan" : idx === 1 ? "Siap Berikutnya" : "Terjadwal"}
-                          </span>
-                        </td>
+                <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
+                  <table className="w-full text-left text-xs whitespace-nowrap min-w-[580px]">
+                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
+                      <tr>
+                        <th className="px-4 py-3">Kelas</th>
+                        <th className="px-4 py-3">Tipe</th>
+                        <th className="px-4 py-3">Jadwal Shift</th>
+                        <th className="px-4 py-3">Praktikan</th>
+                        <th className="px-4 py-3">Asisten (PIC)</th>
+                        <th className="px-4 py-3 text-center">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                      {SI50_CLASSES.slice(0, 7).map((cls, idx) => (
+                        <tr
+                          key={cls.code}
+                          onClick={() => setSelectedClassCode(cls.code)}
+                          className={`transition-colors cursor-pointer ${
+                            selectedClassCode === cls.code
+                              ? "bg-purple-50/70 dark:bg-purple-950/30"
+                              : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
+                          }`}
+                        >
+                          <td className="px-4 py-3 font-mono font-bold text-slate-900 dark:text-white">
+                            {cls.code}
+                          </td>
+                          <td className="px-4 py-3">
+                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                              cls.type === 'Internasional'
+                                ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-900 dark:text-purple-300'
+                                : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300'
+                            }`}>
+                              {cls.type}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
+                            {cls.defaultShift}
+                          </td>
+                          <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
+                            {cls.totalStudents} Mhs
+                          </td>
+                          <td className="px-4 py-3 font-mono font-semibold text-slate-800 dark:text-neutral-200">
+                            {idx === 0 ? "IZIN & GWAN" : idx === 1 ? "GWAN & LEVI" : "LEVI & AL-04"}
+                          </td>
+                          <td className="px-4 py-3 text-center">
+                            <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
+                              idx === 0
+                                ? "bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-700"
+                                : idx === 1
+                                ? "bg-slate-200 dark:bg-neutral-800 text-slate-800 dark:text-neutral-200"
+                                : "bg-slate-100 dark:bg-neutral-900 text-slate-500 dark:text-neutral-400"
+                            }`}>
+                              {idx === 0 ? "● Sedang Berjalan" : idx === 1 ? "Siap Berikutnya" : "Terjadwal"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
@@ -525,27 +583,27 @@ export default function AssistantDashboard() {
 
         {/* 2. ABSENSI TAB (DUAL: ABSENSI PRAKTIKAN & ABSENSI ASPRAK) */}
         {activeTab === "absensi" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Manajemen Presensi & Absensi</h2>
-                  <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Manajemen Presensi & Absensi</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                     SI&apos;50
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Pencatatan kehadiran mahasiswa dan presensi asisten yang bertugas pada shift.
                 </p>
               </div>
 
               {/* Sub-tab switcher */}
-              <div className="flex items-center bg-slate-100 p-1 rounded-xl">
+              <div className="flex items-center bg-slate-100 dark:bg-neutral-900 p-1 rounded-xl border border-slate-200/60 dark:border-neutral-800">
                 <button
                   type="button"
                   onClick={() => setAbsensiSubTab("praktikan")}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    absensiSubTab === "praktikan" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
+                    absensiSubTab === "praktikan" ? "bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500 dark:text-neutral-400 hover:text-slate-800 dark:hover:text-white"
                   }`}
                 >
                   Absensi Praktikan
@@ -554,7 +612,7 @@ export default function AssistantDashboard() {
                   type="button"
                   onClick={() => setAbsensiSubTab("asprak")}
                   className={`px-4 py-2 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    absensiSubTab === "asprak" ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
+                    absensiSubTab === "asprak" ? "bg-white dark:bg-neutral-800 text-slate-900 dark:text-white shadow-xs" : "text-slate-500 dark:text-neutral-400 hover:text-slate-800 dark:hover:text-white"
                   }`}
                 >
                   Absensi Asprak & Komdis
@@ -566,13 +624,13 @@ export default function AssistantDashboard() {
             {absensiSubTab === "praktikan" && (
               <div className="space-y-5">
                 {/* Class selector bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200/80 dark:border-neutral-800">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono font-bold text-slate-700">Pilih Kelas:</span>
+                    <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300">Pilih Kelas:</span>
                     <select
                       value={selectedClassCode}
                       onChange={(e) => setSelectedClassCode(e.target.value)}
-                      className="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-[#250B47]"
+                      className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
                     >
                       {SI50_CLASSES.map((cls) => (
                         <option key={cls.code} value={cls.code}>
@@ -582,16 +640,16 @@ export default function AssistantDashboard() {
                     </select>
                   </div>
                   <div className="flex items-center gap-4 text-xs font-mono">
-                    <span className="text-emerald-700 font-semibold">● Hadir: 38</span>
-                    <span className="text-amber-700 font-semibold">● Terlambat (Komdis): 2</span>
-                    <span className="text-rose-700 font-semibold">● Alpa: 0</span>
+                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">● Hadir: 38</span>
+                    <span className="text-amber-600 dark:text-amber-400 font-semibold">● Terlambat (Komdis): 2</span>
+                    <span className="text-rose-600 dark:text-rose-400 font-semibold">● Alpa: 0</span>
                   </div>
                 </div>
 
                 {/* Table Presensi Praktikan */}
-                <div className="border border-slate-200 rounded-xl overflow-x-auto scrollbar-thin">
+                <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
                   <table className="w-full text-left text-xs whitespace-nowrap min-w-[650px]">
-                    <thead className="bg-[#140827] text-white text-[10px] font-mono uppercase tracking-wider">
+                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
                       <tr>
                         <th className="px-5 py-3.5">NIM</th>
                         <th className="px-5 py-3.5">Nama Mahasiswa</th>
@@ -600,7 +658,7 @@ export default function AssistantDashboard() {
                         <th className="px-5 py-3.5 text-center">Catatan Komdis</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                       {[
                         { nim: "1202260001", name: "Ahmad Faisal Pratama" },
                         { nim: "1202260002", name: "Budi Santoso Wibowo" },
@@ -610,10 +668,10 @@ export default function AssistantDashboard() {
                       ].map((std) => {
                         const status = attendance[std.nim] || "Hadir";
                         return (
-                          <tr key={std.nim} className="hover:bg-slate-50">
-                            <td className="px-5 py-3 font-mono font-semibold text-slate-700">{std.nim}</td>
-                            <td className="px-5 py-3 font-medium text-slate-900">{std.name}</td>
-                            <td className="px-5 py-3 font-mono text-purple-800 font-bold">{selectedClass.code}</td>
+                          <tr key={std.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
+                            <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{std.nim}</td>
+                            <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{std.name}</td>
+                            <td className="px-5 py-3 font-mono text-purple-700 dark:text-purple-400 font-bold">{selectedClass.code}</td>
                             <td className="px-5 py-3">
                               <div className="flex gap-1.5">
                                 {(["Hadir", "Terlambat", "Izin", "Sakit", "Alpa"] as const).map((st) => (
@@ -628,9 +686,9 @@ export default function AssistantDashboard() {
                                           : st === "Terlambat"
                                           ? "bg-amber-600 text-white"
                                           : st === "Izin" || st === "Sakit"
-                                          ? "bg-blue-600 text-white"
+                                          ? "bg-purple-600 text-white"
                                           : "bg-rose-600 text-white"
-                                        : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                                        : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
                                     }`}
                                   >
                                     {st}
@@ -640,7 +698,7 @@ export default function AssistantDashboard() {
                             </td>
                             <td className="px-5 py-3 text-center">
                               {status === "Terlambat" ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                                <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
                                   <AlertTriangle size={11} /> Flag Komdis (+10m)
                                 </span>
                               ) : (
@@ -659,15 +717,15 @@ export default function AssistantDashboard() {
             {/* SUB-VIEW 2: ABSENSI ASPRAK */}
             {absensiSubTab === "asprak" && (
               <div className="space-y-5">
-                <div className="p-4 rounded-xl bg-purple-50/60 border border-purple-100 flex items-center justify-between">
+                <div className="p-4 rounded-xl bg-purple-50/60 dark:bg-purple-950/30 border border-purple-200/60 dark:border-purple-900/40 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Shield size={20} className="text-[#9E1B32]" />
+                    <Shield size={20} className="text-purple-600 dark:text-purple-400" />
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900">Shift Asisten: {selectedClass.code} ({selectedClass.defaultShift})</h4>
-                      <p className="text-[11px] text-slate-500 font-mono">Diverifikasi oleh Komisi Disiplin (Komdis) & Koordinator Lab</p>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white">Shift Asisten: {selectedClass.code} ({selectedClass.defaultShift})</h4>
+                      <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono">Diverifikasi oleh Komisi Disiplin (Komdis) & Koordinator Lab</p>
                     </div>
                   </div>
-                  <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-3 py-1 rounded-full">
                     Sesi Berjalan
                   </span>
                 </div>
@@ -679,22 +737,22 @@ export default function AssistantDashboard() {
                     { role: "VALIDATOR NILAI", code: "LEVI", name: "Levina Sekar", time: "07:24 WIB", status: "Tepat Waktu", roleType: "SEKBEN" },
                     { role: "LOGISTIK & LAB PC", code: "AL-04", name: "Alif Pratama", time: "07:28 WIB", status: "Tepat Waktu", roleType: "ASPRAK" },
                   ].map((asp) => (
-                    <div key={asp.code} className="p-4 rounded-xl border border-slate-200 bg-white shadow-xs flex items-center justify-between">
+                    <div key={asp.code} className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0e071a] shadow-xs flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center font-mono font-bold text-sm">
+                        <div className="w-10 h-10 rounded-xl bg-purple-700 dark:bg-purple-900 text-white flex items-center justify-center font-mono font-bold text-sm">
                           {asp.code}
                         </div>
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-900">{asp.name}</span>
-                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">
+                            <span className="text-xs font-bold text-slate-900 dark:text-white">{asp.name}</span>
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 font-bold">
                               {asp.roleType}
                             </span>
                           </div>
-                          <div className="text-[11px] font-mono text-slate-500">{asp.role} • Masuk: {asp.time}</div>
+                          <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">{asp.role} • Masuk: {asp.time}</div>
                         </div>
                       </div>
-                      <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md font-bold border border-emerald-200">
+                      <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-md font-bold border border-emerald-200 dark:border-emerald-800">
                         ✓ {asp.status}
                       </span>
                     </div>
@@ -707,16 +765,16 @@ export default function AssistantDashboard() {
 
         {/* 3. PENILAIAN PRAKTIKAN TAB */}
         {activeTab === "penilaian" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Penilaian Praktikan</h2>
-                  <span className="text-[10px] font-mono font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Penilaian Praktikan</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                     Modul 4: Sorting O(n log n)
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Komponen Nilai: Tugas Pendahuluan (15%), Jurnal Guided (35%), Mandiri (35%), Kuis (15%).
                 </p>
               </div>
@@ -726,7 +784,7 @@ export default function AssistantDashboard() {
                   type="button"
                   onClick={() => setGradeLocked(!gradeLocked)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold font-mono uppercase transition-colors cursor-pointer ${
-                    gradeLocked ? "bg-rose-100 text-rose-800 border border-rose-200" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                    gradeLocked ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200" : "bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700"
                   }`}
                 >
                   <Lock size={14} />
@@ -735,7 +793,7 @@ export default function AssistantDashboard() {
 
                 <button
                   type="button"
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#9E1B32] to-[#250B47] text-white rounded-xl text-xs font-bold font-mono uppercase shadow-sm hover:opacity-95 cursor-pointer"
+                  className="flex items-center gap-2 px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase shadow-sm cursor-pointer transition-all"
                 >
                   <Download size={14} />
                   Export .xlsx
@@ -744,12 +802,12 @@ export default function AssistantDashboard() {
             </div>
 
             {/* Class switcher */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
-              <span className="text-xs font-mono font-bold text-slate-700">Filter Kelas SI&apos;50:</span>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800">
+              <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300">Filter Kelas SI&apos;50:</span>
               <select
                 value={selectedClassCode}
                 onChange={(e) => setSelectedClassCode(e.target.value)}
-                className="bg-white border border-slate-300 rounded-lg px-3 py-1 text-xs font-mono font-bold text-[#250B47]"
+                className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
               >
                 {SI50_CLASSES.map((cls) => (
                   <option key={cls.code} value={cls.code}>{cls.code} ({cls.name})</option>
@@ -758,9 +816,9 @@ export default function AssistantDashboard() {
             </div>
 
             {/* Spreadsheet Table */}
-            <div className="border border-slate-200 rounded-xl overflow-x-auto scrollbar-thin">
+            <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
               <table className="w-full text-left text-xs whitespace-nowrap min-w-[700px]">
-                <thead className="bg-[#140827] text-white text-[10px] font-mono uppercase tracking-wider">
+                <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
                   <tr>
                     <th className="px-5 py-3.5">NIM</th>
                     <th className="px-5 py-3.5">Nama Mahasiswa</th>
@@ -768,21 +826,21 @@ export default function AssistantDashboard() {
                     <th className="px-3 py-3.5 text-right w-24">Guided (35%)</th>
                     <th className="px-3 py-3.5 text-right w-24">Mandiri (35%)</th>
                     <th className="px-3 py-3.5 text-right w-24">Kuis (15%)</th>
-                    <th className="px-5 py-3.5 text-right text-rose-300">Nilai Akhir</th>
+                    <th className="px-5 py-3.5 text-right text-purple-300">Nilai Akhir</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                   {grades.map((row, idx) => (
-                    <tr key={row.nim} className="hover:bg-slate-50">
-                      <td className="px-5 py-3 font-mono font-semibold text-slate-700">{row.nim}</td>
-                      <td className="px-5 py-3 font-medium text-slate-900">{row.name}</td>
+                    <tr key={row.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
+                      <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{row.nim}</td>
+                      <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{row.name}</td>
                       <td className="px-3 py-2">
                         <input
                           type="text"
                           value={row.tp}
                           disabled={gradeLocked}
                           onChange={(e) => handleGradeChange(idx, "tp", e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-right font-mono text-xs text-slate-900"
+                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
                         />
                       </td>
                       <td className="px-3 py-2">
@@ -791,7 +849,7 @@ export default function AssistantDashboard() {
                           value={row.guided}
                           disabled={gradeLocked}
                           onChange={(e) => handleGradeChange(idx, "guided", e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-right font-mono text-xs text-slate-900"
+                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
                         />
                       </td>
                       <td className="px-3 py-2">
@@ -800,7 +858,7 @@ export default function AssistantDashboard() {
                           value={row.mandiri}
                           disabled={gradeLocked}
                           onChange={(e) => handleGradeChange(idx, "mandiri", e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-right font-mono text-xs text-slate-900"
+                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
                         />
                       </td>
                       <td className="px-3 py-2">
@@ -809,10 +867,10 @@ export default function AssistantDashboard() {
                           value={row.kuis}
                           disabled={gradeLocked}
                           onChange={(e) => handleGradeChange(idx, "kuis", e.target.value)}
-                          className="w-full bg-slate-50 border border-slate-200 rounded px-2 py-1 text-right font-mono text-xs text-slate-900"
+                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
                         />
                       </td>
-                      <td className="px-5 py-3 text-right font-mono text-sm font-bold text-[#9E1B32]">
+                      <td className="px-5 py-3 text-right font-mono font-bold text-sm text-purple-700 dark:text-purple-400">
                         {calcFinalScore(row)}
                       </td>
                     </tr>
@@ -825,30 +883,25 @@ export default function AssistantDashboard() {
 
         {/* 4. DOKUMENTASI RUANGAN TAB */}
         {activeTab === "dokumentasi" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Dokumentasi Ruangan Lab</h2>
-                  <span className="text-[10px] font-mono font-bold bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded">
-                    Ruang EDM Lt. 3
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
-                  Pencatatan kondisi fisik workstation PC, peripheral, kebersihan, dan inventaris sebelum/sesudah shift.
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Dokumentasi & Kondisi Ruangan Lab</h2>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                  Upload bukti kebersihan, checklist PC, dan kepatuhan fasilitas ruang lab sesudah praktikum.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-mono font-semibold text-slate-700">Lab Ready: 45 Workstations</span>
+                <span className="text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300">Lab Ready: 45 Workstations</span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Checklist Fisik Ruangan */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
                   Checklist Kebersihan & Peralatan Shift:
                 </h3>
 
@@ -869,11 +922,11 @@ export default function AssistantDashboard() {
                           setRoomChecklist((prev) => ({ ...prev, [item.key]: !prev[item.key as keyof typeof roomChecklist] }))
                         }
                         className={`w-full p-3.5 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
-                          isChecked ? "bg-emerald-50/60 border-emerald-300 text-slate-900" : "bg-slate-50 border-slate-200 text-slate-600"
+                          isChecked ? "bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 text-slate-900 dark:text-white" : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400"
                         }`}
                       >
                         <span className="text-xs font-medium">{item.label}</span>
-                        <div className={`w-5 h-5 rounded-md flex items-center justify-center ${isChecked ? "bg-emerald-600 text-white" : "border border-slate-300"}`}>
+                        <div className={`w-5 h-5 rounded-md flex items-center justify-center ${isChecked ? "bg-emerald-600 text-white" : "border border-slate-300 dark:border-neutral-700"}`}>
                           {isChecked && <Check size={14} />}
                         </div>
                       </button>
@@ -883,14 +936,14 @@ export default function AssistantDashboard() {
 
                 {/* Catatan Logistik */}
                 <div className="pt-2">
-                  <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500 font-bold block mb-1.5">
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold block mb-1.5">
                     Catatan Asisten / Logistik Sekben:
                   </label>
                   <textarea
                     rows={3}
                     value={roomNote}
                     onChange={(e) => setRoomNote(e.target.value)}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                    className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl p-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                   />
                 </div>
               </div>
@@ -898,10 +951,10 @@ export default function AssistantDashboard() {
               {/* Upload & Bukti Foto Ruangan */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
                     Foto Bukti Kondisi Ruangan:
                   </h3>
-                  <label className="text-xs font-bold text-[#9E1B32] hover:underline flex items-center gap-1 cursor-pointer">
+                  <label className="text-xs font-bold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer">
                     <Camera size={14} />
                     <span>Unggah Foto</span>
                     <input
@@ -921,7 +974,7 @@ export default function AssistantDashboard() {
 
                 <div className="grid grid-cols-2 gap-3">
                   {uploadedPhotos.map((url, i) => (
-                    <div key={i} className="group relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 aspect-video shadow-xs">
+                    <div key={i} className="group relative rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 bg-slate-100 dark:bg-neutral-900 aspect-video shadow-xs">
                       <img src={url} alt={`Dokumentasi ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
                       <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white text-[10px] font-mono">
                         Shift {selectedClass.code} • Foto {i + 1}
@@ -930,8 +983,8 @@ export default function AssistantDashboard() {
                   ))}
                 </div>
 
-                <div className="p-4 rounded-xl bg-purple-50 border border-purple-100 text-xs text-slate-600 space-y-1">
-                  <div className="font-bold text-[#250B47] flex items-center gap-1.5">
+                <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40 text-xs text-slate-600 dark:text-neutral-400 space-y-1">
+                  <div className="font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
                     <Info size={14} /> Wajib untuk Lead PIC & Sekben:
                   </div>
                   <p className="text-[11px] leading-relaxed">
@@ -945,25 +998,25 @@ export default function AssistantDashboard() {
 
         {/* 5. PERTUKARAN JADWAL TAB (SHIFT SWAP) */}
         {activeTab === "jadwal" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Pertukaran Jadwal (Shift Swap Engine)</h2>
-                  <span className="text-[10px] font-mono font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Pertukaran Jadwal (Shift Swap Engine)</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                     SI&apos;50
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Pengajuan pertukaran jadwal jaga antar-asisten untuk 15 kelas S1 Sistem Informasi.
                 </p>
               </div>
             </div>
 
             {/* Swap Form */}
-            <form onSubmit={handleAddSwap} className="p-5 rounded-xl bg-slate-50 border border-slate-200 flex flex-col md:flex-row gap-4 items-end">
+            <form onSubmit={handleAddSwap} className="p-5 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800 flex flex-col md:flex-row gap-4 items-end">
               <div className="flex-1 space-y-1.5 w-full">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold">
                   Kode Asisten Target (Swap With)
                 </label>
                 <input
@@ -971,18 +1024,18 @@ export default function AssistantDashboard() {
                   value={targetAsisten}
                   onChange={(e) => setTargetAsisten(e.target.value)}
                   placeholder="Contoh: LEVI / IZIN"
-                  className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                  className="w-full bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white font-mono uppercase focus:outline-none focus:ring-2 focus:ring-purple-500/30"
                 />
               </div>
 
               <div className="flex-1 space-y-1.5 w-full">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold">
                   Shift Asal
                 </label>
                 <select
                   value={shiftSource}
                   onChange={(e) => setShiftSource(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                  className="w-full bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/30 cursor-pointer"
                 >
                   {SI50_CLASSES.map((cls) => (
                     <option key={`src-${cls.code}`} value={`Modul 4 / ${cls.code}`}>
@@ -993,13 +1046,13 @@ export default function AssistantDashboard() {
               </div>
 
               <div className="flex-1 space-y-1.5 w-full">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold">
                   Shift Tujuan
                 </label>
                 <select
                   value={shiftTarget}
                   onChange={(e) => setShiftTarget(e.target.value)}
-                  className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-rose-500/30"
+                  className="w-full bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/30 cursor-pointer"
                 >
                   {SI50_CLASSES.map((cls) => (
                     <option key={`tgt-${cls.code}`} value={`Modul 4 / ${cls.code}`}>
@@ -1011,7 +1064,7 @@ export default function AssistantDashboard() {
 
               <button
                 type="submit"
-                className="w-full md:w-auto bg-gradient-to-r from-[#9E1B32] to-[#250B47] text-white font-mono text-xs uppercase tracking-wider px-6 py-3 rounded-xl font-bold transition-opacity flex items-center justify-center gap-2 cursor-pointer shadow-sm shrink-0 hover:opacity-95"
+                className="w-full md:w-auto bg-[#7C3AED] hover:bg-[#6D28D9] text-white font-mono text-xs uppercase tracking-wider px-6 py-3 rounded-xl font-bold transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm shrink-0"
               >
                 <ArrowLeftRight size={16} />
                 Ajukan Swap
@@ -1020,34 +1073,34 @@ export default function AssistantDashboard() {
 
             {/* List Permohonan */}
             <div className="space-y-3">
-              <h3 className="font-mono text-xs text-slate-500 uppercase tracking-widest font-bold border-b border-slate-100 pb-2">
+              <h3 className="font-mono text-xs text-slate-500 dark:text-neutral-400 uppercase tracking-widest font-bold border-b border-slate-100 dark:border-neutral-800 pb-2">
                 Permohonan Pertukaran Aktif
               </h3>
 
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                 {swaps.map((s) => (
                   <div key={s.id} className="py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-4">
                       <div className="flex flex-col items-center">
-                        <span className="font-mono text-base font-bold text-slate-900">{s.req}</span>
-                        <span className="text-[9px] font-mono bg-purple-50 text-purple-700 px-2 py-0.5 rounded font-bold">
+                        <span className="font-mono text-base font-bold text-slate-900 dark:text-white">{s.req}</span>
+                        <span className="text-[9px] font-mono bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded font-bold">
                           {s.reqRole}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-slate-400 text-xs font-mono">
-                        <span className="text-slate-800 font-medium">{s.shiftOut}</span>
-                        <ArrowLeftRight size={14} className="text-[#9E1B32]" />
-                        <span className="text-slate-800 font-medium">{s.shiftIn}</span>
+                        <span className="text-slate-800 dark:text-neutral-200 font-medium">{s.shiftOut}</span>
+                        <ArrowLeftRight size={14} className="text-purple-600 dark:text-purple-400" />
+                        <span className="text-slate-800 dark:text-neutral-200 font-medium">{s.shiftIn}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-3">
                       <span className={`text-[10px] font-mono px-3 py-1 rounded-full font-bold ${
-                        s.status === "APPROVED" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                        s.status === "APPROVED" ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300" : "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
                       }`}>
                         {s.status}
                       </span>
-                      <span className="text-xs font-mono text-slate-600">Target: {s.target}</span>
+                      <span className="text-xs font-mono text-slate-600 dark:text-neutral-400">Target: {s.target}</span>
                     </div>
                   </div>
                 ))}
@@ -1058,22 +1111,22 @@ export default function AssistantDashboard() {
 
         {/* MODUL & SILABUS TAB */}
         {activeTab === "modul" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Katalog Modul & Silabus Praktikum</h2>
-                  <span className="text-[10px] font-mono font-bold bg-purple-100 text-purple-900 px-2 py-0.5 rounded">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Katalog Modul & Silabus Praktikum</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                     Alpro 2026
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Materi praktikum, slide instruktur, dan bank soal untuk 15 kelas S1 Sistem Informasi (SI&apos;50).
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
+                <span className="text-xs font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
                   Total: 8 Modul Lengkap
                 </span>
               </div>
@@ -1090,24 +1143,24 @@ export default function AssistantDashboard() {
                 { no: "07", title: "Hash Table & Collision Resolution", diff: "Lanjutan", desc: "Fungsi hash, chaining, dan open addressing probing.", status: "Akan Datang" },
                 { no: "08", title: "Final Project: Big Data Analytics Engine", diff: "Mastery", desc: "Proyek akhir terintegrasi manajemen basis data laboratorium.", status: "Akan Datang" },
               ].map((m) => (
-                <div key={m.no} className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:shadow-sm transition-all flex flex-col justify-between">
+                <div key={m.no} className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900/50 hover:bg-white dark:hover:bg-neutral-900 hover:shadow-xs transition-all flex flex-col justify-between">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-mono text-xs font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-100">
+                      <span className="font-mono text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded border border-purple-200/60 dark:border-purple-800">
                         Modul {m.no}
                       </span>
                       <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${
-                        m.status === 'Aktif (Minggu Ini)' ? 'bg-purple-100 text-purple-900 border border-purple-200' : m.status === 'Selesai' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                        m.status === 'Aktif (Minggu Ini)' ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 border border-purple-200' : m.status === 'Selesai' ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300' : 'bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400'
                       }`}>
                         {m.status}
                       </span>
                     </div>
-                    <h4 className="text-sm font-bold text-slate-900">{m.title}</h4>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{m.desc}</p>
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white">{m.title}</h4>
+                    <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1 leading-relaxed">{m.desc}</p>
                   </div>
-                  <div className="mt-4 pt-3 border-t border-slate-200/60 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-400">Tingkat: <strong className="text-slate-700">{m.diff}</strong></span>
-                    <button type="button" className="text-[#9E1B32] hover:underline font-bold text-[11px] cursor-pointer">
+                  <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-neutral-800 flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-400">Tingkat: <strong className="text-slate-700 dark:text-neutral-300">{m.diff}</strong></span>
+                    <button type="button" className="text-purple-700 dark:text-purple-400 hover:underline font-bold text-[11px] cursor-pointer">
                       Unduh Slide & Bank Soal →
                     </button>
                   </div>
@@ -1117,74 +1170,42 @@ export default function AssistantDashboard() {
           </div>
         )}
 
-        {/* SIMULASI ALGORITMA TAB */}
-        {activeTab === "simulasi" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900">Simulasi & Benchmark Algoritma</h2>
-                <p className="text-xs text-slate-500 font-mono mt-1">
-                  Alat visualisasi komparatif waktu eksekusi dan efisiensi algoritma untuk praktikan.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold">QuickSort</span>
-                <div className="text-2xl font-extrabold text-[#9E1B32] font-mono mt-1">O(n log n)</div>
-                <p className="text-xs text-slate-500 mt-2">Divide & conquer dengan in-place partitioning, rata-rata tercepat.</p>
-              </div>
-              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold">MergeSort</span>
-                <div className="text-2xl font-extrabold text-[#250B47] font-mono mt-1">O(n log n)</div>
-                <p className="text-xs text-slate-500 mt-2">Algoritma stabil dengan jaminan performa kasus terburuk O(n log n).</p>
-              </div>
-              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50">
-                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold">AVL Tree Balance</span>
-                <div className="text-2xl font-extrabold text-emerald-700 font-mono mt-1">O(log n)</div>
-                <p className="text-xs text-slate-500 mt-2">Pohon biner dengan auto-rotation untuk mencegah kemunduran linked-list.</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* PELANGGARAN & SANKSI KOMDIS TAB */}
         {activeTab === "komdis" && (
           currentRole !== "KOMDIS" ? (
-            <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm text-center max-w-lg mx-auto space-y-4 my-12">
-              <div className="w-14 h-14 rounded-2xl bg-rose-50 text-[#9E1B32] flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-950/60 shadow-xs text-center max-w-lg mx-auto space-y-4 my-12 transition-colors">
+              <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center mx-auto">
                 <Shield size={28} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Akses Dibatasi — Khusus Komisi Disiplin (Komdis)</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Dibatasi — Khusus Komisi Disiplin (Komdis)</h3>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 leading-relaxed">
                 Fitur pencatatan pelanggaran, tata tertib, dan sanksi praktikan hanya dapat diakses oleh asisten berwenang Komdis. Anda saat ini aktif sebagai <strong>{currentRole}</strong>.
               </p>
               <button
                 type="button"
                 onClick={() => setCurrentRole("KOMDIS")}
-                className="px-4 py-2 bg-[#9E1B32] text-white text-xs font-mono font-bold rounded-xl shadow-xs hover:bg-[#85162a] cursor-pointer"
+                className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-mono font-bold rounded-xl shadow-xs cursor-pointer transition-all"
               >
                 Simulasi Beralih ke Role Komdis
               </button>
             </div>
           ) : (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Pelanggaran & Pengawasan Komdis</h2>
-                  <span className="text-[10px] font-mono font-bold bg-rose-100 text-rose-800 px-2 py-0.5 rounded">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Pelanggaran & Pengawasan Komdis</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                     Komisi Disiplin Lab
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Pencatatan sanksi keterlambatan, ketidakhadiran, pelanggaran pakaian lab, dan kecurangan kode praktikan.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <button type="button" className="px-4 py-2 bg-[#9E1B32] text-white rounded-xl text-xs font-bold font-mono shadow-xs hover:bg-[#85162a]">
+                <button type="button" className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono shadow-xs cursor-pointer transition-all">
                   + Catat Pelanggaran
                 </button>
               </div>
@@ -1192,32 +1213,32 @@ export default function AssistantDashboard() {
 
             {/* Stat Cards Komdis */}
             <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/50">
                 <span className="text-[10px] font-mono text-slate-400 uppercase">Keterlambatan</span>
-                <div className="text-2xl font-bold text-amber-700 font-mono mt-1">5 Kasus</div>
+                <div className="text-2xl font-bold text-amber-700 dark:text-amber-400 font-mono mt-1">5 Kasus</div>
                 <span className="text-[10px] text-slate-400">Toleransi maks 10 menit</span>
               </div>
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/50">
                 <span className="text-[10px] font-mono text-slate-400 uppercase">Pelanggaran Atribut</span>
-                <div className="text-2xl font-bold text-purple-900 font-mono mt-1">2 Kasus</div>
+                <div className="text-2xl font-bold text-purple-700 dark:text-purple-400 font-mono mt-1">2 Kasus</div>
                 <span className="text-[10px] text-slate-400">Sepatu & kartu praktikan</span>
               </div>
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/50">
                 <span className="text-[10px] font-mono text-slate-400 uppercase">Plagiarisme Kode</span>
-                <div className="text-2xl font-bold text-rose-700 font-mono mt-1">0 Kasus</div>
-                <span className="text-[10px] text-emerald-600 font-semibold">● Bersih (Similarity &lt; 20%)</span>
+                <div className="text-2xl font-bold text-slate-900 dark:text-white font-mono mt-1">0 Kasus</div>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">● Bersih (Similarity &lt; 20%)</span>
               </div>
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <div className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/50">
                 <span className="text-[10px] font-mono text-slate-400 uppercase">Surat Peringatan (SP)</span>
-                <div className="text-2xl font-bold text-slate-900 font-mono mt-1">1 Diterbitkan</div>
-                <span className="text-[10px] text-rose-600 font-semibold">Tindak Lanjut Komdis</span>
+                <div className="text-2xl font-bold text-rose-600 dark:text-rose-400 font-mono mt-1">1 Diterbitkan</div>
+                <span className="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">Tindak Lanjut Komdis</span>
               </div>
             </div>
 
             {/* Tabel Pelanggaran */}
-            <div className="border border-slate-200 rounded-xl overflow-x-auto scrollbar-thin">
+            <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
               <table className="w-full text-left text-xs whitespace-nowrap min-w-[650px]">
-                <thead className="bg-[#140827] text-white text-[10px] font-mono uppercase tracking-wider">
+                <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
                   <tr>
                     <th className="px-5 py-3.5">NIM</th>
                     <th className="px-5 py-3.5">Nama Praktikan</th>
@@ -1227,21 +1248,21 @@ export default function AssistantDashboard() {
                     <th className="px-5 py-3.5 text-center">Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                   {[
                     { nim: "1202260018", name: "Rian Hidayat", cls: "SI5002", type: "Terlambat 18 menit", sanksi: "Pengurangan Nilai Kuis (-10 poin)", status: "Aktif" },
                     { nim: "1202260409", name: "Siti Rahmawati", cls: "SI5004", type: "Tidak Membawa Kartu Praktikan", sanksi: "Teguran Lisan Komdis", status: "Selesai" },
                     { nim: "1202260822", name: "Dimas Aditya", cls: "SI5008", type: "Membawa Minuman ke Meja PC", sanksi: "SP-1 & Piket Lab", status: "Aktif" },
                   ].map((row, i) => (
-                    <tr key={i} className="hover:bg-slate-50">
-                      <td className="px-5 py-3 font-mono font-semibold text-slate-700">{row.nim}</td>
-                      <td className="px-5 py-3 font-medium text-slate-900">{row.name}</td>
-                      <td className="px-5 py-3 font-mono text-purple-700 font-bold">{row.cls}</td>
-                      <td className="px-5 py-3 text-rose-700 font-medium">{row.type}</td>
-                      <td className="px-5 py-3 text-slate-600">{row.sanksi}</td>
+                    <tr key={i} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
+                      <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{row.nim}</td>
+                      <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{row.name}</td>
+                      <td className="px-5 py-3 font-mono text-purple-700 dark:text-purple-400 font-bold">{row.cls}</td>
+                      <td className="px-5 py-3 text-rose-600 dark:text-rose-400 font-medium">{row.type}</td>
+                      <td className="px-5 py-3 text-slate-600 dark:text-neutral-300">{row.sanksi}</td>
                       <td className="px-5 py-3 text-center">
                         <span className={`text-[10px] font-mono px-2.5 py-0.5 rounded-full font-bold ${
-                          row.status === 'Aktif' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'
+                          row.status === 'Aktif' ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300' : 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
                         }`}>
                           {row.status}
                         </span>
@@ -1258,40 +1279,40 @@ export default function AssistantDashboard() {
         {/* INVENTARIS & KAS LAB TAB (SEKBEN) */}
         {activeTab === "inventaris" && (
           currentRole !== "SEKBEN" ? (
-            <div className="bg-white rounded-2xl p-8 border border-slate-200/80 shadow-sm text-center max-w-lg mx-auto space-y-4 my-12">
-              <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-700 flex items-center justify-center mx-auto">
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-950/60 shadow-xs text-center max-w-lg mx-auto space-y-4 my-12 transition-colors">
+              <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center mx-auto">
                 <Package size={28} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900">Akses Dibatasi — Khusus Sekben (Role Inti)</h3>
-              <p className="text-xs text-slate-500 leading-relaxed">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Dibatasi — Khusus Sekben (Role Inti)</h3>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 leading-relaxed">
                 Fitur inventaris alat dan pembukuan kas laboratorium EDM hanya dapat diakses oleh Sekretaris & Bendahara (Sekben). Anda saat ini aktif sebagai <strong>{currentRole}</strong>.
               </p>
               <button
                 type="button"
                 onClick={() => setCurrentRole("SEKBEN")}
-                className="px-4 py-2 bg-indigo-700 text-white text-xs font-mono font-bold rounded-xl shadow-xs hover:bg-indigo-800 cursor-pointer"
+                className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white text-xs font-mono font-bold rounded-xl shadow-xs cursor-pointer transition-all"
               >
                 Simulasi Beralih ke Role Sekben
               </button>
             </div>
           ) : (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900">Inventaris Ruangan & Kas Laboratorium</h2>
-                  <span className="text-[10px] font-mono font-bold bg-indigo-100 text-indigo-900 px-2 py-0.5 rounded">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Inventaris Ruangan & Kas Laboratorium</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                     Sekretaris & Bendahara (Sekben)
                   </span>
                 </div>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Pencatatan kas operasional, logistik inventaris PC 1-45, spidol, dan alat penunjang praktikum EDM.
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
-                <span className="text-xs font-mono font-bold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
-                  Saldo Kas Lab: <strong className="text-emerald-700 font-extrabold">Rp 3.450.000</strong>
+                <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 bg-slate-100 dark:bg-neutral-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-neutral-700">
+                  Saldo Kas Lab: <strong className="text-emerald-700 dark:text-emerald-400 font-extrabold">Rp 3.450.000</strong>
                 </span>
               </div>
             </div>
@@ -1299,7 +1320,7 @@ export default function AssistantDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Inventaris Alat */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
                   Status Logistik Workstations & Peripheral:
                 </h3>
                 <div className="space-y-2">
@@ -1310,12 +1331,12 @@ export default function AssistantDashboard() {
                     { item: "Kabel LAN Gigabit & Switch", qty: "48 Port", condition: "Koneksi Normal (1 Gbps)", status: "ok" },
                     { item: "Spidol & Whiteboard Eraser", qty: "6 Set", condition: "Siap Pakai", status: "ok" },
                   ].map((inv, idx) => (
-                    <div key={idx} className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/50 flex items-center justify-between">
+                    <div key={idx} className="p-3.5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 flex items-center justify-between">
                       <div>
-                        <div className="text-xs font-bold text-slate-900">{inv.item}</div>
-                        <div className="text-[11px] text-slate-500 font-mono">{inv.condition}</div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white">{inv.item}</div>
+                        <div className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono">{inv.condition}</div>
                       </div>
-                      <span className="text-xs font-mono font-bold text-purple-900 bg-purple-50 px-2.5 py-1 rounded-md border border-purple-100">
+                      <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-1 rounded-md border border-purple-200/60 dark:border-purple-800/60">
                         {inv.qty}
                       </span>
                     </div>
@@ -1325,30 +1346,30 @@ export default function AssistantDashboard() {
 
               {/* Buku Kas Operasional */}
               <div className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 uppercase tracking-wide">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
                   Mutasi Kas Operasional Terakhir (Sekben):
                 </h3>
-                <div className="border border-slate-200 rounded-xl overflow-x-auto scrollbar-thin">
+                <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
                   <table className="w-full text-left text-xs whitespace-nowrap min-w-[480px]">
-                    <thead className="bg-[#140827] text-white text-[10px] font-mono uppercase tracking-wider">
+                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
                       <tr>
                         <th className="px-4 py-3">Tanggal</th>
                         <th className="px-4 py-3">Keterangan</th>
                         <th className="px-4 py-3 text-right">Nominal</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-100">
+                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                       {[
                         { date: "26 Sep 2026", desc: "Iuran Modul & Kas Praktikan SI'50", amount: "+ Rp 2.500.000", type: "in" },
                         { date: "24 Sep 2026", desc: "Beli Baterai Mouse & Spidol Whiteboard", amount: "- Rp 150.000", type: "out" },
                         { date: "20 Sep 2026", desc: "Pembersih Monitor & Thermal Paste", amount: "- Rp 200.000", type: "out" },
                         { date: "15 Sep 2026", desc: "Saldo Awal Kas EDM Laboratory 2026", amount: "+ Rp 1.300.000", type: "in" },
                       ].map((row, i) => (
-                        <tr key={i} className="hover:bg-slate-50">
-                          <td className="px-4 py-2.5 font-mono text-slate-500 text-[11px]">{row.date}</td>
-                          <td className="px-4 py-2.5 text-slate-800 font-medium">{row.desc}</td>
+                        <tr key={i} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
+                          <td className="px-4 py-2.5 font-mono text-slate-500 dark:text-neutral-400 text-[11px]">{row.date}</td>
+                          <td className="px-4 py-2.5 text-slate-800 dark:text-neutral-200 font-medium">{row.desc}</td>
                           <td className={`px-4 py-2.5 text-right font-mono font-bold text-xs ${
-                            row.type === 'in' ? 'text-emerald-700' : 'text-rose-700'
+                            row.type === 'in' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                           }`}>
                             {row.amount}
                           </td>
@@ -1365,17 +1386,17 @@ export default function AssistantDashboard() {
 
         {/* 6. AKUN ASISTEN TAB */}
         {activeTab === "akun" && (
-          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900">Profil & Manajemen Akun</h2>
-                <p className="text-xs text-slate-500 font-mono mt-1">
+                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Profil & Manajemen Akun</h2>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                   Informasi kredensial, role wewenang, dan riwayat tugas laboratorium.
                 </p>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-[#9E1B32] bg-rose-50 px-3 py-1 rounded-full border border-rose-200">
+                <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200/60 dark:border-purple-800/60">
                   Role: {currentRole}
                 </span>
               </div>
@@ -1383,20 +1404,20 @@ export default function AssistantDashboard() {
 
             {/* Profile Info Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+              <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
                 <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Identitas Asisten</div>
                 <div className="space-y-1">
-                  <div className="text-lg font-bold text-slate-900">Andi Prasetyo (GWAN)</div>
-                  <div className="text-xs font-mono text-slate-500">NIM: 1202230045</div>
-                  <div className="text-xs font-mono text-purple-800 font-semibold">S1 Sistem Informasi • SI&apos;50</div>
+                  <div className="text-lg font-bold text-slate-900 dark:text-white">Andi Prasetyo (GWAN)</div>
+                  <div className="text-xs font-mono text-slate-500 dark:text-neutral-400">NIM: 1202230045</div>
+                  <div className="text-xs font-mono text-purple-700 dark:text-purple-400 font-semibold">S1 Sistem Informasi • SI&apos;50</div>
                 </div>
               </div>
 
-              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+              <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
                 <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Role & Wewenang</div>
                 <div className="space-y-1">
-                  <div className="text-base font-bold text-[#250B47]">{currentRole}</div>
-                  <div className="text-xs text-slate-600">
+                  <div className="text-base font-bold text-purple-700 dark:text-purple-300">{currentRole}</div>
+                  <div className="text-xs text-slate-600 dark:text-neutral-300">
                     {currentRole === "KOMDIS"
                       ? "Komisi Disiplin: Berwenang memberi flag sanksi keterlambatan praktikan & validasi shift asprak."
                       : currentRole === "SEKBEN"
@@ -1406,10 +1427,10 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              <div className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 space-y-3">
+              <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
                 <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Simulasi Role Akun</div>
                 <div className="space-y-2">
-                  <p className="text-[11px] text-slate-500 leading-tight">Ganti role aktif untuk simulasi fitur:</p>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 leading-tight">Ganti role aktif untuk simulasi fitur:</p>
                   <div className="flex gap-1.5">
                     {(["ASPRAK", "KOMDIS", "SEKBEN"] as const).map((r) => (
                       <button
@@ -1418,8 +1439,8 @@ export default function AssistantDashboard() {
                         onClick={() => setCurrentRole(r)}
                         className={`flex-1 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                           currentRole === r
-                            ? "bg-[#250B47] text-white shadow-xs"
-                            : "bg-white border border-slate-300 text-slate-700 hover:bg-slate-100"
+                            ? "bg-[#7C3AED] text-white shadow-xs"
+                            : "bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-700"
                         }`}
                       >
                         {r}
@@ -1434,12 +1455,12 @@ export default function AssistantDashboard() {
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION BAR (Phones: sm:hidden) */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 px-3 py-2 flex items-center justify-around shadow-lg">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0e071a]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-purple-950/60 px-3 py-2 flex items-center justify-around shadow-lg">
         <button
           type="button"
           onClick={() => setActiveTab("dashboard")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
-            activeTab === "dashboard" ? "text-[#9E1B32] font-bold" : "text-slate-500 hover:text-slate-900"
+            activeTab === "dashboard" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <Home size={18} />
@@ -1450,7 +1471,7 @@ export default function AssistantDashboard() {
           type="button"
           onClick={() => setActiveTab("absensi")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
-            activeTab === "absensi" ? "text-[#9E1B32] font-bold" : "text-slate-500 hover:text-slate-900"
+            activeTab === "absensi" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <CheckSquare size={18} />
@@ -1461,7 +1482,7 @@ export default function AssistantDashboard() {
           type="button"
           onClick={() => setActiveTab("penilaian")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
-            activeTab === "penilaian" ? "text-[#9E1B32] font-bold" : "text-slate-500 hover:text-slate-900"
+            activeTab === "penilaian" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <BarChart3 size={18} />
@@ -1472,7 +1493,7 @@ export default function AssistantDashboard() {
           type="button"
           onClick={() => setActiveTab("jadwal")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
-            activeTab === "jadwal" ? "text-[#9E1B32] font-bold" : "text-slate-500 hover:text-slate-900"
+            activeTab === "jadwal" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
         >
           <ArrowLeftRight size={18} />
@@ -1482,7 +1503,7 @@ export default function AssistantDashboard() {
         <button
           type="button"
           onClick={() => setIsMobileMenuOpen(true)}
-          className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-slate-900 transition-colors cursor-pointer"
+          className="flex flex-col items-center gap-0.5 text-[10px] font-semibold text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white transition-colors cursor-pointer"
         >
           <Menu size={18} />
           <span>Menu</span>
