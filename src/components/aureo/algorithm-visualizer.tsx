@@ -54,13 +54,13 @@ export function AlgorithmVisualizer() {
   }, []);
 
   return (
-    <div className="relative w-full max-w-xl lg:max-w-[580px] select-none group">
+    <div className="relative w-full max-w-xl lg:max-w-[620px] select-none group">
       {/* Glow aura under the card */}
-      <div className="absolute -inset-3 bg-gradient-to-r from-purple-600/25 via-rose-600/20 to-indigo-600/20 rounded-[2rem] blur-xl opacity-60 group-hover:opacity-85 transition-opacity pointer-events-none" />
+      <div className="absolute -inset-3.5 bg-gradient-to-r from-purple-600/30 via-rose-600/25 to-indigo-600/25 rounded-[2.2rem] blur-xl opacity-65 group-hover:opacity-90 transition-opacity pointer-events-none" />
 
       {/* Double Bezel Outer Shell with Frosted Rim */}
-      <div className="relative z-10 rounded-[1.75rem] p-1.5 bg-gradient-to-b from-white/40 via-white/15 to-white/10 backdrop-blur-2xl border border-white/40 shadow-[0_20px_45px_-12px_rgba(20,5,35,0.22)]">
-        <div className="bg-[#0C081D]/95 text-white rounded-[1.45rem] p-3.5 sm:p-4 border border-purple-500/25 space-y-2.5">
+      <div className="relative z-10 rounded-[1.85rem] p-1.5 bg-gradient-to-b from-white/40 via-white/15 to-white/10 backdrop-blur-2xl border border-white/40 shadow-[0_20px_45px_-12px_rgba(20,5,35,0.22)]">
+        <div className="bg-[#0C081D]/95 text-white rounded-[1.55rem] p-3.5 sm:p-4.5 border border-purple-500/25 space-y-2.5">
           
           {/* Card Header Bar - Minimalist & Alive */}
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
@@ -93,7 +93,7 @@ export function AlgorithmVisualizer() {
               <button
                 type="button"
                 onClick={() => setActiveStep((prev) => (prev >= 3 ? 1 : prev + 1))}
-                className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 hover:text-white text-[10px] font-mono transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-white/10 hover:bg-white/15 text-slate-200 hover:text-white text-[10px] font-mono transition-colors cursor-pointer active:scale-95"
                 title="Next Step"
               >
                 <RotateCcw size={10} />
@@ -103,7 +103,7 @@ export function AlgorithmVisualizer() {
           </div>
 
           {/* Visualizer Canvas Area: Bipartite Bezier Network (Larger & Taller) */}
-          <div className="relative w-full h-[135px] sm:h-[150px] bg-[#070510]/95 rounded-2xl border border-white/5 overflow-hidden p-2.5">
+          <div className="relative w-full h-[140px] sm:h-[155px] bg-[#070510]/95 rounded-2xl border border-white/5 overflow-hidden p-2.5">
             <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 480 240" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="curveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">

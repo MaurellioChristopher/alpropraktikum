@@ -58,14 +58,19 @@ export default function Home() {
       </header>
 
       {/* HERO & MAIN INTERACTIVE SECTION - Fits cleanly in 1 viewport with optimal spacing */}
-      <section className="relative z-20 w-full max-w-[1360px] mx-auto px-6 sm:px-8 lg:px-12 py-1 sm:py-2 flex-1 min-h-0 flex items-center">
+      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 py-1 sm:py-2 flex-1 min-h-0 flex items-center">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* LEFT COLUMN: Fluid Typography, Tactile CTAs, and Visualizer */}
-          <div className="lg:col-span-7 flex flex-col space-y-3.5 sm:space-y-4">
+          <div className="lg:col-span-7 flex flex-col space-y-4 sm:space-y-4.5">
             
-            {/* Headlines */}
-            <div className="space-y-2">
+            {/* Headlines with Animated Gradient */}
+            <motion.div 
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="space-y-3"
+            >
               <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/85 border border-rose-200/80 shadow-[0_4px_16px_rgba(158,27,50,0.08)] text-[10.5px] sm:text-[11px] font-mono font-bold text-[#9E1B32] backdrop-blur-md w-fit">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
@@ -74,7 +79,7 @@ export default function Home() {
                 SISTEM OPERASIONAL INTERNAL LABORATORIUM
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] xl:text-[3.15rem] font-black tracking-tight text-[#0F172A] leading-[1.08]">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.9rem] xl:text-[3.25rem] font-black tracking-tight text-[#0F172A] leading-[1.08]">
                 SELAMAT DATANG,
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#9E1B32] via-[#701A75] to-[#1E1B4B]">
@@ -84,40 +89,53 @@ export default function Home() {
                 <span className="text-[#0F172A]">ALGORITMA & PEMROGRAMAN.</span>
               </h1>
 
-              <p className="text-slate-600 text-xs sm:text-[13.5px] lg:text-sm font-normal max-w-xl leading-relaxed">
-                Sistem kendali operasional internal laboratorium EDM untuk koordinasi shift asisten, pencatatan presensi mahasiswa, penilaian live coding, dan sinkronisasi 15 kelas aktif S1 Sistem Informasi Angkatan 2026 (SI&apos;50).
-              </p>
-
-              {/* Minimalist Meta Chips */}
-              <div className="flex flex-wrap items-center gap-2 pt-0.5 text-[10.5px] font-mono">
-                <span className="bg-white/85 backdrop-blur-md text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-slate-200/80 shadow-2xs flex items-center gap-1.5">
+              {/* Minimalist Meta Chips with Soft Hover Lift */}
+              <div className="flex flex-wrap items-center gap-2 pt-1 text-[10.5px] font-mono">
+                <motion.span 
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  className="bg-white/85 backdrop-blur-md text-slate-700 font-semibold px-2.5 py-1 rounded-lg border border-slate-200/80 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                   Telkom University
-                </span>
-                <span className="bg-purple-50/85 backdrop-blur-md text-purple-900 font-bold px-2.5 py-1 rounded-lg border border-purple-200/80 shadow-2xs flex items-center gap-1.5">
+                </motion.span>
+                <motion.span 
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  className="bg-purple-50/85 backdrop-blur-md text-purple-900 font-bold px-2.5 py-1 rounded-lg border border-purple-200/80 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
                   Angkatan 2026 (SI&apos;50)
-                </span>
-                <span className="bg-rose-50/85 backdrop-blur-md text-[#9E1B32] font-bold px-2.5 py-1 rounded-lg border border-rose-200/80 shadow-2xs flex items-center gap-1.5">
+                </motion.span>
+                <motion.span 
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  className="bg-rose-50/85 backdrop-blur-md text-[#9E1B32] font-bold px-2.5 py-1 rounded-lg border border-rose-200/80 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                   15 Kelas Aktif
-                </span>
-                <span className="bg-indigo-50/85 backdrop-blur-md text-indigo-900 font-semibold px-2.5 py-1 rounded-lg border border-indigo-200/80 shadow-2xs flex items-center gap-1.5">
+                </motion.span>
+                <motion.span 
+                  whileHover={{ y: -2, scale: 1.02 }}
+                  className="bg-indigo-50/85 backdrop-blur-md text-indigo-900 font-semibold px-2.5 py-1 rounded-lg border border-indigo-200/80 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                >
                   <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
                   Lab Terpadu Lt. 3
-                </span>
+                </motion.span>
               </div>
-            </div>
+            </motion.div>
 
             {/* Primary Action Buttons — Button-in-Button Trailing Icon Architecture */}
-            <div className="flex flex-wrap items-center gap-3 pt-0.5">
+            <motion.div 
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              className="flex flex-wrap items-center gap-3 pt-0.5"
+            >
               <button
                 type="button"
                 onClick={() => setActiveModal("modul")}
-                className="rounded-full pl-5 pr-2 py-2 bg-gradient-to-r from-[#1A0B36] via-[#2A0E4E] to-[#40126E] hover:from-[#250E4C] hover:to-[#551896] text-white font-bold text-xs uppercase tracking-wider shadow-[0_12px_28px_-6px_rgba(40,15,75,0.35)] transition-all active:scale-95 flex items-center gap-3 group cursor-pointer"
+                className="rounded-full pl-5 pr-2 py-2 bg-gradient-to-r from-[#1A0B36] via-[#2A0E4E] to-[#40126E] hover:from-[#250E4C] hover:to-[#551896] text-white font-bold text-xs uppercase tracking-wider shadow-[0_12px_28px_-6px_rgba(40,15,75,0.35)] hover:shadow-[0_16px_36px_-6px_rgba(40,15,75,0.45)] transition-all active:scale-95 flex items-center gap-3 group cursor-pointer"
               >
                 <div className="flex items-center gap-2">
-                  <BookOpen size={14} />
+                  <BookOpen size={14} className="text-purple-300" />
                   <span>Silabus Modul</span>
                 </div>
                 <div className="w-7 h-7 rounded-full bg-white/15 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
@@ -128,17 +146,22 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setActiveModal("tentang")}
-                className="rounded-full px-5 py-2.5 bg-white/85 hover:bg-white text-slate-700 font-bold text-xs uppercase tracking-wider border border-slate-200 shadow-2xs backdrop-blur-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer hover:border-slate-300"
+                className="rounded-full px-5 py-2.5 bg-white/85 hover:bg-white text-slate-700 font-bold text-xs uppercase tracking-wider border border-slate-200 shadow-2xs hover:shadow-xs backdrop-blur-md transition-all active:scale-95 flex items-center gap-2 cursor-pointer hover:border-slate-300"
               >
                 <Info size={14} className="text-[#9E1B32]" />
                 <span>Tentang Lab EDM</span>
               </button>
-            </div>
+            </motion.div>
 
             {/* Dynamic Visualizer Canvas (Interactive Moving Particle & Graph Network) */}
-            <div className="pt-0.5">
+            <motion.div 
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
+              className="pt-1"
+            >
               <AlgorithmVisualizer />
-            </div>
+            </motion.div>
           </div>
 
           {/* RIGHT COLUMN: Floating Authentication Console (Double-Bezel & Balanced) */}

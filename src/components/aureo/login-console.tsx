@@ -35,13 +35,13 @@ export function LoginForm() {
   };
 
   return (
-    <div className="relative w-full max-w-[480px] lg:max-w-[510px] group">
+    <div className="relative w-full max-w-[490px] lg:max-w-[520px] group">
       {/* Soft Ambient Diffuse Glow behind the glass card */}
-      <div className="absolute -inset-3.5 bg-gradient-to-tr from-rose-500/25 via-purple-600/25 to-indigo-500/20 rounded-[2.3rem] blur-2xl opacity-75 group-hover:opacity-95 transition-opacity pointer-events-none" />
+      <div className="absolute -inset-4 bg-gradient-to-tr from-rose-500/25 via-purple-600/25 to-indigo-500/20 rounded-[2.4rem] blur-2xl opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
       {/* High-End Double-Bezel Hardware Enclosure */}
-      <div className="relative z-10 rounded-[2.1rem] p-1.5 bg-gradient-to-b from-white/95 via-white/80 to-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.14)]">
-        <div className="rounded-[1.75rem] p-5 sm:p-6 lg:p-6 bg-white/75 backdrop-blur-xl border border-white/60 space-y-4">
+      <div className="relative z-10 rounded-[2.15rem] p-1.5 bg-gradient-to-b from-white/95 via-white/80 to-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.16)]">
+        <div className="rounded-[1.8rem] p-5 sm:p-6 lg:p-6 bg-white/80 backdrop-blur-xl border border-white/60 space-y-4">
           
           {/* Brand Logo & Console Title Header */}
           <div className="pb-3 border-b border-slate-200/60 flex items-center justify-between">
@@ -66,9 +66,10 @@ export function LoginForm() {
               </div>
             </div>
 
-            <span className="text-[10px] font-mono font-bold text-slate-500 bg-slate-100/90 px-2.5 py-0.5 rounded-full border border-slate-200/80">
-              SI&apos;50
-            </span>
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50/90 border border-emerald-200/80 text-[10px] font-mono font-semibold text-emerald-700 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Sesi Aktif
+            </div>
           </div>
           
           {/* Quick Assistant Preset Switcher (1-Click Login) */}
