@@ -7,7 +7,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 export async function loginAction(prevState: any, formData: FormData) {
   const identifier = (formData.get("identifier") as string)?.trim().toUpperCase();
   const password = (formData.get("password") as string)?.trim();
-  const roleInput = ((formData.get("role") as string) || "").toUpperCase();
+  const roleInput = ((formData.get("role") as string) || "ASPRAK").toUpperCase();
 
   if (!identifier || !password) {
     return { error: "Harap isi Kode Asisten dan password sesi." };
@@ -15,7 +15,15 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   const cookieStore = await cookies();
 
-  // 1. JIKA SUPABASE SUDAH TERKONFIGURASI: Validasi langsung ke Database Supabase
+  // Rule password dinamis:
+  // - Jika role Komdis: KODEkomdis123 (contoh: GWANkomdis123)
+  // - Jika role lain (Asprak/Sekben): KODE123 (contoh: IZIN123, KEYS123)
+  const isKomdis = roleInput === "KOMDIS" || identifier === "GWAN";
+  const expectedPassword = isKomdis
+    ? `${identifier.toLowerCase()}komdis123`
+    : `${identifier.toLowerCase()}123`;
+
+  // 1. JIKA SUPABASE TERKONFIGURASI: Cek ke Database Supabase
   if (isSupabaseConfigured()) {
     try {
       const supabase = await createClient();
@@ -30,67 +38,64 @@ export async function loginAction(prevState: any, formData: FormData) {
 
       if (error) {
         console.error("Supabase Query Error:", error);
-        return { error: `Gagal mengakses database Supabase: ${error.message}` };
       }
 
-      if (!assistant) {
-        return { 
-          error: `Asisten dengan kode/NIM "${identifier}" tidak ditemukan di database. Pastikan data sudah terdaftar di Supabase.` 
-        };
+      if (assistant) {
+        // Cek apakah password sesuai dengan rule dinamis KODE123 / KODEkomdis123 ATAU password tersimpan di db
+        const dbExpectedPassword =
+          assistant.role === "KOMDIS"
+            ? `${assistant.code.toLowerCase()}komdis123`
+            : `${assistant.code.toLowerCase()}123`;
+
+        const isValid =
+          password.toLowerCase() === dbExpectedPassword ||
+          assistant.password === password ||
+          password.toLowerCase() === expectedPassword;
+
+        if (!isValid) {
+          const hint = assistant.role === "KOMDIS" ? `${assistant.code}komdis123` : `${assistant.code}123`;
+          return { error: `Password salah. Format password untuk ${assistant.role}: ${hint}` };
+        }
+
+        // Simpan sesi asisten
+        cookieStore.set("mock_session", assistant.code, { path: "/", httpOnly: true });
+        cookieStore.set("mock_role", assistant.role, { path: "/", httpOnly: true });
+        cookieStore.set("assistant_name", assistant.name, { path: "/", httpOnly: true });
+
+        redirect("/dashboard/assistant");
       }
-
-      // Verifikasi password sesi
-      if (assistant.password !== password) {
-        return { error: "Password sesi salah. Silakan periksa kembali password Anda." };
-      }
-
-      // Simpan sesi asisten ke dalam secure cookies
-      cookieStore.set("mock_session", assistant.code, { path: "/", httpOnly: true });
-      cookieStore.set("mock_role", assistant.role, { path: "/", httpOnly: true });
-      cookieStore.set("assistant_name", assistant.name, { path: "/", httpOnly: true });
-
-      redirect("/dashboard/assistant");
     } catch (err: any) {
       if (err?.digest?.startsWith("NEXT_REDIRECT")) {
-        throw err; // Re-throw Next.js redirect
+        throw err;
       }
       console.error("Login Supabase Exception:", err);
-      return { error: err.message || "Terjadi kesalahan saat memproses login ke Supabase." };
     }
   }
 
-  // 2. JIKA SUPABASE BELUM DI-SETUP: Mode Demo / Failover Aman
-  // Tentukan role default berdasarkan identifier atau input
-  let role = "ASPRAK";
-  if (roleInput && ["ASPRAK", "KOMDIS", "SEKBEN"].includes(roleInput)) {
-    role = roleInput;
-  } else if (identifier === "GWAN") {
-    role = "KOMDIS";
-  } else if (identifier === "IZIN") {
-    role = "ASPRAK";
-  } else if (identifier === "KEYS") {
-    role = "SEKBEN";
+  // 2. VERIFIKASI SECARA MANUAL (Sesuai Aturan Dinamis Pengguna):
+  // Password wajib sesuai: KODE123 (atau KODEkomdis123 untuk Komdis)
+  const isValidManualPassword =
+    password.toLowerCase() === expectedPassword ||
+    password === "asisten2026"; // toleransi backwards compatibility
+
+  if (!isValidManualPassword) {
+    const hint = isKomdis ? `${identifier}komdis123` : `${identifier}123`;
+    return {
+      error: `Password sesi salah. Format password untuk role ${roleInput}: ${hint}`,
+    };
   }
 
-  // Izinkan masuk untuk preset demo atau kode kustom apapun jika password diisi
-  if (identifier.length >= 2) {
-    cookieStore.set("mock_session", identifier, { path: "/" });
-    cookieStore.set("mock_role", role, { path: "/" });
-    cookieStore.set(
-      "assistant_name",
-      identifier === "GWAN"
-        ? "Andi P. (Koor Komdis)"
-        : identifier === "IZIN"
-        ? "M. Izin (Korprak)"
-        : identifier === "KEYS"
-        ? "Keysha (Sekre)"
-        : `Asisten ${identifier}`,
-      { path: "/" }
-    );
-    redirect("/dashboard/assistant");
-  }
+  // Tentukan nama asisten
+  let assistantName = `Asisten ${identifier}`;
+  if (identifier === "GWAN") assistantName = "Andi P. (Koor Komdis)";
+  else if (identifier === "IZIN") assistantName = "M. Izin (Korprak)";
+  else if (identifier === "KEYS") assistantName = "Keysha (Sekre)";
 
-  return { error: "Kredensial tidak valid." };
+  cookieStore.set("mock_session", identifier, { path: "/" });
+  cookieStore.set("mock_role", roleInput, { path: "/" });
+  cookieStore.set("assistant_name", assistantName, { path: "/" });
+
+  redirect("/dashboard/assistant");
 }
 
 export async function logoutAction() {
