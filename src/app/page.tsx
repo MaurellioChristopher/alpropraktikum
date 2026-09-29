@@ -26,7 +26,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen lg:h-screen lg:max-h-screen lg:overflow-hidden relative bg-white dark:bg-[#06020E] text-slate-900 dark:text-white flex flex-col justify-between selection:bg-purple-600 selection:text-white transition-colors duration-300">
+    <main className="min-h-screen relative bg-white dark:bg-[#06020E] text-slate-900 dark:text-white flex flex-col justify-between selection:bg-purple-600 selection:text-white transition-colors duration-300">
       {/* Background Micro-Circuitry & Ambient Particles (Dynamic moving elements) */}
       <TechBackground />
 
@@ -35,7 +35,7 @@ export default function Home() {
       <div className="absolute bottom-[10%] right-[10%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-bl from-purple-200/25 via-purple-50/15 to-transparent dark:from-purple-900/20 dark:via-purple-950/10 blur-[140px] pointer-events-none" />
 
       {/* TOP NAVBAR - Floating Island Pill Architecture */}
-      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-3.5 sm:pt-4 shrink-0">
+      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-4 sm:pt-6 pb-2 sm:pb-3 shrink-0">
         <motion.div 
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -75,7 +75,7 @@ export default function Home() {
       </header>
 
       {/* HERO & MAIN INTERACTIVE SECTION - Fits cleanly in 1 viewport with optimal spacing */}
-      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 py-1 sm:py-2 flex-1 min-h-0 flex items-center">
+      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 py-5 sm:py-8 lg:py-10 flex-1 flex flex-col justify-center">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* LEFT COLUMN: Fluid Typography, Tactile CTAs, and Visualizer */}
@@ -88,8 +88,8 @@ export default function Home() {
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="space-y-3"
             >
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.9rem] xl:text-[3.25rem] font-black tracking-tight text-slate-900 dark:text-white leading-[1.08]">
-                SELAMAT DATANG,
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] xl:text-[2.85rem] font-black tracking-tight leading-[1.12]">
+                <span className="text-slate-900 dark:text-white">SELAMAT DATANG,</span>
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-purple-500 to-purple-800 dark:from-purple-400 dark:via-purple-200 dark:to-white animate-gradient-flow inline-block">
                   ASISTEN PRAKTIKUM
