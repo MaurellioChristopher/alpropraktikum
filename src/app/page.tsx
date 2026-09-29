@@ -71,14 +71,6 @@ export default function Home() {
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="space-y-3"
             >
-              <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/85 border border-rose-200/80 shadow-[0_4px_16px_rgba(158,27,50,0.08)] text-[10.5px] sm:text-[11px] font-mono font-bold text-[#9E1B32] backdrop-blur-md w-fit">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-500 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#9E1B32]" />
-                </span>
-                SISTEM OPERASIONAL INTERNAL LABORATORIUM
-              </div>
-
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.9rem] xl:text-[3.25rem] font-black tracking-tight text-[#0F172A] leading-[1.08]">
                 SELAMAT DATANG,
                 <br />
