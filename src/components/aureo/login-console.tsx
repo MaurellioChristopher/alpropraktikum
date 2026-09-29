@@ -159,67 +159,81 @@ export function LoginForm() {
             </div>
           </div>
           
-          {/* Quick Assistant Preset Switcher (1-Click Login) with Add Assistant Trigger */}
+          {/* Quick Assistant Preset Switcher (1-Click Login) */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold flex items-center gap-1.5">
                 <Sparkles size={11} className="text-[#9E1B32]" />
                 Pilih Profil Asisten (1-Klik):
               </label>
-
-              {/* Tombol Tambah Akun Baru */}
-              <button
-                type="button"
-                onClick={() => setShowAddModal(true)}
-                className="text-[10px] font-mono text-[#9E1B32] hover:text-[#701A75] font-bold flex items-center gap-1 hover:underline cursor-pointer transition-colors"
-                title="Daftarkan asisten baru ke Supabase"
-              >
-                <Plus size={11} />
-                <span>+ Tambah Akun</span>
-              </button>
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              {assistantsList.slice(0, 3).map((ast) => {
-                const isSelected = identifier === ast.code;
-                return (
-                  <motion.button
-                    key={ast.code}
-                    whileHover={{ y: -2, scale: 1.02 }}
-                    whileTap={{ scale: 0.97 }}
-                    transition={{ type: "spring", stiffness: 450, damping: 22 }}
-                    type="button"
-                    onClick={() => setAssistantPreset(ast.code, ast.role)}
-                    className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
-                      isSelected
-                        ? ast.role === "ASPRAK"
-                          ? "bg-[#250B47] text-white border-purple-900 shadow-md ring-2 ring-purple-600/30 scale-[1.02]"
-                          : ast.role === "KOMDIS"
-                          ? "bg-[#9E1B32] text-white border-rose-900 shadow-md ring-2 ring-rose-600/30 scale-[1.02]"
-                          : "bg-[#1E1B4B] text-white border-indigo-900 shadow-md ring-2 ring-indigo-600/30 scale-[1.02]"
-                        : "bg-white/85 hover:bg-white text-slate-700 border-slate-200/80 shadow-2xs hover:border-slate-300 hover:shadow-xs"
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5 mb-0.5">
-                      {ast.role === "ASPRAK" ? (
-                        <Users size={12} className={isSelected ? "text-purple-300" : "text-slate-400"} />
-                      ) : ast.role === "KOMDIS" ? (
-                        <Shield size={12} className={isSelected ? "text-rose-300" : "text-slate-400"} />
-                      ) : (
-                        <Briefcase size={12} className={isSelected ? "text-indigo-300" : "text-slate-400"} />
-                      )}
-                      <span className="text-xs font-mono font-bold leading-none">{ast.code}</span>
-                    </div>
-                    <div className={`text-[10px] font-mono leading-tight truncate ${
-                      isSelected 
-                        ? ast.role === "ASPRAK" ? "text-purple-200" : ast.role === "KOMDIS" ? "text-rose-200" : "text-indigo-200"
-                        : "text-slate-500"
-                    }`}>
-                      {ast.name}
-                    </div>
-                  </motion.button>
-                );
-              })}
+              {/* GWAN - Koor Komdis */}
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                type="button"
+                onClick={() => setAssistantPreset("GWAN", "KOMDIS")}
+                className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
+                  identifier === "GWAN"
+                    ? "bg-[#9E1B32] text-white border-rose-900 shadow-md ring-2 ring-rose-600/30 scale-[1.02]"
+                    : "bg-white/85 hover:bg-white text-slate-700 border-slate-200/80 shadow-2xs hover:border-rose-300 hover:shadow-xs"
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Shield size={12} className={identifier === "GWAN" ? "text-rose-300" : "text-slate-400"} />
+                  <span className="text-xs font-mono font-bold leading-none">GWAN</span>
+                </div>
+                <div className={`text-[10px] font-mono leading-tight truncate ${identifier === "GWAN" ? "text-rose-200 font-semibold" : "text-rose-600 font-bold"}`}>
+                  Andi P. (Koor Komdis)
+                </div>
+              </motion.button>
+
+              {/* IZIN - Korprak */}
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                type="button"
+                onClick={() => setAssistantPreset("IZIN", "ASPRAK")}
+                className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
+                  identifier === "IZIN"
+                    ? "bg-[#250B47] text-white border-purple-900 shadow-md ring-2 ring-purple-600/30 scale-[1.02]"
+                    : "bg-white/85 hover:bg-white text-slate-700 border-slate-200/80 shadow-2xs hover:border-purple-300 hover:shadow-xs"
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Users size={12} className={identifier === "IZIN" ? "text-purple-300" : "text-slate-400"} />
+                  <span className="text-xs font-mono font-bold leading-none">IZIN</span>
+                </div>
+                <div className={`text-[10px] font-mono leading-tight truncate ${identifier === "IZIN" ? "text-purple-200" : "text-slate-500"}`}>
+                  M. Izin (Korprak)
+                </div>
+              </motion.button>
+
+              {/* KEYS - Sekre */}
+              <motion.button
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 450, damping: 22 }}
+                type="button"
+                onClick={() => setAssistantPreset("KEYS", "SEKBEN")}
+                className={`p-2.5 rounded-2xl text-left border transition-all cursor-pointer relative overflow-hidden ${
+                  identifier === "KEYS"
+                    ? "bg-[#1E1B4B] text-white border-indigo-900 shadow-md ring-2 ring-indigo-600/30 scale-[1.02]"
+                    : "bg-white/85 hover:bg-white text-slate-700 border-slate-200/80 shadow-2xs hover:border-indigo-300 hover:shadow-xs"
+                }`}
+              >
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Briefcase size={12} className={identifier === "KEYS" ? "text-indigo-300" : "text-slate-400"} />
+                  <span className="text-xs font-mono font-bold leading-none">KEYS</span>
+                </div>
+                <div className={`text-[10px] font-mono leading-tight truncate ${identifier === "KEYS" ? "text-indigo-200 font-semibold" : "text-indigo-600 font-bold"}`}>
+                  Keysha (Sekre)
+                </div>
+              </motion.button>
             </div>
           </div>
 
@@ -346,20 +360,12 @@ export function LoginForm() {
           </form>
 
           {/* Informative Security Strip */}
-          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <div className="flex items-center gap-1.5 text-slate-500">
+          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-center text-[10px] font-mono text-slate-400">
+            <div className="flex items-center gap-2 text-slate-500">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <ShieldCheck size={13} className="text-[#9E1B32]" />
               <span>Internal EDM Laboratory • Sesi Aman</span>
             </div>
-            <button
-              type="button"
-              onClick={() => setShowAddModal(true)}
-              className="text-[#9E1B32] hover:underline font-bold flex items-center gap-1 cursor-pointer"
-            >
-              <Database size={11} />
-              <span>Kelola Akun</span>
-            </button>
           </div>
         </div>
       </div>
