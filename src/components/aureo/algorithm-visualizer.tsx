@@ -102,10 +102,10 @@ export function AlgorithmVisualizer() {
           <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-purple-300/10 to-transparent transform -skew-x-20 animate-shimmer" />
         </div>
 
-        <div className="relative z-10 bg-[#0C061A]/95 text-white rounded-[1.55rem] p-3.5 sm:p-4.5 border border-purple-500/25 space-y-2.5">
+        <div className="relative z-10 bg-[#0C061A]/95 text-white rounded-[1.4rem] p-3 sm:p-3.5 border border-purple-500/25 space-y-2">
           
           {/* Card Header Bar - Minimalist, Alive, and Eye-Pleasing */}
-          <div className="flex items-center justify-between pb-2 border-b border-white/5">
+          <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
@@ -164,7 +164,7 @@ export function AlgorithmVisualizer() {
           </div>
 
           {/* Visualizer Canvas Area: Bipartite Bezier Network (Larger & Taller) */}
-          <div className="relative w-full h-[140px] sm:h-[155px] bg-[#06030F]/95 rounded-2xl border border-white/5 overflow-hidden p-2.5">
+          <div className="relative w-full h-[105px] sm:h-[115px] bg-[#06030F]/95 rounded-2xl border border-white/5 overflow-hidden p-2">
             <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 480 240" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="curveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">

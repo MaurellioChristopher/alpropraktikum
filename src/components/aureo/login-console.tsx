@@ -42,47 +42,47 @@ export function LoginForm() {
           <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-purple-300/10 dark:via-purple-400/5 to-transparent transform -skew-x-20 animate-shimmer" />
         </div>
 
-        <div className="rounded-[1.8rem] p-6 sm:p-7 bg-white/90 dark:bg-[#0D071E] backdrop-blur-xl border border-purple-100/80 dark:border-purple-900/50 space-y-4.5 transition-colors">
+        <div className="rounded-[1.8rem] p-4.5 sm:p-5 bg-white/90 dark:bg-[#0D071E] backdrop-blur-xl border border-purple-100/80 dark:border-purple-900/50 space-y-3 transition-colors">
           
           {/* Brand Logo & Console Title Header */}
-          <div className="pb-3 border-b border-purple-100 dark:border-purple-950/80 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="relative h-8 w-10 shrink-0 drop-shadow-sm">
+          <div className="pb-2 border-b border-purple-100 dark:border-purple-950/80 flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="relative h-7 w-9 shrink-0 drop-shadow-sm">
                 <Image
                   src="/images/edm-emblem-crimson.png"
                   alt="EDM Laboratory Logo"
                   fill
-                  sizes="40px"
+                  sizes="36px"
                   className="object-contain"
                   priority
                 />
               </div>
               <div>
-                <span className="text-[9px] font-mono uppercase tracking-widest text-purple-700 dark:text-purple-400 font-extrabold block">
+                <span className="text-[8.5px] font-mono uppercase tracking-widest text-purple-700 dark:text-purple-400 font-extrabold block">
                   Autentikasi Internal
                 </span>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-tight tracking-tight">
+                <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white leading-tight tracking-tight">
                   Portal Asisten Praktikum
                 </h2>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-[10px] font-mono font-semibold text-purple-800 dark:text-purple-300 shadow-2xs">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-[9.5px] font-mono font-semibold text-purple-800 dark:text-purple-300 shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
               Sesi Aktif
             </div>
           </div>
 
           {/* Authentication Form — 100% Pure Manual Input */}
-          <form action={formAction} className="space-y-4 pt-1">
+          <form action={formAction} className="space-y-3 pt-0.5">
             {/* Identifier Field */}
-            <div className="space-y-1.5">
-              <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
+            <div className="space-y-1">
+              <label className="text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
                 Kode Asisten (NIM / ID Lab):
               </label>
               <div className="relative">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                  <User size={16} />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <User size={15} />
                 </div>
                 <input
                   id="identifier"
@@ -92,24 +92,24 @@ export function LoginForm() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
                   placeholder="Masukkan Kode (Contoh: GWAN / IZIN / KEYS)"
-                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono uppercase shadow-inner font-semibold"
+                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono uppercase shadow-inner font-semibold"
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
+                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
                   Password Sesi:
                 </label>
-                <span className="text-[9.5px] font-mono text-purple-700 dark:text-purple-300 font-semibold bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-200/80 dark:border-purple-800/60">
+                <span className="text-[9px] font-mono text-purple-700 dark:text-purple-300 font-semibold bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-200/80 dark:border-purple-800/60">
                   Format: {passwordHint}
                 </span>
               </div>
               <div className="relative">
-                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                  <Lock size={16} />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <Lock size={15} />
                 </div>
                 <input
                   id="password"
@@ -119,21 +119,21 @@ export function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={`Masukkan password (misal: ${passwordHint})...`}
-                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono shadow-inner"
+                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-9 pr-9 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono shadow-inner"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
                 >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                 </button>
               </div>
             </div>
 
             {/* Error Message (Refined Red Accent) */}
             {state?.error && (
-              <div className="text-red-700 dark:text-red-400 text-xs font-mono bg-red-50 dark:bg-red-950/60 p-2.5 rounded-xl border border-red-200 dark:border-red-900/60 flex items-start gap-2">
+              <div className="text-red-700 dark:text-red-400 text-xs font-mono bg-red-50 dark:bg-red-950/60 p-2 rounded-xl border border-red-200 dark:border-red-900/60 flex items-start gap-2">
                 <span className="font-bold">•</span>
                 <span>{state.error}</span>
               </div>
@@ -145,7 +145,7 @@ export function LoginForm() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isPending}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-[#200A3E] via-purple-700 to-purple-600 hover:from-[#2B0E54] hover:via-purple-600 hover:to-purple-500 text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase pl-6 pr-2 py-2.5 rounded-2xl shadow-[0_16px_36px_-8px_rgba(124,58,237,0.45)] hover:shadow-[0_20px_42px_-8px_rgba(124,58,237,0.55)] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-2"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-[#200A3E] via-purple-700 to-purple-600 hover:from-[#2B0E54] hover:via-purple-600 hover:to-purple-500 text-white font-bold text-xs sm:text-[12.5px] tracking-wider uppercase pl-5 pr-1.5 py-2 rounded-2xl shadow-[0_12px_28px_-6px_rgba(124,58,237,0.45)] hover:shadow-[0_16px_32px_-6px_rgba(124,58,237,0.55)] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-1"
             >
               {/* Dynamic Button Sheen on Hover */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
@@ -153,15 +153,15 @@ export function LoginForm() {
               </div>
 
               {isPending ? (
-                <div className="flex items-center justify-center gap-2 w-full py-1">
-                  <Loader2 size={16} className="animate-spin" />
+                <div className="flex items-center justify-center gap-2 w-full py-0.5">
+                  <Loader2 size={15} className="animate-spin" />
                   <span>Memverifikasi Akses Asisten...</span>
                 </div>
               ) : (
                 <>
                   <span className="relative z-10">Masuk ke Dashboard Asisten</span>
-                  <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1.5 group-hover:scale-105 shrink-0">
-                    <ArrowRight size={15} />
+                  <div className="relative z-10 w-7 h-7 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
+                    <ArrowRight size={14} />
                   </div>
                 </>
               )}
@@ -169,10 +169,10 @@ export function LoginForm() {
           </form>
 
           {/* Informative Security Strip */}
-          <div className="pt-2 border-t border-purple-100 dark:border-purple-950/80 flex items-center justify-center text-[10px] font-mono text-slate-400 dark:text-slate-500">
+          <div className="pt-1.5 border-t border-purple-100 dark:border-purple-950/80 flex items-center justify-center text-[9.5px] font-mono text-slate-400 dark:text-slate-500">
             <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-              <ShieldCheck size={13} className="text-purple-600 dark:text-purple-400" />
+              <ShieldCheck size={12} className="text-purple-600 dark:text-purple-400" />
               <span>Internal EDM Laboratory • Sesi Aman</span>
             </div>
           </div>

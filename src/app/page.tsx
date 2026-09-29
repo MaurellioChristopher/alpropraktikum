@@ -26,7 +26,7 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen relative bg-white dark:bg-[#06020E] text-slate-900 dark:text-white flex flex-col justify-between selection:bg-purple-600 selection:text-white transition-colors duration-300">
+    <main className="h-screen max-h-screen overflow-hidden relative bg-white dark:bg-[#06020E] text-slate-900 dark:text-white flex flex-col justify-between selection:bg-purple-600 selection:text-white transition-colors duration-300">
       {/* Background Micro-Circuitry & Ambient Particles (Dynamic moving elements) */}
       <TechBackground />
 
@@ -35,19 +35,19 @@ export default function Home() {
       <div className="absolute bottom-[10%] right-[10%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-bl from-purple-200/25 via-purple-50/15 to-transparent dark:from-purple-900/20 dark:via-purple-950/10 blur-[140px] pointer-events-none" />
 
       {/* TOP NAVBAR - Floating Island Pill Architecture */}
-      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-4 sm:pt-6 pb-2 sm:pb-3 shrink-0">
+      <header className="relative z-30 w-full max-w-5xl mx-auto px-4 pt-2.5 sm:pt-3 pb-1 shrink-0">
         <motion.div 
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="relative overflow-hidden mx-auto px-5 sm:px-6 py-2.5 rounded-full bg-white/85 dark:bg-[#0E0820]/90 backdrop-blur-xl border border-purple-100 dark:border-purple-900/50 shadow-[0_8px_32px_rgba(25,10,45,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all"
+          className="relative overflow-hidden mx-auto px-5 sm:px-6 py-2 rounded-full bg-white/85 dark:bg-[#0E0820]/90 backdrop-blur-xl border border-purple-100 dark:border-purple-900/50 shadow-[0_8px_32px_rgba(25,10,45,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex items-center justify-between transition-all"
         >
           {/* Subtle Nav Sheen */}
           <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-full">
             <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-purple-400/10 dark:via-purple-400/5 to-transparent transform -skew-x-20 animate-shimmer" />
           </div>
 
-          <EdmLogo className="h-6 sm:h-7 relative z-10" />
+          <EdmLogo className="h-5.5 sm:h-6 relative z-10" />
 
           {/* Right Navigation with Theme Toggle */}
           <nav className="flex items-center gap-4 sm:gap-6 relative z-10">
@@ -75,20 +75,20 @@ export default function Home() {
       </header>
 
       {/* HERO & MAIN INTERACTIVE SECTION - Fits cleanly in 1 viewport with optimal spacing */}
-      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 py-5 sm:py-8 lg:py-10 flex-1 flex flex-col justify-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 py-1 sm:py-2 flex-1 min-h-0 flex items-center">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
           
           {/* LEFT COLUMN: Fluid Typography, Tactile CTAs, and Visualizer */}
-          <div className="lg:col-span-7 flex flex-col space-y-4 sm:space-y-4.5">
+          <div className="lg:col-span-7 flex flex-col space-y-3">
             
             {/* Headlines with Animated Gradient */}
             <motion.div 
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-3"
+              className="space-y-2.5"
             >
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.5rem] xl:text-[2.85rem] font-black tracking-tight leading-[1.12]">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2.15rem] xl:text-[2.4rem] font-black tracking-tight leading-[1.08]">
                 <span className="text-slate-900 dark:text-white">SELAMAT DATANG,</span>
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-purple-500 to-purple-800 dark:from-purple-400 dark:via-purple-200 dark:to-white animate-gradient-flow inline-block">
@@ -99,31 +99,31 @@ export default function Home() {
               </h1>
 
               {/* Minimalist Meta Chips with Soft Hover Lift (White / Purple / Black) */}
-              <div className="flex flex-wrap items-center gap-2 pt-1 text-[10.5px] font-mono">
+              <div className="flex flex-wrap items-center gap-1.5 pt-0.5 text-[10px] font-mono">
                 <motion.span 
                   whileHover={{ y: -2, scale: 1.02 }}
-                  className="bg-white/90 dark:bg-[#0E0820] text-slate-800 dark:text-slate-200 font-semibold px-2.5 py-1 rounded-lg border border-purple-200/70 dark:border-purple-900/60 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                  className="bg-white/90 dark:bg-[#0E0820] text-slate-800 dark:text-slate-200 font-semibold px-2 py-0.5 rounded-lg border border-purple-200/70 dark:border-purple-900/60 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
                   Telkom University
                 </motion.span>
                 <motion.span 
                   whileHover={{ y: -2, scale: 1.02 }}
-                  className="bg-purple-50/90 dark:bg-purple-950/70 text-purple-900 dark:text-purple-200 font-bold px-2.5 py-1 rounded-lg border border-purple-200 dark:border-purple-850 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                  className="bg-purple-50/90 dark:bg-purple-950/70 text-purple-900 dark:text-purple-200 font-bold px-2 py-0.5 rounded-lg border border-purple-200 dark:border-purple-850 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
                   Angkatan 2026 (SI&apos;50)
                 </motion.span>
                 <motion.span 
                   whileHover={{ y: -2, scale: 1.02 }}
-                  className="bg-purple-900 text-white dark:bg-purple-900/90 font-bold px-2.5 py-1 rounded-lg border border-purple-700 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                  className="bg-purple-900 text-white dark:bg-purple-900/90 font-bold px-2 py-0.5 rounded-lg border border-purple-700 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-300 animate-pulse" />
                   15 Kelas Aktif
                 </motion.span>
                 <motion.span 
                   whileHover={{ y: -2, scale: 1.02 }}
-                  className="bg-slate-100/90 dark:bg-black/60 text-slate-700 dark:text-slate-300 font-semibold px-2.5 py-1 rounded-lg border border-slate-300/70 dark:border-purple-900/40 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
+                  className="bg-slate-100/90 dark:bg-black/60 text-slate-700 dark:text-slate-300 font-semibold px-2 py-0.5 rounded-lg border border-slate-300/70 dark:border-purple-900/40 shadow-2xs flex items-center gap-1.5 cursor-default transition-shadow hover:shadow-xs"
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
                   Lab Terpadu Lt. 3
@@ -136,7 +136,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-              className="flex flex-wrap items-center gap-3 pt-0.5"
+              className="flex flex-wrap items-center gap-2.5 pt-0.5"
             >
               <motion.button
                 whileHover={{ y: -2, scale: 1.02 }}
@@ -144,18 +144,18 @@ export default function Home() {
                 transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setActiveModal("modul")}
-                className="relative overflow-hidden rounded-full pl-5 pr-2 py-2 bg-gradient-to-r from-[#200A3E] via-[#3B0764] to-[#581C87] hover:from-[#2B0E54] hover:to-[#6B21A8] text-white font-bold text-xs uppercase tracking-wider shadow-[0_12px_28px_-6px_rgba(88,28,135,0.45)] hover:shadow-[0_16px_36px_-6px_rgba(88,28,135,0.55)] transition-all flex items-center gap-3 group cursor-pointer"
+                className="relative overflow-hidden rounded-full pl-4.5 pr-1.5 py-1.5 bg-gradient-to-r from-[#200A3E] via-[#3B0764] to-[#581C87] hover:from-[#2B0E54] hover:to-[#6B21A8] text-white font-bold text-xs uppercase tracking-wider shadow-[0_12px_28px_-6px_rgba(88,28,135,0.45)] hover:shadow-[0_16px_36px_-6px_rgba(88,28,135,0.55)] transition-all flex items-center gap-2.5 group cursor-pointer"
               >
                 {/* Button specular sheen */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
                   <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform -skew-x-20 animate-shimmer" />
                 </div>
                 <div className="relative z-10 flex items-center gap-2">
-                  <BookOpen size={14} className="text-purple-300" />
+                  <BookOpen size={13} className="text-purple-300" />
                   <span>Silabus Modul</span>
                 </div>
-                <div className="relative z-10 w-7 h-7 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
-                  <ArrowRight size={13} />
+                <div className="relative z-10 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
+                  <ArrowRight size={12} />
                 </div>
               </motion.button>
 
@@ -165,9 +165,9 @@ export default function Home() {
                 transition={{ type: "spring", stiffness: 450, damping: 22 }}
                 type="button"
                 onClick={() => setActiveModal("tentang")}
-                className="rounded-full px-5 py-2.5 bg-white dark:bg-[#0E0820] hover:bg-purple-50/50 dark:hover:bg-purple-950/40 text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider border border-purple-200 dark:border-purple-800/80 shadow-2xs hover:shadow-xs backdrop-blur-md transition-all flex items-center gap-2 cursor-pointer hover:border-purple-400 dark:hover:border-purple-600"
+                className="rounded-full px-4.5 py-2 bg-white dark:bg-[#0E0820] hover:bg-purple-50/50 dark:hover:bg-purple-950/40 text-slate-800 dark:text-slate-200 font-bold text-xs uppercase tracking-wider border border-purple-200 dark:border-purple-800/80 shadow-2xs hover:shadow-xs backdrop-blur-md transition-all flex items-center gap-2 cursor-pointer hover:border-purple-400 dark:hover:border-purple-600"
               >
-                <Info size={14} className="text-purple-600 dark:text-purple-400" />
+                <Info size={13} className="text-purple-600 dark:text-purple-400" />
                 <span>Tentang Lab EDM</span>
               </motion.button>
             </motion.div>
@@ -177,7 +177,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
-              className="pt-1"
+              className="pt-0.5"
             >
               <AlgorithmVisualizer />
             </motion.div>
@@ -192,15 +192,15 @@ export default function Home() {
       </section>
 
       {/* FOOTER STRIP - Minimalist & Compact */}
-      <footer className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-2.5 sm:py-3 border-t border-purple-100 dark:border-purple-950/60 shrink-0 flex items-center justify-between text-[11px] font-mono text-slate-500 dark:text-slate-400">
+      <footer className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-1.5 sm:py-2 border-t border-purple-100 dark:border-purple-950/60 shrink-0 flex items-center justify-between text-[10.5px] font-mono text-slate-500 dark:text-slate-400">
         <span className="text-slate-400 dark:text-slate-500">Enterprise Data Management</span>
-        <div className="flex items-center gap-2.5 text-[11px]">
-          <div className="relative h-4 w-5 shrink-0">
+        <div className="flex items-center gap-2.5 text-[10.5px]">
+          <div className="relative h-3.5 w-4.5 shrink-0">
             <Image
               src="/images/edm-emblem-crimson.png"
               alt="EDM Logo"
               fill
-              sizes="20px"
+              sizes="18px"
               className="object-contain"
             />
           </div>
