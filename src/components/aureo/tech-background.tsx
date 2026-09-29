@@ -91,7 +91,7 @@ export function TechBackground() {
           </motion.div>
         ))}
 
-      {/* Soft Ambient Floating Animated Radial Lights (Ethereal Aurora Drift) */}
+      {/* Soft Ambient Floating Animated Radial Lights (Deep Purple & Obsidian Ethereal Aura) */}
       <motion.div
         animate={{
           x: [0, 30, -25, 0],
@@ -99,7 +99,7 @@ export function TechBackground() {
           scale: [1, 1.12, 0.95, 1],
         }}
         transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-[10%] -left-[5%] w-[48vw] h-[48vw] rounded-full bg-gradient-to-br from-purple-300/30 via-rose-200/25 to-transparent blur-[130px]"
+        className="absolute -top-[10%] -left-[5%] w-[48vw] h-[48vw] rounded-full bg-gradient-to-br from-purple-500/20 via-purple-800/15 to-transparent blur-[130px]"
       />
       <motion.div
         animate={{
@@ -108,7 +108,7 @@ export function TechBackground() {
           scale: [1, 1.18, 0.92, 1],
         }}
         transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute top-[25%] -right-[8%] w-[58vw] h-[58vw] rounded-full bg-gradient-to-bl from-rose-300/25 via-purple-200/25 to-indigo-200/20 blur-[150px]"
+        className="absolute top-[25%] -right-[8%] w-[58vw] h-[58vw] rounded-full bg-gradient-to-bl from-purple-600/20 via-purple-900/20 to-transparent blur-[150px]"
       />
       <motion.div
         animate={{
@@ -116,7 +116,7 @@ export function TechBackground() {
           y: [0, 25, -30, 0],
         }}
         transition={{ duration: 16, repeat: Infinity, ease: "easeInOut", delay: 4 }}
-        className="absolute -bottom-[15%] left-[25%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-tr from-indigo-200/30 via-rose-100/20 to-transparent blur-[120px]"
+        className="absolute -bottom-[15%] left-[25%] w-[42vw] h-[42vw] rounded-full bg-gradient-to-tr from-purple-800/25 via-purple-950/20 to-transparent blur-[120px]"
       />
 
       {/* SVG PCB Circuit Micro-traces (Right-side signature matching reference) */}
@@ -128,17 +128,17 @@ export function TechBackground() {
       >
         <defs>
           <linearGradient id="traceGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#9E1B32" stopOpacity="0.45" />
-            <stop offset="40%" stopColor="#7C3AED" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0.75" />
+            <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.55" />
+            <stop offset="40%" stopColor="#9333EA" stopOpacity="0.45" />
+            <stop offset="100%" stopColor="#C084FC" stopOpacity="0.8" />
           </linearGradient>
           <linearGradient id="pulseDotGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#E11D48" />
-            <stop offset="100%" stopColor="#9333EA" />
+            <stop offset="0%" stopColor="#C084FC" />
+            <stop offset="100%" stopColor="#7C3AED" />
           </linearGradient>
           <linearGradient id="pulseDotGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#38BDF8" />
-            <stop offset="100%" stopColor="#6366F1" />
+            <stop offset="0%" stopColor="#E9D5FF" />
+            <stop offset="100%" stopColor="#A855F7" />
           </linearGradient>
         </defs>
 
@@ -180,8 +180,8 @@ export function TechBackground() {
           { cx: 560, cy: 410 },
         ].map((via, i) => (
           <g key={i}>
-            <circle cx={via.cx} cy={via.cy} r="4" fill="#FFFFFF" stroke="#9E1B32" strokeWidth="1.5" />
-            <circle cx={via.cx} cy={via.cy} r="1.5" fill="#9E1B32" />
+            <circle cx={via.cx} cy={via.cy} r="4" fill="#FFFFFF" stroke="#7C3AED" strokeWidth="1.5" />
+            <circle cx={via.cx} cy={via.cy} r="1.5" fill="#7C3AED" />
           </g>
         ))}
 
@@ -255,7 +255,7 @@ export function TechBackground() {
         />
       </svg>
 
-      {/* Dynamic Particle Wave Field (SVG Sine Matrix matching reference style) */}
+      {/* Dynamic Particle Wave Field (SVG Sine Matrix in Purple Palette) */}
       <svg
         className="absolute top-1/4 -left-1/4 w-[150vw] h-[70vh] opacity-40 overflow-visible"
         viewBox="0 0 100 100"
@@ -263,10 +263,10 @@ export function TechBackground() {
       >
         <defs>
           <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#4C1D95" stopOpacity="0.2" />
-            <stop offset="35%" stopColor="#9E1B32" stopOpacity="0.6" />
-            <stop offset="70%" stopColor="#6366F1" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#CBD5E1" stopOpacity="0.1" />
+            <stop offset="0%" stopColor="#2E1065" stopOpacity="0.3" />
+            <stop offset="40%" stopColor="#7C3AED" stopOpacity="0.65" />
+            <stop offset="75%" stopColor="#A855F7" stopOpacity="0.5" />
+            <stop offset="100%" stopColor="#C084FC" stopOpacity="0.1" />
           </linearGradient>
         </defs>
 
@@ -277,7 +277,7 @@ export function TechBackground() {
               cx={d.x}
               cy={d.y}
               r={d.size}
-              fill={d.isHighlight ? "#9E1B32" : "url(#dotGrad)"}
+              fill={d.isHighlight ? "#A855F7" : "url(#dotGrad)"}
               opacity={d.opacity}
             />
           ))}

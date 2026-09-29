@@ -11,7 +11,7 @@ export default async function DashboardLayout({
   const userRole = (cookieStore.get("mock_role")?.value as "ASPRAK" | "KOMDIS" | "SEKBEN") || (sessionUser === "IZIN" ? "KOMDIS" : sessionUser === "LEVI" ? "SEKBEN" : "ASPRAK");
 
   return (
-    <div className="min-h-screen bg-[#F4F6FB] flex flex-col font-sans selection:bg-rose-600 selection:text-white">
+    <div className="min-h-screen bg-[#F4F6FB] dark:bg-[#080512] flex flex-col font-sans selection:bg-rose-600 selection:text-white transition-colors duration-300">
       {/* Top Header matching reference */}
       <DashboardHeader assistantCode={sessionUser} currentRole={userRole} />
 

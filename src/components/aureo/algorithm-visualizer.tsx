@@ -77,7 +77,7 @@ export function AlgorithmVisualizer() {
 
   // Right cluster target nodes
   const rightClusters = [
-    { id: "R1", label: "TK08", y: 35, color: "#BE123C" },
+    { id: "R1", label: "TK08", y: 35, color: "#9333EA" },
     { id: "R2", label: "2008", y: 65, color: "#7C3AED" },
   ];
 
@@ -91,25 +91,25 @@ export function AlgorithmVisualizer() {
 
   return (
     <div className="relative w-full max-w-xl lg:max-w-[620px] select-none group">
-      {/* Dynamic Ambient Pulsing Aura */}
-      <div className="absolute -inset-3.5 bg-gradient-to-r from-purple-600/30 via-rose-600/25 to-indigo-600/25 rounded-[2.2rem] blur-xl opacity-65 group-hover:opacity-90 transition-opacity pointer-events-none" />
+      {/* Dynamic Ambient Pulsing Aura (Purple / Obsidian) */}
+      <div className="absolute -inset-3.5 bg-gradient-to-r from-purple-700/30 via-purple-600/30 to-purple-900/25 rounded-[2.2rem] blur-xl opacity-65 group-hover:opacity-90 transition-opacity pointer-events-none" />
 
       {/* Double Bezel Outer Shell with Specular Sheen */}
-      <div className="relative z-10 rounded-[1.85rem] p-1.5 bg-gradient-to-b from-white/40 via-white/15 to-white/10 backdrop-blur-2xl border border-white/40 shadow-[0_20px_45px_-12px_rgba(20,5,35,0.22)] overflow-hidden">
+      <div className="relative z-10 rounded-[1.85rem] p-1.5 bg-gradient-to-b from-white/30 via-purple-900/10 to-transparent dark:from-purple-900/30 dark:via-purple-950/20 dark:to-black/40 backdrop-blur-2xl border border-purple-200/40 dark:border-purple-800/40 shadow-[0_20px_45px_-12px_rgba(20,5,35,0.22)] overflow-hidden">
         
         {/* Subtle Specular Light Sweep */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[1.85rem]">
-          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/10 to-transparent transform -skew-x-20 animate-shimmer" />
+          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-purple-300/10 to-transparent transform -skew-x-20 animate-shimmer" />
         </div>
 
-        <div className="relative z-10 bg-[#0C081D]/95 text-white rounded-[1.55rem] p-3.5 sm:p-4.5 border border-purple-500/25 space-y-2.5">
+        <div className="relative z-10 bg-[#0C061A]/95 text-white rounded-[1.55rem] p-3.5 sm:p-4.5 border border-purple-500/25 space-y-2.5">
           
           {/* Card Header Bar - Minimalist, Alive, and Eye-Pleasing */}
           <div className="flex items-center justify-between pb-2 border-b border-white/5">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500" />
               </span>
               <h3 className="font-sans font-bold text-xs sm:text-[13px] tracking-wider text-slate-200 uppercase whitespace-nowrap">
                 Simulasi Algoritma & Flow Data
@@ -130,7 +130,7 @@ export function AlgorithmVisualizer() {
                       key={i}
                       animate={{
                         height: `${(bar.val / 100) * 14}px`,
-                        backgroundColor: bar.active ? "#F43F5E" : "#A855F7",
+                        backgroundColor: bar.active ? "#C084FC" : "#7C3AED",
                       }}
                       transition={{ type: "spring", stiffness: 350, damping: 22 }}
                       className="w-1 rounded-full"
@@ -143,7 +143,7 @@ export function AlgorithmVisualizer() {
                 <span>Step</span>
                 <div className="w-10 h-1.5 bg-slate-800 rounded-full overflow-hidden">
                   <motion.div 
-                    className="h-full bg-gradient-to-r from-rose-500 to-purple-500 rounded-full"
+                    className="h-full bg-gradient-to-r from-purple-600 to-purple-300 rounded-full"
                     animate={{ width: `${(activeStep / 3) * 100}%` }}
                     transition={{ duration: 0.5 }}
                   />
@@ -164,18 +164,18 @@ export function AlgorithmVisualizer() {
           </div>
 
           {/* Visualizer Canvas Area: Bipartite Bezier Network (Larger & Taller) */}
-          <div className="relative w-full h-[140px] sm:h-[155px] bg-[#070510]/95 rounded-2xl border border-white/5 overflow-hidden p-2.5">
+          <div className="relative w-full h-[140px] sm:h-[155px] bg-[#06030F]/95 rounded-2xl border border-white/5 overflow-hidden p-2.5">
             <svg className="absolute inset-0 w-full h-full overflow-visible" viewBox="0 0 480 240" preserveAspectRatio="none">
               <defs>
                 <linearGradient id="curveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#E11D48" stopOpacity="0.85" />
-                  <stop offset="50%" stopColor="#A855F7" stopOpacity="0.45" />
-                  <stop offset="100%" stopColor="#6366F1" stopOpacity="0.85" />
+                  <stop offset="0%" stopColor="#9333EA" stopOpacity="0.85" />
+                  <stop offset="50%" stopColor="#A855F7" stopOpacity="0.55" />
+                  <stop offset="100%" stopColor="#C084FC" stopOpacity="0.85" />
                 </linearGradient>
                 <linearGradient id="curveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#9E1B32" stopOpacity="0.75" />
+                  <stop offset="0%" stopColor="#7C3AED" stopOpacity="0.75" />
                   <stop offset="70%" stopColor="#C084FC" stopOpacity="0.55" />
-                  <stop offset="100%" stopColor="#BE123C" stopOpacity="0.95" />
+                  <stop offset="100%" stopColor="#E9D5FF" stopOpacity="0.95" />
                 </linearGradient>
               </defs>
 

@@ -33,21 +33,21 @@ export function LoginForm() {
 
   return (
     <div className="relative w-full max-w-[490px] lg:max-w-[520px] group">
-      {/* Soft Ambient Diffuse Glow behind the glass card */}
-      <div className="absolute -inset-4 bg-gradient-to-tr from-rose-500/25 via-purple-600/25 to-indigo-500/20 rounded-[2.4rem] blur-2xl opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none" />
+      {/* Soft Ambient Diffuse Glow behind the glass card (Purple Aura) */}
+      <div className="absolute -inset-4 bg-gradient-to-tr from-purple-700/25 via-purple-600/30 to-purple-900/20 dark:from-purple-800/35 dark:via-purple-700/35 dark:to-purple-950/30 rounded-[2.4rem] blur-2xl opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
       {/* High-End Double-Bezel Hardware Enclosure with Specular Glint */}
-      <div className="relative z-10 rounded-[2.15rem] p-1.5 bg-gradient-to-b from-white/95 via-white/80 to-white/90 backdrop-blur-2xl border border-white/90 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.16)] overflow-hidden">
+      <div className="relative z-10 rounded-[2.15rem] p-1.5 bg-gradient-to-b from-white/95 via-purple-50/40 to-white/90 dark:from-[#1D1036] dark:via-[#0E0820] dark:to-black backdrop-blur-2xl border border-purple-100 dark:border-purple-900/40 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.16)] dark:shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] overflow-hidden transition-colors">
         
         {/* Subtle Specular Sheen across glass surface */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.15rem]">
-          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-20 animate-shimmer" />
+          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-purple-300/10 dark:via-purple-400/5 to-transparent transform -skew-x-20 animate-shimmer" />
         </div>
 
-        <div className="rounded-[1.8rem] p-6 sm:p-7 bg-white/80 backdrop-blur-xl border border-white/60 space-y-4.5">
+        <div className="rounded-[1.8rem] p-6 sm:p-7 bg-white/90 dark:bg-[#0D071E] backdrop-blur-xl border border-purple-100/80 dark:border-purple-900/50 space-y-4.5 transition-colors">
           
           {/* Brand Logo & Console Title Header */}
-          <div className="pb-3 border-b border-slate-200/60 flex items-center justify-between">
+          <div className="pb-3 border-b border-purple-100 dark:border-purple-950/80 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative h-8 w-10 shrink-0 drop-shadow-sm">
                 <Image
@@ -60,17 +60,17 @@ export function LoginForm() {
                 />
               </div>
               <div>
-                <span className="text-[9px] font-mono uppercase tracking-widest text-[#9E1B32] font-extrabold block">
+                <span className="text-[9px] font-mono uppercase tracking-widest text-purple-700 dark:text-purple-400 font-extrabold block">
                   Autentikasi Internal
                 </span>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 leading-tight tracking-tight">
+                <h2 className="text-base sm:text-lg font-black text-slate-900 dark:text-white leading-tight tracking-tight">
                   Portal Asisten Praktikum
                 </h2>
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50/90 border border-emerald-200/80 text-[10px] font-mono font-semibold text-emerald-700 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-[10px] font-mono font-semibold text-purple-800 dark:text-purple-300 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
               Sesi Aktif
             </div>
           </div>
@@ -81,10 +81,10 @@ export function LoginForm() {
 
             {/* Role Indicator Pills */}
             <div className="space-y-1.5">
-              <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 font-bold">
+              <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
                 Hak Akses Role:
               </label>
-              <div className="flex gap-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200/70">
+              <div className="flex gap-2 p-1.5 bg-slate-100/90 dark:bg-[#140C2C] rounded-2xl border border-purple-100 dark:border-purple-900/40">
                 {(["ASPRAK", "KOMDIS", "SEKBEN"] as const).map((r) => {
                   const isSelected = selectedRole === r;
                   return (
@@ -95,26 +95,26 @@ export function LoginForm() {
                       className={`flex-1 py-2 px-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                         isSelected
                           ? r === "KOMDIS"
-                            ? "bg-[#9E1B32] text-white shadow-md ring-2 ring-rose-500/20"
+                            ? "bg-purple-900 text-white shadow-md ring-2 ring-purple-500/20"
                             : r === "SEKBEN"
-                            ? "bg-[#1E1B4B] text-white shadow-md ring-2 ring-indigo-500/20"
-                            : "bg-[#250B47] text-white shadow-md ring-2 ring-purple-500/20"
-                          : "text-slate-600 hover:text-slate-900 hover:bg-white/60"
+                            ? "bg-[#180A2D] text-white shadow-md ring-2 ring-purple-500/20 border border-purple-700/50"
+                            : "bg-purple-600 text-white shadow-md ring-2 ring-purple-500/20"
+                          : "text-slate-600 dark:text-slate-400 hover:text-purple-900 dark:hover:text-purple-200 hover:bg-white/60 dark:hover:bg-purple-950/40"
                       }`}
                     >
                       {r === "ASPRAK" ? (
                         <>
-                          <Users size={12} className={isSelected ? "text-purple-300" : "text-slate-400"} />
+                          <Users size={12} className={isSelected ? "text-purple-200" : "text-slate-400"} />
                           <span>Asprak</span>
                         </>
                       ) : r === "KOMDIS" ? (
                         <>
-                          <Shield size={12} className={isSelected ? "text-rose-300" : "text-slate-400"} />
+                          <Shield size={12} className={isSelected ? "text-purple-200" : "text-slate-400"} />
                           <span>Komdis</span>
                         </>
                       ) : (
                         <>
-                          <Briefcase size={12} className={isSelected ? "text-indigo-300" : "text-slate-400"} />
+                          <Briefcase size={12} className={isSelected ? "text-purple-200" : "text-slate-400"} />
                           <span>Sekben</span>
                         </>
                       )}
@@ -126,7 +126,7 @@ export function LoginForm() {
 
             {/* Identifier Field */}
             <div className="space-y-1.5">
-              <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 font-bold">
+              <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
                 Kode Asisten (NIM / ID Lab):
               </label>
               <div className="relative">
@@ -141,7 +141,7 @@ export function LoginForm() {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
                   placeholder="Masukkan Kode (Contoh: GWAN / IZIN / KEYS)"
-                  className="w-full bg-white/95 border border-slate-300/85 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-[#9E1B32] transition-all font-mono uppercase shadow-inner font-semibold"
+                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono uppercase shadow-inner font-semibold"
                 />
               </div>
             </div>
@@ -149,10 +149,10 @@ export function LoginForm() {
             {/* Password Field */}
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 font-bold">
+                <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
                   Password Sesi:
                 </label>
-                <span className="text-[9.5px] font-mono text-purple-700 font-semibold bg-purple-50 px-2 py-0.5 rounded-md border border-purple-200/80">
+                <span className="text-[9.5px] font-mono text-purple-700 dark:text-purple-300 font-semibold bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-200/80 dark:border-purple-800/60">
                   Format: {passwordHint}
                 </span>
               </div>
@@ -168,21 +168,21 @@ export function LoginForm() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder={`Masukkan password (misal: ${passwordHint})...`}
-                  className="w-full bg-white/95 border border-slate-300/85 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-[#9E1B32] transition-all font-mono shadow-inner"
+                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-10 pr-10 py-2.5 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono shadow-inner"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                 </button>
               </div>
             </div>
 
-            {/* Error Message */}
+            {/* Error Message (Refined Red Accent) */}
             {state?.error && (
-              <div className="text-rose-700 text-xs font-mono bg-rose-50 p-2.5 rounded-xl border border-rose-200 flex items-start gap-2">
+              <div className="text-red-700 dark:text-red-400 text-xs font-mono bg-red-50 dark:bg-red-950/60 p-2.5 rounded-xl border border-red-200 dark:border-red-900/60 flex items-start gap-2">
                 <span className="font-bold">•</span>
                 <span>{state.error}</span>
               </div>
@@ -194,7 +194,7 @@ export function LoginForm() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isPending}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-[#9E1B32] via-[#7B1238] to-[#250B47] hover:from-[#B51E3A] hover:via-[#8E1542] hover:to-[#351065] text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase pl-6 pr-2 py-2.5 rounded-2xl shadow-[0_16px_36px_-8px_rgba(158,27,50,0.38)] hover:shadow-[0_20px_42px_-8px_rgba(158,27,50,0.48)] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-2"
+              className="w-full relative overflow-hidden bg-gradient-to-r from-[#200A3E] via-purple-700 to-purple-600 hover:from-[#2B0E54] hover:via-purple-600 hover:to-purple-500 text-white font-bold text-xs sm:text-[13px] tracking-wider uppercase pl-6 pr-2 py-2.5 rounded-2xl shadow-[0_16px_36px_-8px_rgba(124,58,237,0.45)] hover:shadow-[0_20px_42px_-8px_rgba(124,58,237,0.55)] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-2"
             >
               {/* Dynamic Button Sheen on Hover */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
@@ -218,10 +218,10 @@ export function LoginForm() {
           </form>
 
           {/* Informative Security Strip */}
-          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-center text-[10px] font-mono text-slate-400">
-            <div className="flex items-center gap-2 text-slate-500">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <ShieldCheck size={13} className="text-[#9E1B32]" />
+          <div className="pt-2 border-t border-purple-100 dark:border-purple-950/80 flex items-center justify-center text-[10px] font-mono text-slate-400 dark:text-slate-500">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+              <ShieldCheck size={13} className="text-purple-600 dark:text-purple-400" />
               <span>Internal EDM Laboratory • Sesi Aman</span>
             </div>
           </div>
