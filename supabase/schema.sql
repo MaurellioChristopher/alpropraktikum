@@ -52,16 +52,11 @@ WITH CHECK (true);
 -- Anda bisa mengubah atau menambah data asisten sesuai tim Anda di bawah ini!
 -- ====================================================================
 
+-- Bersihkan data awal sebelumnya agar tidak bentrok dengan NIM yang sama
+TRUNCATE TABLE public.assistants;
+
 INSERT INTO public.assistants (code, nim, name, role, password, email)
 VALUES 
   ('GWAN', '1202230001', 'Andi Pratama (Koor Komdis)', 'KOMDIS', 'asisten2026', 'andip@telkomuniversity.ac.id'),
   ('IZIN', '1202230002', 'M. Izin Alamsyah (Korprak)', 'ASPRAK', 'asisten2026', 'izina@telkomuniversity.ac.id'),
-  ('KEYS', '1202230003', 'Keysha (Sekre)', 'SEKBEN', 'asisten2026', 'keyshap@telkomuniversity.ac.id')
-ON CONFLICT (code) DO UPDATE 
-SET 
-  nim = EXCLUDED.nim,
-  name = EXCLUDED.name,
-  role = EXCLUDED.role,
-  password = EXCLUDED.password,
-  email = EXCLUDED.email,
-  updated_at = timezone('utc'::text, now());
+  ('KEYS', '1202230003', 'Keysha (Sekre)', 'SEKBEN', 'asisten2026', 'keyshap@telkomuniversity.ac.id');
