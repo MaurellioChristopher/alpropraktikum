@@ -38,31 +38,21 @@ export default function Home() {
           <EdmLogo className="h-6 sm:h-7" />
 
           {/* Right Navigation */}
-          <nav className="flex items-center gap-4 sm:gap-6">
-            <div className="flex items-center gap-4 sm:gap-6">
-              <button
-                type="button"
-                onClick={() => setActiveModal("modul")}
-                className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-[#9E1B32] transition-colors cursor-pointer"
-              >
-                Modul
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveModal("tentang")}
-                className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-[#9E1B32] transition-colors cursor-pointer"
-              >
-                Tentang
-              </button>
-            </div>
-
-            {/* Quick Login Pill Button */}
-            <a
-              href="#login-section"
-              className="bg-gradient-to-r from-[#9E1B32] via-[#7B1238] to-[#250B47] hover:from-[#B51E3A] hover:via-[#8E1542] hover:to-[#38106A] text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider px-4 py-1.5 rounded-full shadow-xs transition-all active:scale-95 flex items-center gap-1.5 cursor-pointer"
+          <nav className="flex items-center gap-5 sm:gap-7">
+            <button
+              type="button"
+              onClick={() => setActiveModal("modul")}
+              className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-[#9E1B32] transition-colors cursor-pointer"
             >
-              <span>Masuk</span>
-            </a>
+              Modul
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveModal("tentang")}
+              className="text-xs font-semibold uppercase tracking-wider text-slate-600 hover:text-[#9E1B32] transition-colors cursor-pointer"
+            >
+              Tentang
+            </button>
           </nav>
         </div>
       </header>
@@ -150,13 +140,8 @@ export default function Home() {
       </section>
 
       {/* FOOTER STRIP - Minimalist & Compact */}
-      <footer className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-2.5 sm:py-3 border-t border-slate-200/70 shrink-0 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-slate-500">
-        <div className="flex items-center gap-3">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Server: EDM-CORE-01 (ACTIVE)</span>
-          <span className="hidden sm:inline">•</span>
-          <span className="hidden sm:inline">Telkom University</span>
-        </div>
+      <footer className="relative z-20 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-10 py-2.5 sm:py-3 border-t border-slate-200/70 shrink-0 flex items-center justify-between text-[11px] font-mono text-slate-500">
+        <span className="text-slate-400">Enterprise Data Management</span>
         <div className="flex items-center gap-2.5 text-[11px]">
           <div className="relative h-4 w-5 shrink-0">
             <Image

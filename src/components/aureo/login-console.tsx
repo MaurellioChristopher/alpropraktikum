@@ -253,12 +253,11 @@ export function LoginForm() {
           </form>
 
           {/* Informative Security Strip */}
-          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px] font-mono text-slate-400">
+          <div className="pt-2 border-t border-slate-200/60 flex items-center justify-center text-[10px] font-mono text-slate-400">
             <div className="flex items-center gap-1.5 text-slate-500">
               <ShieldCheck size={13} className="text-[#9E1B32]" />
               <span>Internal EDM Laboratory</span>
             </div>
-            <span className="font-semibold text-slate-600">S1 SI &apos;26 Telkom University</span>
           </div>
         </div>
       </div>
