@@ -54,13 +54,9 @@ WITH CHECK (true);
 
 INSERT INTO public.assistants (code, nim, name, role, password, email)
 VALUES 
-  ('GWAN', '1202230001', 'Andi Pratama', 'ASPRAK', 'asisten2026', 'andip@telkomuniversity.ac.id'),
-  ('IZIN', '1202230002', 'M. Izin Alamsyah', 'KOMDIS', 'asisten2026', 'izina@telkomuniversity.ac.id'),
-  ('LEVI', '1202230003', 'Levina Putri', 'SEKBEN', 'asisten2026', 'levinap@telkomuniversity.ac.id'),
-  ('RAFI', '1202230004', 'Rafi Al-Fayed', 'ASPRAK', 'asisten2026', 'rafia@telkomuniversity.ac.id'),
-  ('DINA', '1202230005', 'Dina Kartika', 'ASPRAK', 'asisten2026', 'dinak@telkomuniversity.ac.id'),
-  ('FAIS', '1202230006', 'Faisal Rahman', 'KOMDIS', 'asisten2026', 'faisalr@telkomuniversity.ac.id'),
-  ('NINA', '1202230007', 'Nina Safitri', 'SEKBEN', 'asisten2026', 'ninas@telkomuniversity.ac.id')
+  ('GWAN', '1202230001', 'Andi Pratama (Koor Komdis)', 'KOMDIS', 'asisten2026', 'andip@telkomuniversity.ac.id'),
+  ('IZIN', '1202230002', 'M. Izin Alamsyah (Korprak)', 'ASPRAK', 'asisten2026', 'izina@telkomuniversity.ac.id'),
+  ('KEYS', '1202230003', 'Keysha (Sekre)', 'SEKBEN', 'asisten2026', 'keyshap@telkomuniversity.ac.id')
 ON CONFLICT (code) DO UPDATE 
 SET 
   nim = EXCLUDED.nim,

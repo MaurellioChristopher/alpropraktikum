@@ -64,9 +64,11 @@ export async function loginAction(prevState: any, formData: FormData) {
   let role = "ASPRAK";
   if (roleInput && ["ASPRAK", "KOMDIS", "SEKBEN"].includes(roleInput)) {
     role = roleInput;
-  } else if (identifier === "IZIN") {
+  } else if (identifier === "GWAN") {
     role = "KOMDIS";
-  } else if (identifier === "LEVI") {
+  } else if (identifier === "IZIN") {
+    role = "ASPRAK";
+  } else if (identifier === "KEYS") {
     role = "SEKBEN";
   }
 
@@ -74,7 +76,17 @@ export async function loginAction(prevState: any, formData: FormData) {
   if (identifier.length >= 2) {
     cookieStore.set("mock_session", identifier, { path: "/" });
     cookieStore.set("mock_role", role, { path: "/" });
-    cookieStore.set("assistant_name", identifier === "GWAN" ? "Andi P." : identifier === "IZIN" ? "M. Izin" : identifier === "LEVI" ? "Levina P." : `Asisten ${identifier}`, { path: "/" });
+    cookieStore.set(
+      "assistant_name",
+      identifier === "GWAN"
+        ? "Andi P. (Koor Komdis)"
+        : identifier === "IZIN"
+        ? "M. Izin (Korprak)"
+        : identifier === "KEYS"
+        ? "Keysha (Sekre)"
+        : `Asisten ${identifier}`,
+      { path: "/" }
+    );
     redirect("/dashboard/assistant");
   }
 

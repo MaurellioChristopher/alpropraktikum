@@ -36,9 +36,9 @@ export function LoginForm() {
 
   // Dynamic Assistant presets from Supabase
   const [assistantsList, setAssistantsList] = useState<AssistantRecord[]>([
-    { code: "GWAN", name: "Andi P. (Asprak)", role: "ASPRAK" },
-    { code: "IZIN", name: "M. Izin (Komdis)", role: "KOMDIS" },
-    { code: "LEVI", name: "Levina (Sekben)", role: "SEKBEN" },
+    { code: "GWAN", name: "Andi P. (Koor Komdis)", role: "KOMDIS" },
+    { code: "IZIN", name: "M. Izin (Korprak)", role: "ASPRAK" },
+    { code: "KEYS", name: "Keysha (Sekre)", role: "SEKBEN" },
   ]);
 
   // Add Assistant Modal States
@@ -270,7 +270,7 @@ export function LoginForm() {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
-                  placeholder="Contoh: GWAN / IZIN / LEVI"
+                  placeholder="Contoh: GWAN / IZIN / KEYS"
                   className="w-full bg-white/95 border border-slate-300/85 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/25 focus:border-[#9E1B32] transition-all font-mono uppercase shadow-inner font-semibold"
                 />
               </div>

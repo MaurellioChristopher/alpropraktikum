@@ -20,9 +20,9 @@ export async function getAssistants(): Promise<AssistantRecord[]> {
   if (!isSupabaseConfigured()) {
     // Fallback data demo jika belum connect ke Supabase
     return [
-      { code: "GWAN", nim: "1202230001", name: "Andi P. (Asprak)", role: "ASPRAK" },
-      { code: "IZIN", nim: "1202230002", name: "M. Izin (Komdis)", role: "KOMDIS" },
-      { code: "LEVI", nim: "1202230003", name: "Levina (Sekben)", role: "SEKBEN" },
+      { code: "GWAN", nim: "1202230001", name: "Andi P. (Koor Komdis)", role: "KOMDIS" },
+      { code: "IZIN", nim: "1202230002", name: "M. Izin (Korprak)", role: "ASPRAK" },
+      { code: "KEYS", nim: "1202230003", name: "Keysha (Sekre)", role: "SEKBEN" },
     ];
   }
 
