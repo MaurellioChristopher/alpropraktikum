@@ -116,7 +116,15 @@ export function DashboardHeader({
 
             <div className="hidden sm:flex flex-col text-left">
               <span className="text-xs font-semibold text-white leading-tight">
-                {assistantCode === "IZIN" ? "Izin (Komdis)" : assistantCode === "LEVI" ? "Levi (Sekben)" : "Gwan (Asprak)"}
+                {assistantCode === "GWAN"
+                  ? "Gwan (Koor Komdis)"
+                  : assistantCode === "IZIN"
+                  ? "Izin (Korprak)"
+                  : assistantCode === "KEYS"
+                  ? "Keys (Sekre)"
+                  : assistantCode === "LEVI"
+                  ? "Levi (Sekben)"
+                  : `${assistantCode} (${activeRole})`}
               </span>
               <span className="text-[10px] font-mono text-purple-300">ID: {assistantCode} • {activeRole}</span>
             </div>
@@ -129,7 +137,15 @@ export function DashboardHeader({
             <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 py-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
                 <div className="font-bold text-xs text-slate-900 dark:text-white">
-                  {assistantCode === "IZIN" ? "Muhammad Izin" : assistantCode === "LEVI" ? "Levina Sekar" : "Andi Prasetyo (Gwan)"}
+                  {assistantCode === "GWAN"
+                    ? "Andi Pratama (Koor Komdis)"
+                    : assistantCode === "IZIN"
+                    ? "M. Izin Alamsyah (Korprak)"
+                    : assistantCode === "KEYS"
+                    ? "Keysha Aurelia (Sekre)"
+                    : assistantCode === "LEVI"
+                    ? "Levina Sekar (Sekben)"
+                    : `Asisten ${assistantCode}`}
                 </div>
                 <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">ID: {assistantCode} • Telkom University</div>
               </div>
@@ -137,7 +153,7 @@ export function DashboardHeader({
               {/* Quick Switch Role Inside Dashboard */}
               <div className="px-4 py-2.5 border-b border-slate-100 dark:border-slate-800 space-y-1.5">
                 <div className="text-[10px] font-mono uppercase text-slate-400 dark:text-slate-500 font-bold flex items-center gap-1.5">
-                  <RefreshCw size={11} className="text-[#9E1B32] dark:text-rose-400" />
+                  <RefreshCw size={11} className="text-purple-600 dark:text-purple-400" />
                   Simulasi Ganti Role:
                 </div>
                 <div className="grid grid-cols-3 gap-1">

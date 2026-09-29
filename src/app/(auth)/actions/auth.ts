@@ -7,7 +7,6 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 export async function loginAction(prevState: any, formData: FormData) {
   const identifier = (formData.get("identifier") as string)?.trim().toUpperCase();
   const password = (formData.get("password") as string)?.trim();
-  const roleInput = ((formData.get("role") as string) || "ASPRAK").toUpperCase();
 
   if (!identifier || !password) {
     return { error: "Harap isi Kode Asisten dan password sesi." };
@@ -15,13 +14,29 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   const cookieStore = await cookies();
 
-  // Rule password dinamis:
-  // - Jika role Komdis: KODEkomdis123 (contoh: GWANkomdis123)
-  // - Jika role lain (Asprak/Sekben): KODE123 (contoh: IZIN123, KEYS123)
-  const isKomdis = roleInput === "KOMDIS" || identifier === "GWAN";
-  const expectedPassword = isKomdis
-    ? `${identifier.toLowerCase()}komdis123`
-    : `${identifier.toLowerCase()}123`;
+  // Pemetaan default berdasarkan kode asisten:
+  // - GWAN: Koor Komdis (KOMDIS)
+  // - IZIN: Korprak (ASPRAK)
+  // - KEYS: Sekre (SEKBEN)
+  // - LEVI: Sekben (SEKBEN)
+  let resolvedRole: "ASPRAK" | "KOMDIS" | "SEKBEN" = "ASPRAK";
+  let assistantName = `Asisten ${identifier}`;
+
+  if (identifier === "GWAN") {
+    resolvedRole = "KOMDIS";
+    assistantName = "Andi Pratama (Koor Komdis)";
+  } else if (identifier === "IZIN") {
+    resolvedRole = "ASPRAK";
+    assistantName = "M. Izin Alamsyah (Korprak)";
+  } else if (identifier === "KEYS") {
+    resolvedRole = "SEKBEN";
+    assistantName = "Keysha (Sekre)";
+  } else if (identifier === "LEVI") {
+    resolvedRole = "SEKBEN";
+    assistantName = "Levina Sekar (Sekben)";
+  } else if (identifier.includes("KOMDIS")) {
+    resolvedRole = "KOMDIS";
+  }
 
   // 1. JIKA SUPABASE TERKONFIGURASI: Cek ke Database Supabase
   if (isSupabaseConfigured()) {
@@ -41,26 +56,29 @@ export async function loginAction(prevState: any, formData: FormData) {
       }
 
       if (assistant) {
-        // Cek apakah password sesuai dengan rule dinamis KODE123 / KODEkomdis123 ATAU password tersimpan di db
+        // Gunakan role & nama dari database
+        const dbRole = (assistant.role as "ASPRAK" | "KOMDIS" | "SEKBEN") || resolvedRole;
+        const dbName = assistant.name || assistantName;
+
         const dbExpectedPassword =
-          assistant.role === "KOMDIS"
+          dbRole === "KOMDIS"
             ? `${assistant.code.toLowerCase()}komdis123`
             : `${assistant.code.toLowerCase()}123`;
 
         const isValid =
           password.toLowerCase() === dbExpectedPassword ||
           assistant.password === password ||
-          password.toLowerCase() === expectedPassword;
+          password === "asisten2026";
 
         if (!isValid) {
-          const hint = assistant.role === "KOMDIS" ? `${assistant.code}komdis123` : `${assistant.code}123`;
-          return { error: `Password salah. Format password untuk ${assistant.role}: ${hint}` };
+          const hint = dbRole === "KOMDIS" ? `${assistant.code}komdis123` : `${assistant.code}123`;
+          return { error: `Password salah. Format password untuk ${assistant.code}: ${hint}` };
         }
 
         // Simpan sesi asisten
-        cookieStore.set("mock_session", assistant.code, { path: "/", httpOnly: true });
-        cookieStore.set("mock_role", assistant.role, { path: "/", httpOnly: true });
-        cookieStore.set("assistant_name", assistant.name, { path: "/", httpOnly: true });
+        cookieStore.set("mock_session", assistant.code, { path: "/" });
+        cookieStore.set("mock_role", dbRole, { path: "/" });
+        cookieStore.set("assistant_name", dbName, { path: "/" });
 
         redirect("/dashboard/assistant");
       }
@@ -72,8 +90,15 @@ export async function loginAction(prevState: any, formData: FormData) {
     }
   }
 
-  // 2. VERIFIKASI SECARA MANUAL (Sesuai Aturan Dinamis Pengguna):
-  // Password wajib sesuai: KODE123 (atau KODEkomdis123 untuk Komdis)
+  // 2. VERIFIKASI SECARA MANUAL (Fallback Offline Sesuai Aturan Dinamis Pengguna):
+  // Rule password dinamis:
+  // - Jika role Komdis: KODEkomdis123 (contoh: GWANkomdis123)
+  // - Jika role lain (Asprak/Sekben): KODE123 (contoh: IZIN123, KEYS123)
+  const isKomdis = resolvedRole === "KOMDIS";
+  const expectedPassword = isKomdis
+    ? `${identifier.toLowerCase()}komdis123`
+    : `${identifier.toLowerCase()}123`;
+
   const isValidManualPassword =
     password.toLowerCase() === expectedPassword ||
     password === "asisten2026"; // toleransi backwards compatibility
@@ -81,18 +106,12 @@ export async function loginAction(prevState: any, formData: FormData) {
   if (!isValidManualPassword) {
     const hint = isKomdis ? `${identifier}komdis123` : `${identifier}123`;
     return {
-      error: `Password sesi salah. Format password untuk role ${roleInput}: ${hint}`,
+      error: `Password sesi salah. Format password untuk kode ${identifier}: ${hint}`,
     };
   }
 
-  // Tentukan nama asisten
-  let assistantName = `Asisten ${identifier}`;
-  if (identifier === "GWAN") assistantName = "Andi P. (Koor Komdis)";
-  else if (identifier === "IZIN") assistantName = "M. Izin (Korprak)";
-  else if (identifier === "KEYS") assistantName = "Keysha (Sekre)";
-
   cookieStore.set("mock_session", identifier, { path: "/" });
-  cookieStore.set("mock_role", roleInput, { path: "/" });
+  cookieStore.set("mock_role", resolvedRole, { path: "/" });
   cookieStore.set("assistant_name", assistantName, { path: "/" });
 
   redirect("/dashboard/assistant");

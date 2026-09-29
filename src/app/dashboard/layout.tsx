@@ -8,7 +8,8 @@ export default async function DashboardLayout({
 }) {
   const cookieStore = await cookies();
   const sessionUser = cookieStore.get("mock_session")?.value || "GWAN";
-  const userRole = (cookieStore.get("mock_role")?.value as "ASPRAK" | "KOMDIS" | "SEKBEN") || (sessionUser === "IZIN" ? "KOMDIS" : sessionUser === "LEVI" ? "SEKBEN" : "ASPRAK");
+  const defaultRole = sessionUser === "GWAN" ? "KOMDIS" : (sessionUser === "KEYS" || sessionUser === "LEVI") ? "SEKBEN" : "ASPRAK";
+  const userRole = (cookieStore.get("mock_role")?.value as "ASPRAK" | "KOMDIS" | "SEKBEN") || defaultRole;
 
   return (
     <div className="min-h-screen bg-[#F4F6FB] dark:bg-[#080512] flex flex-col font-sans selection:bg-rose-600 selection:text-white transition-colors duration-300">

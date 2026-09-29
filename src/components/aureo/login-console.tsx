@@ -13,23 +13,21 @@ import {
   Lock,
   ArrowRight,
   ShieldCheck,
-  Shield,
-  Briefcase,
-  Users,
 } from "lucide-react";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [selectedRole, setSelectedRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN">("ASPRAK");
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   // Dynamic placeholder hint for password
   const passwordHint =
-    selectedRole === "KOMDIS" || identifier === "GWAN"
-      ? `${identifier || "KODE"}komdis123`
-      : `${identifier || "KODE"}123`;
+    identifier === "GWAN"
+      ? "GWANkomdis123"
+      : identifier
+      ? `${identifier}123`
+      : "KODE123";
 
   return (
     <div className="relative w-full max-w-[490px] lg:max-w-[520px] group">
@@ -77,53 +75,6 @@ export function LoginForm() {
 
           {/* Authentication Form — 100% Pure Manual Input */}
           <form action={formAction} className="space-y-4 pt-1">
-            <input type="hidden" name="role" value={selectedRole} />
-
-            {/* Role Indicator Pills */}
-            <div className="space-y-1.5">
-              <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
-                Hak Akses Role:
-              </label>
-              <div className="flex gap-2 p-1.5 bg-slate-100/90 dark:bg-[#140C2C] rounded-2xl border border-purple-100 dark:border-purple-900/40">
-                {(["ASPRAK", "KOMDIS", "SEKBEN"] as const).map((r) => {
-                  const isSelected = selectedRole === r;
-                  return (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => setSelectedRole(r)}
-                      className={`flex-1 py-2 px-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-                        isSelected
-                          ? r === "KOMDIS"
-                            ? "bg-purple-900 text-white shadow-md ring-2 ring-purple-500/20"
-                            : r === "SEKBEN"
-                            ? "bg-[#180A2D] text-white shadow-md ring-2 ring-purple-500/20 border border-purple-700/50"
-                            : "bg-purple-600 text-white shadow-md ring-2 ring-purple-500/20"
-                          : "text-slate-600 dark:text-slate-400 hover:text-purple-900 dark:hover:text-purple-200 hover:bg-white/60 dark:hover:bg-purple-950/40"
-                      }`}
-                    >
-                      {r === "ASPRAK" ? (
-                        <>
-                          <Users size={12} className={isSelected ? "text-purple-200" : "text-slate-400"} />
-                          <span>Asprak</span>
-                        </>
-                      ) : r === "KOMDIS" ? (
-                        <>
-                          <Shield size={12} className={isSelected ? "text-purple-200" : "text-slate-400"} />
-                          <span>Komdis</span>
-                        </>
-                      ) : (
-                        <>
-                          <Briefcase size={12} className={isSelected ? "text-purple-200" : "text-slate-400"} />
-                          <span>Sekben</span>
-                        </>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
             {/* Identifier Field */}
             <div className="space-y-1.5">
               <label className="text-[10.5px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
@@ -208,7 +159,7 @@ export function LoginForm() {
                 </div>
               ) : (
                 <>
-                  <span className="relative z-10">Masuk ke Dashboard ({selectedRole})</span>
+                  <span className="relative z-10">Masuk ke Dashboard Asisten</span>
                   <div className="relative z-10 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1.5 group-hover:scale-105 shrink-0">
                     <ArrowRight size={15} />
                   </div>

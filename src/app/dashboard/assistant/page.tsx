@@ -47,9 +47,30 @@ export default function AssistantDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedClassCode, setSelectedClassCode] = useState<string>("SI5001");
   const [currentRole, setCurrentRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN">("ASPRAK");
+  const [sessionUser, setSessionUser] = useState<string>("GWAN");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [perizinanApproved, setPerizinanApproved] = useState(false);
   const [activeAsprakTask, setActiveAsprakTask] = useState(false);
+
+  React.useEffect(() => {
+    if (typeof document !== "undefined") {
+      const rawCookies = document.cookie ? document.cookie.split("; ") : [];
+      const parsed: Record<string, string> = {};
+      for (const c of rawCookies) {
+        const [k, v] = c.split("=");
+        if (k && v) parsed[k] = decodeURIComponent(v);
+      }
+      const user = parsed.mock_session || "GWAN";
+      setSessionUser(user);
+      if (parsed.mock_role && (parsed.mock_role === "ASPRAK" || parsed.mock_role === "KOMDIS" || parsed.mock_role === "SEKBEN")) {
+        setCurrentRole(parsed.mock_role as "ASPRAK" | "KOMDIS" | "SEKBEN");
+      } else {
+        if (user === "GWAN") setCurrentRole("KOMDIS");
+        else if (user === "KEYS" || user === "LEVI") setCurrentRole("SEKBEN");
+        else setCurrentRole("ASPRAK");
+      }
+    }
+  }, []);
 
   // Absensi sub-tab: 'praktikan' | 'asprak'
   const [absensiSubTab, setAbsensiSubTab] = useState<"praktikan" | "asprak">("praktikan");
@@ -302,12 +323,16 @@ export default function AssistantDashboard() {
                       Tim Asisten Jaga:
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/40 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">PIC</span>
-                      <strong>IZIN</strong>
+                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Lead PIC</span>
+                      <strong>IZIN (Korprak)</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Tutor</span>
+                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Koor Komdis</span>
                       <strong>GWAN</strong>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Sekre</span>
+                      <strong>KEYS</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
                       <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Validator</span>
@@ -1407,9 +1432,31 @@ export default function AssistantDashboard() {
               <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
                 <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Identitas Asisten</div>
                 <div className="space-y-1">
-                  <div className="text-lg font-bold text-slate-900 dark:text-white">Andi Prasetyo (GWAN)</div>
-                  <div className="text-xs font-mono text-slate-500 dark:text-neutral-400">NIM: 1202230045</div>
-                  <div className="text-xs font-mono text-purple-700 dark:text-purple-400 font-semibold">S1 Sistem Informasi • SI&apos;50</div>
+                  <div className="text-lg font-bold text-slate-900 dark:text-white">
+                    {sessionUser === "GWAN"
+                      ? "Andi Pratama (GWAN)"
+                      : sessionUser === "IZIN"
+                      ? "M. Izin Alamsyah (IZIN)"
+                      : sessionUser === "KEYS"
+                      ? "Keysha Aurelia (KEYS)"
+                      : sessionUser === "LEVI"
+                      ? "Levina Sekar (LEVI)"
+                      : `Asisten ${sessionUser}`}
+                  </div>
+                  <div className="text-xs font-mono text-slate-500 dark:text-neutral-400">
+                    NIM: {sessionUser === "GWAN" ? "1202230001" : sessionUser === "IZIN" ? "1202230002" : sessionUser === "KEYS" ? "1202230003" : "1202230045"}
+                  </div>
+                  <div className="text-xs font-mono text-purple-700 dark:text-purple-400 font-semibold">
+                    {sessionUser === "GWAN"
+                      ? "Koordinator Komisi Disiplin (Koor Komdis)"
+                      : sessionUser === "IZIN"
+                      ? "Koordinator Praktikum (Korprak)"
+                      : sessionUser === "KEYS"
+                      ? "Sekretaris Laboratorium (Sekre)"
+                      : sessionUser === "LEVI"
+                      ? "Bendahara Laboratorium (Sekben)"
+                      : "S1 Sistem Informasi • SI'50"}
+                  </div>
                 </div>
               </div>
 
