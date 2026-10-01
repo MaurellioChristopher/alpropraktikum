@@ -75,7 +75,7 @@ export default function Home() {
       </header>
 
       {/* HERO & MAIN INTERACTIVE SECTION - Fits cleanly in 1 viewport with optimal spacing */}
-      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 py-1 sm:py-2 flex-1 min-h-0 flex items-center">
+      <section className="relative z-20 w-full max-w-[1380px] mx-auto px-6 sm:px-8 lg:px-10 pt-4 sm:pt-6 md:pt-7 pb-1 sm:pb-2 flex-1 min-h-0 flex items-center">
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-center">
           
           {/* LEFT COLUMN: Fluid Typography, Tactile CTAs, and Visualizer */}
@@ -86,7 +86,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-2.5"
+              className="space-y-2.5 pt-1.5 sm:pt-2.5"
             >
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[2.15rem] xl:text-[2.4rem] font-black tracking-tight leading-[1.08]">
                 <span className="text-slate-900 dark:text-white">SELAMAT DATANG,</span>
@@ -213,12 +213,16 @@ export default function Home() {
       {/* MODAL POPUPS FOR MODUL & TENTANG */}
       <AnimatePresence>
         {activeModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md cursor-pointer"
+            onClick={() => setActiveModal(null)}
+          >
             <motion.div
+              onClick={(e) => e.stopPropagation()}
               initial={{ scale: 0.95, opacity: 0, y: 10 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              className="bg-white dark:bg-[#0D071E] rounded-2xl shadow-2xl border border-purple-200 dark:border-purple-900/70 max-w-2xl w-full p-6 sm:p-8 relative max-h-[85vh] overflow-y-auto"
+              className="bg-white dark:bg-[#0D071E] rounded-2xl shadow-2xl border border-purple-200 dark:border-purple-900/70 max-w-2xl w-full p-6 sm:p-8 relative max-h-[85vh] overflow-y-auto cursor-default"
             >
               {/* Distinctive Red Close Button X as requested */}
               <button

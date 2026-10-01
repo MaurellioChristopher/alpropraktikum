@@ -41,6 +41,12 @@ import {
   Activity,
   Layers,
   Search,
+  Mail,
+  Phone,
+  MapPin,
+  User,
+  Calendar,
+  Key,
 } from "lucide-react";
 
 export default function AssistantDashboard() {
@@ -975,20 +981,29 @@ export default function AssistantDashboard() {
 
               {/* Upload & Bukti Foto Ruangan */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
-                    Foto Bukti Kondisi Ruangan:
-                  </h3>
-                  <label className="text-xs font-bold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-neutral-800 pb-2">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
+                      Foto Bukti Kondisi Ruangan:
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
+                      Format: JPG, PNG, WebP • Maks. ukuran: <span className="font-bold text-purple-700 dark:text-purple-300">5 MB per foto</span> (Disarankan rasio 16:9)
+                    </p>
+                  </div>
+                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer shrink-0">
                     <Camera size={14} />
                     <span>Unggah Foto</span>
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/jpeg,image/png,image/webp"
                       className="hidden"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            alert("Ukuran foto melebihi batas maksimal 5 MB. Harap unggah foto dengan ukuran lebih kecil.");
+                            return;
+                          }
                           const url = URL.createObjectURL(file);
                           setUploadedPhotos((prev) => [url, ...prev]);
                         }
@@ -1013,7 +1028,7 @@ export default function AssistantDashboard() {
                     <Info size={14} /> Wajib untuk Lead PIC & Sekben:
                   </div>
                   <p className="text-[11px] leading-relaxed">
-                    Setiap akhir sesi shift praktikum, asisten wajib mengunggah minimal 1 foto sudut pandang penuh ruang laboratorium untuk keperluan audit inventaris.
+                    Setiap akhir sesi shift praktikum, asisten wajib mengunggah minimal 1 foto sudut pandang penuh ruang laboratorium untuk keperluan audit inventaris. Format yang diterima JPG, PNG, atau WebP dengan batas maksimal 5 MB per foto.
                   </p>
                 </div>
               </div>
@@ -1184,7 +1199,20 @@ export default function AssistantDashboard() {
                     <p className="text-xs text-slate-500 dark:text-neutral-400 mt-1 leading-relaxed">{m.desc}</p>
                   </div>
                   <div className="mt-4 pt-3 border-t border-slate-200/60 dark:border-neutral-800 flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-400">Tingkat: <strong className="text-slate-700 dark:text-neutral-300">{m.diff}</strong></span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-slate-400 text-[11px]">Tingkat:</span>
+                      <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
+                        m.diff === 'Dasar'
+                          ? 'bg-emerald-100/80 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                          : m.diff === 'Menengah'
+                          ? 'bg-amber-100/80 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800'
+                          : m.diff === 'Lanjutan'
+                          ? 'bg-blue-100/80 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800'
+                          : 'bg-rose-100/80 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800'
+                      }`}>
+                        {m.diff}
+                      </span>
+                    </div>
                     <button type="button" className="text-purple-700 dark:text-purple-400 hover:underline font-bold text-[11px] cursor-pointer">
                       Unduh Slide & Bank Soal →
                     </button>
@@ -1409,90 +1437,276 @@ export default function AssistantDashboard() {
           )
         )}
 
-        {/* 6. AKUN ASISTEN TAB */}
+        {/* 6. AKUN ASISTEN TAB - Full Modern Profile Page */}
         {activeTab === "akun" && (
-          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Profil & Manajemen Akun</h2>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
-                  Informasi kredensial, role wewenang, dan riwayat tugas laboratorium.
-                </p>
+          <div className="space-y-6">
+            {/* Profile Header Card with Cover Banner & Avatar */}
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl border border-slate-200/80 dark:border-purple-950/60 shadow-xs overflow-hidden transition-colors">
+              {/* Cover Gradient Banner */}
+              <div className="relative h-28 sm:h-36 bg-gradient-to-r from-[#1E0836] via-[#2E1065] to-[#0F0728] overflow-hidden">
+                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#C084FC_1px,transparent_1px)] [background-size:16px_16px]" />
+                <div className="absolute -bottom-6 -right-6 w-40 h-40 rounded-full bg-purple-600/20 blur-2xl" />
+                <div className="absolute top-3 right-4 flex items-center gap-2">
+                  <span className="text-[10px] font-mono font-bold text-purple-200 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15">
+                    Lab Terpadu Lt. 3 • EDM Lab
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200/60 dark:border-purple-800/60">
-                  Role: {currentRole}
-                </span>
+              {/* Profile Details & Avatar Bar */}
+              <div className="px-5 sm:px-8 pb-6 pt-0">
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-14 mb-4">
+                  {/* Large Avatar */}
+                  <div className="flex items-end gap-4">
+                    <div className="relative">
+                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-purple-700 to-indigo-600 p-1 shadow-xl ring-4 ring-white dark:ring-[#0e071a]">
+                        <div className="w-full h-full rounded-xl bg-purple-900/90 flex items-center justify-center text-white text-2xl sm:text-3xl font-black font-mono">
+                          {sessionUser.slice(0, 2)}
+                        </div>
+                      </div>
+                      <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0e071a] animate-pulse" title="Sesi Aktif Online" />
+                    </div>
+
+                    <div className="space-y-0.5 pb-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                          {sessionUser === "GWAN"
+                            ? "Andi Pratama"
+                            : sessionUser === "IZIN"
+                            ? "M. Izin Alamsyah"
+                            : sessionUser === "KEYS"
+                            ? "Keysha Aurelia"
+                            : sessionUser === "LEVI"
+                            ? "Levina Sekar"
+                            : `Asisten ${sessionUser}`}
+                        </h2>
+                        <span className="font-mono text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800">
+                          {sessionUser}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono">
+                        NIM: {sessionUser === "GWAN" ? "1202230001" : sessionUser === "IZIN" ? "1202230002" : sessionUser === "KEYS" ? "1202230003" : "1202230045"} • S1 Sistem Informasi (SI&apos;50)
+                      </p>
+                      <div className="flex items-center gap-2 pt-0.5">
+                        <span className="text-[10px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full border border-purple-200/80 dark:border-purple-800/80">
+                          {sessionUser === "GWAN"
+                            ? "Koordinator Komisi Disiplin (Koor Komdis)"
+                            : sessionUser === "IZIN"
+                            ? "Koordinator Praktikum (Korprak)"
+                            : sessionUser === "KEYS"
+                            ? "Sekretaris Laboratorium (Sekre)"
+                            : sessionUser === "LEVI"
+                            ? "Bendahara Laboratorium (Sekben)"
+                            : "Asisten Praktikum (Asprak)"}
+                        </span>
+                        <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                          Aktif Mengajar 2026
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Profile Action Buttons */}
+                  <div className="flex items-center gap-2 pt-2 sm:pt-0">
+                    <button
+                      type="button"
+                      onClick={() => alert("Fitur edit profil tersinkronisasi otomatis dengan Database SSO Telkom University.")}
+                      className="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Edit3 size={14} />
+                      <span>Edit Profil</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => alert("Permohonan ganti password telah diteruskan ke administrator Lab EDM.")}
+                      className="px-3.5 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Key size={14} />
+                      <span>Ganti Password</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Performance & Assignment Stats Strip */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100 dark:border-neutral-800 text-center">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Kelas Dibina</div>
+                    <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">15 Kelas</div>
+                    <div className="text-[10px] text-purple-600 dark:text-purple-400 font-mono">SI5001 - SI50INT</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Jam Praktikum</div>
+                    <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">32 Jam</div>
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">Tuntas Semester Ini</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Presensi Asprak</div>
+                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">100%</div>
+                    <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono">14/14 Shift Hadir</div>
+                  </div>
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Rating Asisten</div>
+                    <div className="text-lg font-bold text-purple-700 dark:text-purple-300 mt-0.5">4.92 / 5.0</div>
+                    <div className="text-[10px] text-amber-500 font-mono">★★★★★ (45 Review)</div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Profile Info Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
-                <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Identitas Asisten</div>
-                <div className="space-y-1">
-                  <div className="text-lg font-bold text-slate-900 dark:text-white">
-                    {sessionUser === "GWAN"
-                      ? "Andi Pratama (GWAN)"
-                      : sessionUser === "IZIN"
-                      ? "M. Izin Alamsyah (IZIN)"
-                      : sessionUser === "KEYS"
-                      ? "Keysha Aurelia (KEYS)"
-                      : sessionUser === "LEVI"
-                      ? "Levina Sekar (LEVI)"
-                      : `Asisten ${sessionUser}`}
+            {/* Profile Content 2-Column Split */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              {/* Left Column: Data Diri & Akademik */}
+              <div className="lg:col-span-7 bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+                  <div className="flex items-center gap-2">
+                    <User size={18} className="text-purple-600 dark:text-purple-400" />
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-wider">
+                      Informasi Personal & Akademik
+                    </h3>
                   </div>
-                  <div className="text-xs font-mono text-slate-500 dark:text-neutral-400">
-                    NIM: {sessionUser === "GWAN" ? "1202230001" : sessionUser === "IZIN" ? "1202230002" : sessionUser === "KEYS" ? "1202230003" : "1202230045"}
+                  <span className="text-[10px] font-mono text-slate-400">Terverifikasi Telkom SSO</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Nama Lengkap</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">
+                      {sessionUser === "GWAN"
+                        ? "Andi Pratama, S.Kom"
+                        : sessionUser === "IZIN"
+                        ? "M. Izin Alamsyah, S.Kom"
+                        : sessionUser === "KEYS"
+                        ? "Keysha Aurelia"
+                        : sessionUser === "LEVI"
+                        ? "Levina Sekar"
+                        : `Asisten ${sessionUser}`}
+                    </div>
                   </div>
-                  <div className="text-xs font-mono text-purple-700 dark:text-purple-400 font-semibold">
-                    {sessionUser === "GWAN"
-                      ? "Koordinator Komisi Disiplin (Koor Komdis)"
-                      : sessionUser === "IZIN"
-                      ? "Koordinator Praktikum (Korprak)"
-                      : sessionUser === "KEYS"
-                      ? "Sekretaris Laboratorium (Sekre)"
-                      : sessionUser === "LEVI"
-                      ? "Bendahara Laboratorium (Sekben)"
-                      : "S1 Sistem Informasi • SI'50"}
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Kode Lab / ID Asisten</div>
+                    <div className="font-mono font-bold text-purple-700 dark:text-purple-300">{sessionUser}</div>
+                  </div>
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Nomor Induk Mahasiswa (NIM)</div>
+                    <div className="font-mono font-semibold text-slate-900 dark:text-white">
+                      {sessionUser === "GWAN" ? "1202230001" : sessionUser === "IZIN" ? "1202230002" : sessionUser === "KEYS" ? "1202230003" : "1202230045"}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Program Studi / Fakultas</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">S1 Sistem Informasi • FRI</div>
+                  </div>
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase flex items-center gap-1">
+                      <Mail size={12} />
+                      <span>Email SSO Institusi</span>
+                    </div>
+                    <div className="font-mono text-slate-800 dark:text-slate-200 truncate">
+                      {sessionUser.toLowerCase()}@student.telkomuniversity.ac.id
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase flex items-center gap-1">
+                      <Phone size={12} />
+                      <span>WhatsApp / Telepon</span>
+                    </div>
+                    <div className="font-mono text-slate-800 dark:text-slate-200">
+                      +62 812-9876-5432
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2 space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase flex items-center gap-1">
+                      <MapPin size={12} />
+                      <span>Penugasan Laboratorium</span>
+                    </div>
+                    <div className="text-slate-800 dark:text-slate-200">
+                      Enterprise Data Management (EDM) Laboratory, Gedung Laboratorium Terpadu Lt. 3, Telkom University
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
-                <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Role & Wewenang</div>
-                <div className="space-y-1">
-                  <div className="text-base font-bold text-purple-700 dark:text-purple-300">{currentRole}</div>
-                  <div className="text-xs text-slate-600 dark:text-neutral-300">
+              {/* Right Column: Role & Wewenang + Simulasi Role Switcher + Keamanan */}
+              <div className="lg:col-span-5 space-y-6">
+                {/* Role & Wewenang Card */}
+                <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <ShieldCheck size={18} className="text-purple-600 dark:text-purple-400" />
+                      <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-wider">
+                        Role & Wewenang
+                      </h3>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-full border border-purple-200 dark:border-purple-800">
+                      {currentRole}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
                     {currentRole === "KOMDIS"
-                      ? "Komisi Disiplin: Berwenang memberi flag sanksi keterlambatan praktikan & validasi shift asprak."
+                      ? "Komisi Disiplin: Berwenang memberi flag sanksi keterlambatan praktikan, verifikasi surat izin, dan validasi kepatuhan shift asprak."
                       : currentRole === "SEKBEN"
-                      ? "Sekretaris/Bendahara (Inti): Pengelolaan administrasi perizinan, surat izin, dan logistik kas ruangan."
-                      : "Asisten Praktikum (Asprak): Pengampu materi shift, bimbingan modul, dan input nilai praktikan."}
+                      ? "Sekretaris/Bendahara (Inti): Pengelolaan administrasi perizinan, surat izin, dan logistik kas ruangan praktikum."
+                      : "Asisten Praktikum (Asprak): Pengampu materi shift, bimbingan modul, live rating, dan input nilai praktikan."}
+                  </p>
+
+                  {/* Simulasi Role Switcher with Clean Pills */}
+                  <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 space-y-2">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">
+                      Simulasi Ganti Role (Testing Hak Akses):
+                    </div>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {(["ASPRAK", "KOMDIS", "SEKBEN"] as const).map((r) => (
+                        <button
+                          key={r}
+                          type="button"
+                          onClick={() => setCurrentRole(r)}
+                          className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                            currentRole === r
+                              ? "bg-purple-700 text-white shadow-xs"
+                              : "bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700"
+                          }`}
+                        >
+                          {r}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="p-5 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/50 space-y-3">
-                <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">Simulasi Role Akun</div>
-                <div className="space-y-2">
-                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 leading-tight">Ganti role aktif untuk simulasi fitur:</p>
-                  <div className="flex gap-1.5">
-                    {(["ASPRAK", "KOMDIS", "SEKBEN"] as const).map((r) => (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => setCurrentRole(r)}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
-                          currentRole === r
-                            ? "bg-[#7C3AED] text-white shadow-xs"
-                            : "bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-700"
-                        }`}
-                      >
-                        {r}
-                      </button>
-                    ))}
+                {/* Keamanan & Sesi Card */}
+                <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-3 transition-colors">
+                  <div className="flex items-center gap-2 border-b border-slate-100 dark:border-neutral-800 pb-3">
+                    <Lock size={18} className="text-purple-600 dark:text-purple-400" />
+                    <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-wider">
+                      Keamanan & Sesi
+                    </h3>
+                  </div>
+
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
+                      <span className="text-slate-500 dark:text-neutral-400 font-mono">Format Password Sesi</span>
+                      <span className="font-mono font-semibold text-slate-900 dark:text-white">
+                        {sessionUser === "GWAN" ? "GWANkomdis123" : `${sessionUser}123`}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
+                      <span className="text-slate-500 dark:text-neutral-400 font-mono">Status Sesi Jaringan</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 font-mono font-semibold flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                        Terenkripsi Internal Lab
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between py-1">
+                      <span className="text-slate-500 dark:text-neutral-400 font-mono">Terakhir Login</span>
+                      <span className="font-mono text-slate-700 dark:text-neutral-300">Hari ini (Aktif)</span>
+                    </div>
                   </div>
                 </div>
               </div>

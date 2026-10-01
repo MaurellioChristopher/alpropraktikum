@@ -89,6 +89,14 @@ export function AlgorithmVisualizer() {
     return () => clearInterval(timer);
   }, []);
 
+  const stepDescriptions = [
+    { title: "Partisi Pivot (44)", desc: "Membandingkan elemen array dengan pivot 44 untuk pembagian sub-array" },
+    { title: "Divide & Conquer", desc: "Sorting rekursif sub-array kiri (<44) dan sub-array kanan (>44)" },
+    { title: "Routing Lab Cluster", desc: "Aliran data nilai terurut disinkronkan ke Workstation TK08 & 2008" },
+  ];
+
+  const currentDesc = stepDescriptions[(activeStep - 1) % 3];
+
   return (
     <div className="relative w-full max-w-xl lg:max-w-[620px] select-none group">
       {/* Dynamic Ambient Pulsing Aura (Purple / Obsidian) */}
@@ -104,63 +112,61 @@ export function AlgorithmVisualizer() {
 
         <div className="relative z-10 bg-[#0C061A]/95 text-white rounded-[1.4rem] p-3 sm:p-3.5 border border-purple-500/25 space-y-2">
           
-          {/* Card Header Bar - Minimalist, Alive, and Eye-Pleasing */}
-          <div className="flex items-center justify-between pb-1.5 border-b border-white/5">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500" />
-              </span>
-              <h3 className="font-sans font-bold text-xs sm:text-[13px] tracking-wider text-slate-200 uppercase whitespace-nowrap">
-                Simulasi Algoritma & Flow Data
-              </h3>
-              <span className="text-[10px] font-mono text-purple-300 bg-purple-950/70 px-2 py-0.5 rounded-md border border-purple-800/40 shrink-0">
-                O(n log n)
-              </span>
-            </div>
+          {/* Card Header Bar - No Overlapping, Clear & Detailed */}
+          <div className="pb-1.5 border-b border-white/5 space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500" />
+                </span>
+                <h3 className="font-sans font-bold text-xs sm:text-[13px] tracking-wider text-slate-200 uppercase whitespace-nowrap">
+                  Pipeline Data & Algoritma
+                </h3>
+                <span className="text-[9.5px] font-mono text-purple-300 bg-purple-950/80 px-2 py-0.5 rounded border border-purple-800/50">
+                  QuickSort O(n log n)
+                </span>
+              </div>
 
-            {/* Live Algorithm Partition Visualizer & Step Progress */}
-            <div className="flex items-center gap-3">
-              {/* Animated QuickSort Partition Array Bars */}
-              <div className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 border border-white/10">
-                <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider mr-1">Sort:</span>
-                <div className="flex items-end gap-1 h-3.5">
-                  {currentSortBars.map((bar, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{
-                        height: `${(bar.val / 100) * 14}px`,
-                        backgroundColor: bar.active ? "#C084FC" : "#7C3AED",
-                      }}
-                      transition={{ type: "spring", stiffness: 350, damping: 22 }}
-                      className="w-1 rounded-full"
+              {/* Step indicator & Next button */}
+              <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-1.5 text-[9.5px] font-mono text-slate-400">
+                  <span>Tahap</span>
+                  <div className="w-8 sm:w-10 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div 
+                      className="h-full bg-gradient-to-r from-purple-600 to-purple-300 rounded-full"
+                      animate={{ width: `${(activeStep / 3) * 100}%` }}
+                      transition={{ duration: 0.5 }}
                     />
-                  ))}
+                  </div>
+                  <span className="text-purple-300 font-bold">{activeStep}/3</span>
                 </div>
-              </div>
 
-              <div className="flex items-center gap-1.5 text-[10px] font-mono text-slate-400">
-                <span>Step</span>
-                <div className="w-10 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                  <motion.div 
-                    className="h-full bg-gradient-to-r from-purple-600 to-purple-300 rounded-full"
-                    animate={{ width: `${(activeStep / 3) * 100}%` }}
-                    transition={{ duration: 0.5 }}
-                  />
-                </div>
-                <span className="text-purple-300 font-semibold">{activeStep}/3</span>
+                <button
+                  type="button"
+                  onClick={() => setActiveStep((prev) => (prev >= 3 ? 1 : prev + 1))}
+                  className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-[9.5px] font-mono transition-all cursor-pointer active:scale-95"
+                  title="Tahap Berikutnya"
+                >
+                  <RotateCcw size={9} />
+                  <span>Next</span>
+                </button>
               </div>
-
-              <button
-                type="button"
-                onClick={() => setActiveStep((prev) => (prev >= 3 ? 1 : prev + 1))}
-                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 hover:text-white text-[10px] font-mono transition-all cursor-pointer active:scale-95 shadow-xs"
-                title="Next Step"
-              >
-                <RotateCcw size={10} className="transition-transform group-hover:rotate-45" />
-                <span>Next</span>
-              </button>
             </div>
+
+            {/* Explanation of current stage so user understands what this is */}
+            <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+              <span className="text-purple-300/90 font-medium">
+                {currentDesc.title}: <span className="text-slate-300 font-normal">{currentDesc.desc}</span>
+              </span>
+            </div>
+          </div>
+
+          {/* Stage Column Labels Header */}
+          <div className="grid grid-cols-3 text-[9px] font-mono uppercase tracking-wider text-slate-400/90 px-2">
+            <span>1. Input Array Nilai</span>
+            <span className="text-center">2. Partisi & Pivot Tree</span>
+            <span className="text-right">3. Cluster Workstation</span>
           </div>
 
           {/* Visualizer Canvas Area: Bipartite Bezier Network (Larger & Taller) */}
@@ -365,13 +371,22 @@ export function AlgorithmVisualizer() {
             </div>
           </div>
 
-          {/* Micro Telemetry Bar at Card Bottom */}
-          <div className="pt-1 flex items-center justify-between text-[10px] font-mono text-slate-400">
-            <div className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              <span>Telemetry: 15 Kelas SI&apos;50 Connected</span>
+          {/* Micro Telemetry & Legend Bar at Card Bottom */}
+          <div className="pt-1 flex items-center justify-between text-[9.5px] font-mono text-slate-400 border-t border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-500/30" />
+                <span className="text-slate-300">Pivot Aktif (44)</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-purple-500" />
+                <span>Sync 15 Kelas SI&apos;50</span>
+              </div>
             </div>
-            <span className="text-purple-300/90 font-medium">Sync: Real-Time</span>
+            <div className="flex items-center gap-1.5 text-purple-300/90 font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Real-Time Telemetry</span>
+            </div>
           </div>
 
         </div>
