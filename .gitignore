@@ -40,3 +40,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# LMS fetch cache & dumps
+alpro_*.json
+moodle_courses.json
+sample_student_grades.json
+result.json
+result.txt
+scratch_*.js

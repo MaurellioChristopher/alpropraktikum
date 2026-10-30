@@ -3,7 +3,9 @@
 import React, { useState } from "react";
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
 import { SI50_CLASSES, SIClass } from "@/lib/si-classes";
+import { MOODLE_STUDENTS_BY_CLASS, LMS_ALPRO_METADATA } from "@/data/moodle-alpro-students";
 import { motion, AnimatePresence } from "motion/react";
+import Link from "next/link";
 import {
   Lock,
   Edit3,
@@ -49,6 +51,29 @@ import {
   Key,
 } from "lucide-react";
 
+interface StudentGradeRow {
+  nim: string;
+  name: string;
+  warmingUp: string;
+  preTest: string;
+  practice: string;
+  jurnal: string;
+  postTest: string;
+}
+
+const getStudentsByClass = (classCode: string): StudentGradeRow[] => {
+  const list = MOODLE_STUDENTS_BY_CLASS[classCode] || [];
+  return list.map((s) => ({
+    nim: s.nim,
+    name: s.name,
+    warmingUp: s.warmingUp !== null && s.warmingUp !== undefined ? s.warmingUp.toString() : "",
+    preTest: s.preTest !== null && s.preTest !== undefined ? s.preTest.toString() : "",
+    practice: s.practice !== null && s.practice !== undefined ? s.practice.toString() : "",
+    jurnal: s.jurnal !== null && s.jurnal !== undefined ? s.jurnal.toString() : "",
+    postTest: s.postTest !== null && s.postTest !== undefined ? s.postTest.toString() : "",
+  }));
+};
+
 export default function AssistantDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedClassCode, setSelectedClassCode] = useState<string>("SI5001");
@@ -80,24 +105,20 @@ export default function AssistantDashboard() {
 
   // Absensi sub-tab: 'praktikan' | 'asprak'
   const [absensiSubTab, setAbsensiSubTab] = useState<"praktikan" | "asprak">("praktikan");
+  const [attendanceSearchQuery, setAttendanceSearchQuery] = useState("");
+  const [gradeSearchQuery, setGradeSearchQuery] = useState("");
 
-  // State Absensi Praktikan per class
-  const [attendance, setAttendance] = useState<Record<string, "Hadir" | "Terlambat" | "Izin" | "Sakit" | "Alpa">>({
-    "1202260001": "Hadir",
-    "1202260002": "Hadir",
-    "1202260003": "Terlambat",
-    "1202260004": "Hadir",
-    "1202260005": "Izin",
+  // State Absensi Praktikan per class (key: NIM)
+  const [attendance, setAttendance] = useState<Record<string, "Hadir" | "Terlambat" | "Izin" | "Sakit" | "Alpa">>({});
+
+  // State Penilaian Praktikan per class
+  const [gradesByClass, setGradesByClass] = useState<Record<string, StudentGradeRow[]>>(() => {
+    const initial: Record<string, StudentGradeRow[]> = {};
+    for (const cls of SI50_CLASSES) {
+      initial[cls.code] = getStudentsByClass(cls.code);
+    }
+    return initial;
   });
-
-  // State Penilaian Praktikan
-  const [grades, setGrades] = useState([
-    { nim: "1202260001", name: "Ahmad Faisal", tp: "85", guided: "90", mandiri: "88", kuis: "80" },
-    { nim: "1202260002", name: "Budi Santoso", tp: "90", guided: "85", mandiri: "92", kuis: "75" },
-    { nim: "1202260003", name: "Citra Kirana", tp: "78", guided: "82", mandiri: "79", kuis: "85" },
-    { nim: "1202260004", name: "Dina Amelia", tp: "95", guided: "95", mandiri: "90", kuis: "92" },
-    { nim: "1202260005", name: "Eko Pratama", tp: "82", guided: "88", mandiri: "85", kuis: "88" },
-  ]);
   const [gradeLocked, setGradeLocked] = useState(false);
 
   // State Dokumentasi Ruangan
@@ -129,23 +150,69 @@ export default function AssistantDashboard() {
     setAttendance((prev) => ({ ...prev, [nim]: status }));
   };
 
-  const handleGradeChange = (idx: number, field: "tp" | "guided" | "mandiri" | "kuis", val: string) => {
+  const handleGradeChange = (
+    idx: number,
+    field: "warmingUp" | "preTest" | "practice" | "jurnal" | "postTest",
+    val: string
+  ) => {
     if (gradeLocked) return;
+    if (val !== "" && isNaN(Number(val))) return;
     const num = Number(val);
-    if (val !== "" && (isNaN(num) || num > 100)) return;
-    setGrades((prev) => {
-      const copy = [...prev];
-      copy[idx] = { ...copy[idx], [field]: val };
-      return copy;
+    if (num > 100) return;
+
+    setGradesByClass((prev) => {
+      const copy = [...(prev[selectedClassCode] || getStudentsByClass(selectedClassCode))];
+      if (copy[idx]) {
+        copy[idx] = { ...copy[idx], [field]: val };
+      }
+      return { ...prev, [selectedClassCode]: copy };
     });
   };
 
-  const calcFinalScore = (row: typeof grades[0]) => {
-    const tp = parseFloat(row.tp) || 0;
-    const g = parseFloat(row.guided) || 0;
-    const m = parseFloat(row.mandiri) || 0;
-    const k = parseFloat(row.kuis) || 0;
-    return ((tp * 0.15) + (g * 0.35) + (m * 0.35) + (k * 0.15)).toFixed(2);
+  const calcFinalScore = (row: StudentGradeRow) => {
+    const wu = parseFloat(row.warmingUp) || 0;
+    const pre = parseFloat(row.preTest) || 0;
+    const prac = parseFloat(row.practice) || 0;
+    const jur = parseFloat(row.jurnal) || 0;
+    const post = parseFloat(row.postTest) || 0;
+    // Warming Up (10%), Pre Test (15%), Practice (30%), Jurnal (30%), Post Test (15%)
+    return ((wu * 0.10) + (pre * 0.15) + (prac * 0.30) + (jur * 0.30) + (post * 0.15)).toFixed(2);
+  };
+
+  const handleExportCSV = () => {
+    const list = gradesByClass[selectedClassCode] || getStudentsByClass(selectedClassCode);
+    const headers = [
+      "NIM",
+      "Nama Mahasiswa",
+      "Kelas",
+      "Warming Up (10%)",
+      "Pre Test (15%)",
+      "Practice (30%)",
+      "Jurnal (30%)",
+      "Post Test (15%)",
+      "Nilai Akhir",
+    ];
+    const rows = list.map((r) => [
+      `"${r.nim}"`,
+      `"${r.name}"`,
+      `"${selectedClassCode}"`,
+      r.warmingUp || "0",
+      r.preTest || "0",
+      r.practice || "0",
+      r.jurnal || "0",
+      r.postTest || "0",
+      calcFinalScore(r),
+    ]);
+    const csvContent =
+      "data:text/csv;charset=utf-8," +
+      [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `Nilai_Alpro_${selectedClassCode}_LMS_Telkom.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const handleAddSwap = (e: React.FormEvent) => {
@@ -385,13 +452,13 @@ export default function AssistantDashboard() {
                     <Users size={16} className="text-purple-600 dark:text-purple-400" />
                   </div>
                   <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
-                    615 <span className="text-xs font-normal text-slate-400">Mhs</span>
+                    {LMS_ALPRO_METADATA.totalStudents} <span className="text-xs font-normal text-slate-400">Mhs</span>
                   </div>
                 </div>
                 <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 space-y-1.5">
                   <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-purple-700 dark:text-purple-300 font-semibold">15 Kelas Aktif</span>
-                    <span className="text-slate-400">100%</span>
+                    <span className="text-purple-700 dark:text-purple-300 font-semibold">{LMS_ALPRO_METADATA.totalClasses} Kelas Aktif</span>
+                    <span className="text-slate-400">CeLOE Course 9963</span>
                   </div>
                   <div className="w-full h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
                     <div className="h-full bg-[#7C3AED] rounded-full w-full" />
@@ -652,98 +719,127 @@ export default function AssistantDashboard() {
             </div>
 
             {/* SUB-VIEW 1: ABSENSI PRAKTIKAN */}
-            {absensiSubTab === "praktikan" && (
-              <div className="space-y-5">
-                {/* Class selector bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200/80 dark:border-neutral-800">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300">Pilih Kelas:</span>
-                    <select
-                      value={selectedClassCode}
-                      onChange={(e) => setSelectedClassCode(e.target.value)}
-                      className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
-                    >
-                      {SI50_CLASSES.map((cls) => (
-                        <option key={cls.code} value={cls.code}>
-                          {cls.code} ({cls.defaultShift})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="flex items-center gap-4 text-xs font-mono">
-                    <span className="text-emerald-600 dark:text-emerald-400 font-semibold">● Hadir: 38</span>
-                    <span className="text-amber-600 dark:text-amber-400 font-semibold">● Terlambat (Komdis): 2</span>
-                    <span className="text-rose-600 dark:text-rose-400 font-semibold">● Alpa: 0</span>
-                  </div>
-                </div>
+            {absensiSubTab === "praktikan" && (() => {
+              const classStudents = MOODLE_STUDENTS_BY_CLASS[selectedClassCode] || [];
+              const filteredStudents = classStudents.filter(
+                (std) =>
+                  std.name.toLowerCase().includes(attendanceSearchQuery.toLowerCase()) ||
+                  std.nim.includes(attendanceSearchQuery)
+              );
+              const hadirCount = classStudents.filter((s) => (attendance[s.nim] || "Hadir") === "Hadir").length;
+              const terlambatCount = classStudents.filter((s) => attendance[s.nim] === "Terlambat").length;
+              const izinCount = classStudents.filter((s) => attendance[s.nim] === "Izin" || attendance[s.nim] === "Sakit").length;
+              const alpaCount = classStudents.filter((s) => attendance[s.nim] === "Alpa").length;
 
-                {/* Table Presensi Praktikan */}
-                <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
-                  <table className="w-full text-left text-xs whitespace-nowrap min-w-[650px]">
-                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
-                      <tr>
-                        <th className="px-5 py-3.5">NIM</th>
-                        <th className="px-5 py-3.5">Nama Mahasiswa</th>
-                        <th className="px-5 py-3.5">Kelas</th>
-                        <th className="px-5 py-3.5">Status Kehadiran</th>
-                        <th className="px-5 py-3.5 text-center">Catatan Komdis</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
-                      {[
-                        { nim: "1202260001", name: "Ahmad Faisal Pratama" },
-                        { nim: "1202260002", name: "Budi Santoso Wibowo" },
-                        { nim: "1202260003", name: "Citra Kirana Dewi" },
-                        { nim: "1202260004", name: "Dina Amelia Zahra" },
-                        { nim: "1202260005", name: "Eko Prasetyo Ramadhan" },
-                      ].map((std) => {
-                        const status = attendance[std.nim] || "Hadir";
-                        return (
-                          <tr key={std.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
-                            <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{std.nim}</td>
-                            <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{std.name}</td>
-                            <td className="px-5 py-3 font-mono text-purple-700 dark:text-purple-400 font-bold">{selectedClass.code}</td>
-                            <td className="px-5 py-3">
-                              <div className="flex gap-1.5">
-                                {(["Hadir", "Terlambat", "Izin", "Sakit", "Alpa"] as const).map((st) => (
-                                  <button
-                                    key={st}
-                                    type="button"
-                                    onClick={() => handleAttendanceChange(std.nim, st)}
-                                    className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
-                                      status === st
-                                        ? st === "Hadir"
-                                          ? "bg-emerald-600 text-white"
-                                          : st === "Terlambat"
-                                          ? "bg-amber-600 text-white"
-                                          : st === "Izin" || st === "Sakit"
-                                          ? "bg-purple-600 text-white"
-                                          : "bg-rose-600 text-white"
-                                        : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
-                                    }`}
-                                  >
-                                    {st}
-                                  </button>
-                                ))}
-                              </div>
-                            </td>
-                            <td className="px-5 py-3 text-center">
-                              {status === "Terlambat" ? (
-                                <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
-                                  <AlertTriangle size={11} /> Flag Komdis (+10m)
-                                </span>
-                              ) : (
-                                <span className="text-[10px] text-slate-400 font-mono">-</span>
-                              )}
+              return (
+                <div className="space-y-5">
+                  {/* Class selector & telemetry bar */}
+                  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-4 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200/80 dark:border-neutral-800">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300">Pilih Kelas:</span>
+                      <select
+                        value={selectedClassCode}
+                        onChange={(e) => setSelectedClassCode(e.target.value)}
+                        className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
+                      >
+                        {SI50_CLASSES.map((cls) => (
+                          <option key={cls.code} value={cls.code}>
+                            {cls.code} ({cls.defaultShift}) • {cls.totalStudents} Mhs
+                          </option>
+                        ))}
+                      </select>
+
+                      {/* Search in class */}
+                      <div className="relative min-w-[200px]">
+                        <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          type="text"
+                          placeholder="Cari NIM / Nama..."
+                          value={attendanceSearchQuery}
+                          onChange={(e) => setAttendanceSearchQuery(e.target.value)}
+                          className="w-full pl-8 pr-3 py-1 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:border-purple-500"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
+                      <span className="text-emerald-600 dark:text-emerald-400 font-semibold">● Hadir: {hadirCount}</span>
+                      <span className="text-amber-600 dark:text-amber-400 font-semibold">● Terlambat: {terlambatCount}</span>
+                      <span className="text-purple-600 dark:text-purple-400 font-semibold">● Izin/Sakit: {izinCount}</span>
+                      <span className="text-rose-600 dark:text-rose-400 font-semibold">● Alpa: {alpaCount}</span>
+                    </div>
+                  </div>
+
+                  {/* Table Presensi Praktikan */}
+                  <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[500px]">
+                    <table className="w-full text-left text-xs whitespace-nowrap min-w-[650px]">
+                      <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
+                        <tr>
+                          <th className="px-5 py-3.5">NIM</th>
+                          <th className="px-5 py-3.5">Nama Mahasiswa</th>
+                          <th className="px-5 py-3.5">Kelas</th>
+                          <th className="px-5 py-3.5">Status Kehadiran</th>
+                          <th className="px-5 py-3.5 text-center">Catatan Komdis</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                        {filteredStudents.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="text-center py-8 text-slate-400 font-mono">
+                              Tidak ada mahasiswa yang cocok dengan pencarian &quot;{attendanceSearchQuery}&quot;
                             </td>
                           </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+                        ) : (
+                          filteredStudents.map((std) => {
+                            const status = attendance[std.nim] || "Hadir";
+                            return (
+                              <tr key={std.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
+                                <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{std.nim}</td>
+                                <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{std.name}</td>
+                                <td className="px-5 py-3 font-mono text-purple-700 dark:text-purple-400 font-bold">{selectedClass.code}</td>
+                                <td className="px-5 py-3">
+                                  <div className="flex gap-1.5">
+                                    {(["Hadir", "Terlambat", "Izin", "Sakit", "Alpa"] as const).map((st) => (
+                                      <button
+                                        key={st}
+                                        type="button"
+                                        onClick={() => handleAttendanceChange(std.nim, st)}
+                                        className={`px-2.5 py-1 rounded text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                                          status === st
+                                            ? st === "Hadir"
+                                              ? "bg-emerald-600 text-white"
+                                              : st === "Terlambat"
+                                              ? "bg-amber-600 text-white"
+                                              : st === "Izin" || st === "Sakit"
+                                              ? "bg-purple-600 text-white"
+                                              : "bg-rose-600 text-white"
+                                            : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
+                                        }`}
+                                      >
+                                        {st}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </td>
+                                <td className="px-5 py-3 text-center">
+                                  {status === "Terlambat" ? (
+                                    <span className="inline-flex items-center gap-1 text-[10px] font-mono text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2 py-0.5 rounded border border-amber-200 dark:border-amber-800">
+                                      <AlertTriangle size={11} /> Flag Komdis (+10m)
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] text-slate-400 font-mono">-</span>
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* SUB-VIEW 2: ABSENSI ASPRAK */}
             {absensiSubTab === "asprak" && (
@@ -794,123 +890,187 @@ export default function AssistantDashboard() {
           </div>
         )}
 
-        {/* 3. PENILAIAN PRAKTIKAN TAB */}
-        {activeTab === "penilaian" && (
-          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Penilaian Praktikan</h2>
-                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
-                    Modul 4: Sorting O(n log n)
-                  </span>
+        {/* 3. PENILAIAN PRAKTIKAN TAB (5 KOMPONEN LMS CE-LOE) */}
+        {activeTab === "penilaian" && (() => {
+          const currentGrades = gradesByClass[selectedClassCode] || getStudentsByClass(selectedClassCode);
+          const filteredRows = currentGrades.filter(
+            (r) =>
+              r.name.toLowerCase().includes(gradeSearchQuery.toLowerCase()) ||
+              r.nim.includes(gradeSearchQuery)
+          );
+
+          return (
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+              <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Penilaian Praktikan</h2>
+                    <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
+                      LMS Telkom University
+                    </span>
+                    <span className="text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                      ✓ Course {LMS_ALPRO_METADATA.courseId} Synced
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                    5 Komponen Resmi: Warming Up (10%), Pre Test (15%), Practice (30%), Jurnal (30%), Post Test (15%).
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
-                  Komponen Nilai: Tugas Pendahuluan (15%), Jurnal Guided (35%), Mandiri (35%), Kuis (15%).
-                </p>
+
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <Link
+                    href="/dashboard/assistant/grading"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 rounded-xl text-xs font-mono font-bold border border-purple-200 dark:border-purple-800/60 transition-colors"
+                  >
+                    <span>Spreadsheet Lengkap</span>
+                    <ArrowUpRight size={14} />
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => setGradeLocked(!gradeLocked)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold font-mono uppercase transition-colors cursor-pointer ${
+                      gradeLocked
+                        ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200"
+                        : "bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700"
+                    }`}
+                  >
+                    <Lock size={13} />
+                    {gradeLocked ? "Terkunci" : "Kunci"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleExportCSV}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase shadow-sm cursor-pointer transition-all"
+                  >
+                    <Download size={13} />
+                    Export .csv
+                  </button>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setGradeLocked(!gradeLocked)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold font-mono uppercase transition-colors cursor-pointer ${
-                    gradeLocked ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200" : "bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700"
-                  }`}
-                >
-                  <Lock size={14} />
-                  {gradeLocked ? "Nilai Terkunci" : "Kunci Nilai"}
-                </button>
+              {/* Class switcher & search bar */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 shrink-0">Filter Kelas SI&apos;50:</span>
+                  <select
+                    value={selectedClassCode}
+                    onChange={(e) => setSelectedClassCode(e.target.value)}
+                    className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
+                  >
+                    {SI50_CLASSES.map((cls) => (
+                      <option key={cls.code} value={cls.code}>
+                        {cls.code} ({cls.name}) • {cls.totalStudents} Mhs
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-                <button
-                  type="button"
-                  className="flex items-center gap-2 px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase shadow-sm cursor-pointer transition-all"
-                >
-                  <Download size={14} />
-                  Export .xlsx
-                </button>
+                <div className="relative min-w-[220px]">
+                  <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari praktikan (NIM/Nama)..."
+                    value={gradeSearchQuery}
+                    onChange={(e) => setGradeSearchQuery(e.target.value)}
+                    className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:border-purple-500"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Class switcher */}
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800">
-              <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300">Filter Kelas SI&apos;50:</span>
-              <select
-                value={selectedClassCode}
-                onChange={(e) => setSelectedClassCode(e.target.value)}
-                className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
-              >
-                {SI50_CLASSES.map((cls) => (
-                  <option key={cls.code} value={cls.code}>{cls.code} ({cls.name})</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Spreadsheet Table */}
-            <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
-              <table className="w-full text-left text-xs whitespace-nowrap min-w-[700px]">
-                <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
-                  <tr>
-                    <th className="px-5 py-3.5">NIM</th>
-                    <th className="px-5 py-3.5">Nama Mahasiswa</th>
-                    <th className="px-3 py-3.5 text-right w-24">TP (15%)</th>
-                    <th className="px-3 py-3.5 text-right w-24">Guided (35%)</th>
-                    <th className="px-3 py-3.5 text-right w-24">Mandiri (35%)</th>
-                    <th className="px-3 py-3.5 text-right w-24">Kuis (15%)</th>
-                    <th className="px-5 py-3.5 text-right text-purple-300">Nilai Akhir</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
-                  {grades.map((row, idx) => (
-                    <tr key={row.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
-                      <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{row.nim}</td>
-                      <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{row.name}</td>
-                      <td className="px-3 py-2">
-                        <input
-                          type="text"
-                          value={row.tp}
-                          disabled={gradeLocked}
-                          onChange={(e) => handleGradeChange(idx, "tp", e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
-                        />
-                      </td>
-                      <td className="px-3 py-2">
-                        <input
-                          type="text"
-                          value={row.guided}
-                          disabled={gradeLocked}
-                          onChange={(e) => handleGradeChange(idx, "guided", e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
-                        />
-                      </td>
-                      <td className="px-3 py-2">
-                        <input
-                          type="text"
-                          value={row.mandiri}
-                          disabled={gradeLocked}
-                          onChange={(e) => handleGradeChange(idx, "mandiri", e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
-                        />
-                      </td>
-                      <td className="px-3 py-2">
-                        <input
-                          type="text"
-                          value={row.kuis}
-                          disabled={gradeLocked}
-                          onChange={(e) => handleGradeChange(idx, "kuis", e.target.value)}
-                          className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white"
-                        />
-                      </td>
-                      <td className="px-5 py-3 text-right font-mono font-bold text-sm text-purple-700 dark:text-purple-400">
-                        {calcFinalScore(row)}
-                      </td>
+              {/* Spreadsheet Table with 5 Components */}
+              <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[520px]">
+                <table className="w-full text-left text-xs whitespace-nowrap min-w-[850px]">
+                  <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
+                    <tr>
+                      <th className="px-5 py-3.5">NIM</th>
+                      <th className="px-5 py-3.5">Nama Mahasiswa</th>
+                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Warming Up (10%)</th>
+                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Pre Test (15%)</th>
+                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Practice (30%)</th>
+                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Jurnal (30%)</th>
+                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Post Test (15%)</th>
+                      <th className="px-5 py-3.5 text-right text-purple-300">Nilai Akhir</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                    {filteredRows.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="text-center py-8 text-slate-400 font-mono">
+                          Tidak ada mahasiswa yang cocok dengan pencarian &quot;{gradeSearchQuery}&quot;
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredRows.map((row) => {
+                        const originalIdx = currentGrades.findIndex((g) => g.nim === row.nim);
+                        return (
+                          <tr key={row.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
+                            <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{row.nim}</td>
+                            <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{row.name}</td>
+                            <td className="px-2 py-2">
+                              <input
+                                type="text"
+                                value={row.warmingUp}
+                                disabled={gradeLocked}
+                                onChange={(e) => handleGradeChange(originalIdx, "warmingUp", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white focus:border-purple-500"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <input
+                                type="text"
+                                value={row.preTest}
+                                disabled={gradeLocked}
+                                onChange={(e) => handleGradeChange(originalIdx, "preTest", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white focus:border-purple-500"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <input
+                                type="text"
+                                value={row.practice}
+                                disabled={gradeLocked}
+                                onChange={(e) => handleGradeChange(originalIdx, "practice", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white focus:border-purple-500"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <input
+                                type="text"
+                                value={row.jurnal}
+                                disabled={gradeLocked}
+                                onChange={(e) => handleGradeChange(originalIdx, "jurnal", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white focus:border-purple-500"
+                              />
+                            </td>
+                            <td className="px-2 py-2">
+                              <input
+                                type="text"
+                                value={row.postTest}
+                                disabled={gradeLocked}
+                                onChange={(e) => handleGradeChange(originalIdx, "postTest", e.target.value)}
+                                placeholder="0"
+                                className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white focus:border-purple-500"
+                              />
+                            </td>
+                            <td className="px-5 py-3 text-right font-mono font-bold text-sm text-purple-700 dark:text-purple-400">
+                              {calcFinalScore(row)}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 4. DOKUMENTASI RUANGAN TAB */}
         {activeTab === "dokumentasi" && (
