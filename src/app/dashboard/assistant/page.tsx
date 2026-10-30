@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
+import { DashboardHeader } from "@/components/aureo/dashboard-header";
 import { SI50_CLASSES, SIClass } from "@/lib/si-classes";
 import { MOODLE_STUDENTS_BY_CLASS, LMS_ALPRO_METADATA } from "@/data/moodle-alpro-students";
 import { ALPRO_ASSISTANTS, ALPRO_DIVISIONS, getAssistantByCode, AssistantProfile } from "@/data/assistants-roster";
@@ -11,6 +13,10 @@ import {
   Lock,
   Edit3,
   Play,
+  Pause,
+  RotateCcw,
+  Timer,
+  MessageSquare,
   Clock,
   Users,
   Check,
@@ -150,6 +156,37 @@ export default function AssistantDashboard() {
   const [shiftSource, setShiftSource] = useState("Modul 4 / SI5001");
   const [shiftTarget, setShiftTarget] = useState("Modul 4 / SI5002");
 
+  // State Timer Sesi Praktikum
+  const [timerSeconds, setTimerSeconds] = useState(600); // 10 minutes default (Warming Up)
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timerStage, setTimerStage] = useState<"warmingUp" | "preTest" | "practice" | "postTest">("warmingUp");
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (timerRunning && timerSeconds > 0) {
+      interval = setInterval(() => {
+        setTimerSeconds((prev) => (prev > 0 ? prev - 1 : 0));
+      }, 1000);
+    } else if (timerSeconds === 0 && timerRunning) {
+      setTimerRunning(false);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [timerRunning, timerSeconds]);
+
+  const setTimerPreset = (stage: "warmingUp" | "preTest" | "practice" | "postTest", secs: number) => {
+    setTimerStage(stage);
+    setTimerSeconds(secs);
+    setTimerRunning(false);
+  };
+
+  const formatTimer = (totalSeconds: number) => {
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
+
   const selectedClass = SI50_CLASSES.find((c) => c.code === selectedClassCode) || SI50_CLASSES[0];
 
   const handleAttendanceChange = (nim: string, status: "Hadir" | "Terlambat" | "Izin" | "Sakit" | "Alpa") => {
@@ -254,53 +291,58 @@ export default function AssistantDashboard() {
       {/* RIGHT MAIN CONTENT AREA */}
       <div className="flex-1 w-full min-w-0 space-y-5">
         
+        {/* TOP SUB-HEADER (Matching Image 1) */}
+        <DashboardHeader
+          assistantCode={sessionUser}
+          currentRole={currentRole}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          onRoleChange={(r) => setCurrentRole(r)}
+        />
+
         {/* MOBILE & TABLET TOP ACTION BAR (< lg) */}
-        <div className="lg:hidden bg-white dark:bg-[#0e071a] rounded-2xl p-3.5 sm:p-4 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-3 transition-colors">
+        <div className="lg:hidden bg-white dark:bg-[#0e071a] rounded-2xl p-3 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-2.5 transition-colors">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-neutral-400 uppercase shrink-0">Menu:</span>
-              <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 border border-purple-200/60 dark:border-purple-800/60 px-2.5 py-1 rounded-lg truncate">
-                {activeTab === "dashboard" ? "🏠 Dashboard Operasional" :
-                 activeTab === "modul" ? "📖 Modul & Silabus" :
-                 activeTab === "absensi" ? "📋 Presensi & Kehadiran" :
-                 activeTab === "penilaian" ? "📊 Penilaian Praktikan" :
-                 activeTab === "jadwal" ? "🔄 Pertukaran Jadwal" :
-                 activeTab === "dokumentasi" ? "📷 Dokumentasi Ruangan" :
-                 activeTab === "komdis" ? "🛡️ Wewenang Komdis" :
-                 activeTab === "inventaris" ? "📦 Inventaris Sekben" : "👤 Profil Akun"}
-              </span>
-            </div>
+            <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 border border-purple-200/60 dark:border-purple-800/60 px-2.5 py-1 rounded-lg">
+              {activeTab === "dashboard" || activeTab === "beranda" ? "🏠 Beranda" :
+               activeTab === "praktikan" || activeTab === "absensi" ? "📋 Praktikan" :
+               activeTab === "informasi" || activeTab === "modul" ? "👥 Informasi Praktikan" :
+               activeTab === "komdis" ? "🚩 Laporan Kecurangan" :
+               activeTab === "dokumentasi" ? "📷 Dokumentasi" :
+               activeTab === "jadwal" || activeTab === "jadwal_saya" ? "📅 Jadwal" :
+               activeTab === "timer" ? "⏱️ Timer Sesi" : "👤 Profil Akun"}
+            </span>
 
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 dark:bg-neutral-800 text-white text-xs font-bold font-mono shadow-xs hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-700 text-white text-xs font-bold font-mono shadow-xs hover:bg-purple-800 transition-colors shrink-0 cursor-pointer"
             >
-              <Menu size={15} />
-              <span>Semua Menu</span>
+              <Menu size={14} />
+              <span>Menu</span>
             </button>
           </div>
 
           {/* Quick horizontal tap switcher */}
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none touch-pan-x">
             {[
-              { id: "dashboard", label: "Dashboard", icon: Home },
-              { id: "absensi", label: "Presensi", icon: CheckSquare },
-              { id: "penilaian", label: "Nilai", icon: BarChart3 },
-              { id: "jadwal", label: "Swap Jadwal", icon: ArrowLeftRight },
+              { id: "dashboard", label: "Beranda", icon: Home },
+              { id: "absensi", label: "Praktikan", icon: CheckSquare },
               { id: "modul", label: "Silabus", icon: BookOpen },
+              { id: "jadwal", label: "Jadwal", icon: Calendar },
+              { id: "timer", label: "Timer", icon: Timer },
+              { id: "dokumentasi", label: "Dokumentasi", icon: Camera },
             ].map((tab) => {
               const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
+              const isActive = activeTab === tab.id || (tab.id === "dashboard" && activeTab === "beranda");
               return (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isActive
-                      ? "bg-[#7C3AED] text-white shadow-xs"
-                      : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
+                      ? "bg-purple-700 text-white shadow-xs font-bold"
+                      : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200"
                   }`}
                 >
                   <Icon size={13} />
@@ -311,386 +353,330 @@ export default function AssistantDashboard() {
           </div>
         </div>
         
-        {/* 1. DASHBOARD TAB: HIGH-CRAFT OBSERVABILITY & MISSION CONTROL */}
-        {activeTab === "dashboard" && (
-          <div className="space-y-5">
-            {/* TOP COMMAND BAR: COHORT IDENTITY & UNIFIED CLASS SELECTOR */}
-            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-4 sm:p-5 border border-purple-100/80 dark:border-purple-950/60 shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-4 transition-colors">
-              <div className="flex items-center gap-3.5">
-                <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200/60 dark:border-purple-800/40 text-purple-700 dark:text-purple-300 flex items-center justify-center shrink-0">
-                  <GraduationCap size={22} />
+        {/* 1. BERANDA / DASHBOARD TAB (Faithfully matching Image 1) */}
+        {(activeTab === "dashboard" || activeTab === "beranda") && (
+          <div className="space-y-6">
+
+            {/* HERO GREETING BANNER WITH EDM CYBER MASCOT */}
+            <div className="relative rounded-[2.2rem] bg-gradient-to-r from-[#DDE7FF] via-[#EAE5FC] to-[#F3EEFF] dark:from-[#1E0D3C] dark:via-[#16092C] dark:to-[#0D041A] border border-purple-200/70 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all">
+              {/* Subtle ambient blur */}
+              <div className="absolute top-0 right-1/3 w-80 h-80 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Left Greeting Text */}
+              <div className="space-y-3.5 max-w-md relative z-10">
+                <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
+                  ALPRO • MODUL 4
                 </div>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]">
+                  Hai, {currentAssistantProfile.name.split(" ")[0]}!<br />
+                  <span className="font-extrabold text-slate-800 dark:text-neutral-100">
+                    Draf aman. Mata juga butuh jeda.
+                  </span>
+                </h1>
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h1 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-                      S1 Sistem Informasi 2026 (SI&apos;50)
-                    </h1>
-                    <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800/50">
-                      15 Kelas Terdaftar
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
-                    EDM Laboratory • Praktikum Algoritma & Pemrograman
-                  </p>
+                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800 text-xs font-mono font-semibold text-slate-700 dark:text-neutral-200 shadow-2xs">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    Jadwal modul selesai
+                  </span>
                 </div>
               </div>
 
-              {/* Single, Unified Class Selector Strip */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 xl:pb-0 scrollbar-none">
-                <span className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-400 font-semibold shrink-0 mr-1 hidden sm:inline-block">
-                  Pilih Kelas:
-                </span>
-                <div className="flex items-center gap-1.5 p-1 bg-slate-100/90 dark:bg-neutral-900/90 rounded-xl border border-slate-200/70 dark:border-neutral-800">
-                  {SI50_CLASSES.map((cls) => {
-                    const isSelected = selectedClassCode === cls.code;
-                    return (
-                      <button
-                        key={cls.code}
-                        type="button"
-                        onClick={() => setSelectedClassCode(cls.code)}
-                        className={`shrink-0 text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg transition-all cursor-pointer ${
-                          isSelected
-                            ? "bg-[#7C3AED] text-white shadow-xs"
-                            : "text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/70 dark:hover:bg-neutral-800/70"
-                        }`}
-                      >
-                        {cls.code}
-                        {cls.type === "Internasional" && <span className="text-purple-200 ml-0.5">★</span>}
-                      </button>
-                    );
-                  })}
+              {/* Center: Official EDM Cyber Mascot standing */}
+              <div className="relative z-10 flex flex-col items-center justify-center shrink-0 my-[-10px] lg:my-[-24px]">
+                <div className="relative w-44 sm:w-52 lg:w-60 h-56 sm:h-64 lg:h-72 drop-shadow-2xl">
+                  <Image
+                    src="/images/edm-mascot.png"
+                    alt="EDM Laboratory Cyber Mascot"
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 176px, 240px"
+                    className="object-contain"
+                  />
+                </div>
+                <div className="w-32 sm:w-40 h-4 bg-purple-900/20 dark:bg-purple-950/50 rounded-full blur-md -mt-2" />
+              </div>
+
+              {/* Right: Floating Glass Card (MINGGU INI • MODUL 4) */}
+              <div className="relative z-10 w-full lg:w-80 rounded-2xl bg-white/90 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/40 shadow-sm space-y-4">
+                <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-400 font-bold">
+                  MINGGU INI • MODUL 4
+                </div>
+
+                <div className="space-y-1">
+                  <div className="text-[11px] text-slate-500 dark:text-neutral-400 font-medium">
+                    Praktikum berikutnya
+                  </div>
+                  <div className="text-sm font-bold text-slate-900 dark:text-white">
+                    Jadwal modul selesai
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-neutral-800">
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-500 dark:text-neutral-400">Kelas terlaksana</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      <strong className="text-emerald-600 dark:text-emerald-400">12</strong> / 15 kelas
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-emerald-500 rounded-full w-[80%]" />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-neutral-800">
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className="text-slate-500 dark:text-neutral-400">Praktikan dinilai</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
+                      <strong className="text-purple-600 dark:text-purple-400">480</strong> / 568 praktikan
+                    </span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
+                    <div className="h-full bg-purple-600 rounded-full w-[84.5%]" />
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* LIVE SHIFT COMMAND STRIP */}
-            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-6 border border-purple-200/80 dark:border-purple-900/40 shadow-xs relative overflow-hidden transition-colors">
-              <div className="absolute -top-12 -right-12 w-64 h-64 bg-purple-500/10 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+            {/* AKSES CEPAT (4 Bento Cards matching Image 1) */}
+            <div className="space-y-3">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
+                Akses cepat
+              </h3>
 
-              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div className="space-y-3">
-                  {/* Status Pills */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/60 px-3 py-1 rounded-full">
-                      <span className="relative flex h-2 w-2">
-                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-500 opacity-75" />
-                        <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-600" />
-                      </span>
-                      SHIFT AKTIF SEKARANG
-                    </span>
-                    <span className="text-[11px] font-mono font-semibold text-slate-700 dark:text-neutral-300 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/70 dark:border-neutral-700/60 px-2.5 py-1 rounded-full">
-                      Modul 4: Sorting & Binary Search Tree
-                    </span>
-                    <span className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                      Ruang Lab EDM Lt. 3
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                {/* Card 1: Praktikan */}
+                <div
+                  onClick={() => setActiveTab("absensi")}
+                  className="rounded-3xl p-5 bg-gradient-to-br from-[#EEF4FF] to-[#E0ECFF] dark:from-[#131A33] dark:to-[#0C1226] border border-blue-100 dark:border-blue-900/40 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between min-h-[140px]"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-neutral-800 shadow-xs flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
+                      <CheckSquare size={24} />
+                    </div>
+                    <span className="w-7 h-7 rounded-full bg-amber-500 text-white font-bold font-mono text-xs flex items-center justify-center shadow-xs">
+                      A
                     </span>
                   </div>
-
-                  {/* Heading & Details */}
-                  <div>
-                    <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
-                      Shift Aktif: Kelas {selectedClass.code} ({selectedClass.name})
-                    </h2>
-                    <p className="text-xs font-mono text-slate-500 dark:text-neutral-400 mt-1">
-                      Jadwal: <strong className="text-slate-800 dark:text-neutral-200">{selectedClass.defaultShift} WIB</strong> • Terdaftar: <strong className="text-slate-800 dark:text-neutral-200">{selectedClass.totalStudents} Mahasiswa SI&apos;50</strong>
+                  <div className="space-y-0.5 pt-3">
+                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
+                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                      Praktikan
+                    </div>
+                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                      568 praktikan • 15 kelas SI&apos;50
                     </p>
                   </div>
+                </div>
 
-                  {/* Squad on Duty */}
-                  <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-mono">
-                    <span className="text-slate-400 dark:text-neutral-500 text-[11px] uppercase tracking-wider font-semibold">
-                      Tim Asisten Jaga:
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/40 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Korprak</span>
-                      <strong>DEVO (Devin)</strong>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Koor CnI</span>
-                      <strong>MACY (Maurel)</strong>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Sekre 1</span>
-                      <strong>GRGS (Gracia)</strong>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Bendahara</span>
-                      <strong>SYOW (Syalfa)</strong>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Koor MD</span>
-                      <strong>MUDI (Daffa)</strong>
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Koor TnC</span>
-                      <strong>FIAG (Figo)</strong>
-                    </span>
+                {/* Card 2: Dokumentasi */}
+                <div
+                  onClick={() => setActiveTab("dokumentasi")}
+                  className="rounded-3xl p-5 bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5] dark:from-[#06291C] dark:to-[#041E14] border border-emerald-100 dark:border-emerald-900/40 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between min-h-[140px]"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-neutral-800 shadow-xs flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
+                      <Camera size={24} />
+                    </div>
+                  </div>
+                  <div className="space-y-0.5 pt-3">
+                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
+                      Dokumentasi
+                    </div>
+                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                      Foto &amp; video praktikum Lab EDM
+                    </p>
                   </div>
                 </div>
 
-                {/* Quick Actions */}
-                <div className="flex sm:flex-row lg:flex-col gap-2.5 shrink-0 pt-2 lg:pt-0">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("absensi")}
-                    className="flex-1 sm:flex-none px-5 py-2.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase tracking-wider shadow-sm hover:shadow-purple-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <CheckSquare size={15} />
-                    <span>Presensi Shift Ini</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("penilaian")}
-                    className="flex-1 sm:flex-none px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-800 dark:text-neutral-200 rounded-xl text-xs font-bold font-mono uppercase tracking-wider border border-slate-200 dark:border-neutral-700/80 transition-colors flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    <BarChart3 size={15} />
-                    <span>Input Nilai Praktikan</span>
-                  </button>
+                {/* Card 3: Jadwal Saya */}
+                <div
+                  onClick={() => setActiveTab("jadwal")}
+                  className="rounded-3xl p-5 bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] dark:from-[#2B1706] dark:to-[#1F1004] border border-amber-100 dark:border-amber-900/40 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between min-h-[140px]"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-neutral-800 shadow-xs flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
+                      <Calendar size={24} />
+                    </div>
+                  </div>
+                  <div className="space-y-0.5 pt-3">
+                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
+                      Jadwal Saya
+                    </div>
+                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                      3 kelas penugasan shift jaga
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {/* 4 TELEMETRY OBSERVABILITY METRIC CARDS */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Metric 1 */}
-              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
-                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
-                      Total Praktikan
-                    </span>
-                    <Users size={16} className="text-purple-600 dark:text-purple-400" />
+                {/* Card 4: PPT Modul 4 */}
+                <div
+                  className="rounded-3xl p-5 bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] dark:from-[#1D1036] dark:to-[#120824] border border-purple-100 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[140px]"
+                >
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
+                      <BookOpen size={16} className="text-purple-600" />
+                      PPT Modul 4
+                    </div>
+                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                      Slide praktikum minggu ini
+                    </p>
                   </div>
-                  <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
-                    {LMS_ALPRO_METADATA.totalStudents} <span className="text-xs font-normal text-slate-400">Mhs</span>
-                  </div>
-                </div>
-                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-purple-700 dark:text-purple-300 font-semibold">{LMS_ALPRO_METADATA.totalClasses} Kelas Aktif</span>
-                    <span className="text-slate-400">CeLOE Course 9963</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#7C3AED] rounded-full w-full" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Metric 2 */}
-              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
-                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
-                      Tingkat Kehadiran
-                    </span>
-                    <CheckCircle2 size={16} className="text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-bold font-mono text-purple-700 dark:text-purple-400 pt-1">
-                    97.2%
-                  </div>
-                </div>
-                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-slate-700 dark:text-neutral-300 font-medium">598 Tepat Waktu</span>
-                  <span className="text-slate-400 dark:text-neutral-400">17 Dispensasi</span>
-                </div>
-              </div>
-
-              {/* Metric 3 */}
-              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
-                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
-                      Antrean Validasi
-                    </span>
-                    <BarChart3 size={16} className="text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
-                    42 <span className="text-xs font-normal text-slate-400">Pending</span>
-                  </div>
-                </div>
-                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-purple-700 dark:text-purple-300 font-medium">Modul 4</span>
-                  <span className="text-slate-400 dark:text-neutral-400">Batas Sinkron H+2</span>
-                </div>
-              </div>
-
-              {/* Metric 4 */}
-              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs flex flex-col justify-between transition-colors">
-                <div className="space-y-1">
-                  <div className="flex items-center justify-between text-slate-400 dark:text-neutral-400">
-                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider">
-                      Workstation Lab EDM
-                    </span>
-                    <Cpu size={16} className="text-purple-600 dark:text-purple-400" />
-                  </div>
-                  <div className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white pt-1">
-                    43 <span className="text-base font-normal text-slate-400">/ 45 PC</span>
-                  </div>
-                </div>
-                <div className="pt-3 border-t border-slate-100 dark:border-neutral-800/80 mt-3 space-y-1.5">
-                  <div className="flex items-center justify-between text-[11px] font-mono">
-                    <span className="text-slate-700 dark:text-neutral-300 font-semibold">95.5% Siap</span>
-                    <span className="text-slate-400">2 Maintenance</span>
-                  </div>
-                  <div className="w-full h-1.5 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#7C3AED] rounded-full w-[95.5%]" />
+                  <div className="flex items-center gap-2 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => alert("Membuka Slide Modul 4 Reguler...")}
+                      className="flex-1 py-1.5 px-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-mono font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <span>Reguler</span>
+                      <span>↗</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => alert("Membuka Slide Modul 4 Internasional...")}
+                      className="flex-1 py-1.5 px-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-mono font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                    >
+                      <span>Inter</span>
+                      <span>↗</span>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* DIRECTIVES & WEEKLY SCHEDULE MATRIX SPLIT */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-              {/* LEFT (xl:col-span-5): OPERATIONAL DIRECTIVES */}
-              <div className="xl:col-span-5 bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
+            {/* 2-COLUMN LOWER SECTION: PLOTTINGAN SAYA & KONTAK DOSEN */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+              {/* Left Column: Plottingan saya */}
+              <div className="lg:col-span-7 bg-white dark:bg-[#0e071a] rounded-[2rem] p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-lg bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-400 flex items-center justify-center">
-                      <Info size={15} />
+                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                    Plottingan saya
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("jadwal")}
+                    className="text-xs font-mono font-semibold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>Lihat semua</span>
+                    <span>→</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2.5">
+                  {[
+                    { code: "SI5002", name: "SI-48-02", group: "Grup A", count: 38, shift: "Senin, 07:30 - 09:30 WIB" },
+                    { code: "SI5004", name: "SI-48-04", group: "Grup B", count: 38, shift: "Selasa, 13:30 - 15:30 WIB" },
+                    { code: "SI5010", name: "SI-48-10", group: "Grup C", count: 38, shift: "Kamis, 09:30 - 11:30 WIB" },
+                  ].map((p) => (
+                    <div
+                      key={p.code}
+                      className="p-4 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200/70 dark:border-neutral-800 flex items-center justify-between gap-4 hover:border-purple-300 dark:hover:border-purple-700 transition-all"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-900 text-purple-700 dark:text-purple-300 flex items-center justify-center font-mono font-bold text-xs shrink-0">
+                          &lt;/&gt;
+                        </div>
+                        <div>
+                          <div className="font-bold text-sm text-slate-900 dark:text-white">
+                            {p.name}
+                          </div>
+                          <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                            {p.group} • {p.count} praktikan • {p.shift}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedClassCode(p.code);
+                          setActiveTab("absensi");
+                        }}
+                        className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold font-mono transition-colors cursor-pointer shadow-xs"
+                      >
+                        Buka
+                      </button>
                     </div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm tracking-wide uppercase">
-                      Instruksi & Pengumuman Lab
-                    </h3>
-                  </div>
-                  <span className="text-[10px] font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full font-semibold border border-purple-200/60 dark:border-purple-800/60">
-                    Live Feed
-                  </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right Column: Kontak Dosen */}
+              <div className="lg:col-span-5 bg-white dark:bg-[#0e071a] rounded-[2rem] p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+                  <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                    Kontak dosen
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => alert("Daftar lengkap 5 Dosen Pengampu Algoritma Pemrograman Telkom University.")}
+                    className="text-xs font-mono font-semibold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>Lihat semua</span>
+                    <span>→</span>
+                  </button>
                 </div>
 
                 <div className="space-y-3">
-                  {/* Directive 1 */}
-                  <div className="p-3.5 rounded-xl border border-purple-200/60 dark:border-purple-900/40 bg-purple-50/30 dark:bg-purple-950/20 space-y-1.5 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-mono font-bold text-purple-800 dark:text-purple-300 bg-purple-100 dark:bg-purple-900/50 px-2 py-0.5 rounded uppercase">
-                        Komdis Lab • Disiplin
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">Hari ini</span>
+                  {[
+                    {
+                      initial: "SFC",
+                      name: "Safara Cathasa Riverinda Rijadi, S.T., M.T.",
+                      classes: "SI-48-01 • SI-48-INT",
+                      phone: "6281234567891",
+                    },
+                    {
+                      initial: "VRT",
+                      name: "Elvira Lailatuth Thohiroh, S.Kom., M.Kom.",
+                      classes: "SI-48-02 • SI-48-04",
+                      phone: "6281234567892",
+                    },
+                    {
+                      initial: "EDM",
+                      name: "Dr. Ir. Husni Thamrin, S.T., M.T.",
+                      classes: "SI-48-07 • SI-48-10",
+                      phone: "6281234567893",
+                    },
+                  ].map((d) => (
+                    <div
+                      key={d.initial}
+                      className="p-3.5 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200/70 dark:border-neutral-800 flex items-center justify-between gap-3"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-900 text-purple-700 dark:text-purple-300 font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                          {d.initial}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                            {d.name}
+                          </div>
+                          <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
+                            {d.classes}
+                          </div>
+                        </div>
+                      </div>
+
+                      <a
+                        href={`https://wa.me/${d.phone}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-9 h-9 rounded-full bg-emerald-500 hover:bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs transition-colors cursor-pointer"
+                        title={`Hubungi via WhatsApp (${d.name})`}
+                      >
+                        <MessageSquare size={16} />
+                      </a>
                     </div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                      Tata Tertib Pakaian & Toleransi Keterlambatan
-                    </h4>
-                    <p className="text-[11px] text-slate-600 dark:text-neutral-400 leading-relaxed">
-                      Praktikan wajib mengenakan kemeja berkerah rapi dan sepatu tertutup. Toleransi terlambat maksimal 10 menit, setelahnya wajib melapor ke meja Komdis.
-                    </p>
-                  </div>
-
-                  {/* Directive 2 */}
-                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900/40 space-y-1.5 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-mono font-bold text-slate-700 dark:text-neutral-300 bg-slate-200 dark:bg-neutral-800 px-2 py-0.5 rounded uppercase">
-                        Akademik • Nilai
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">Kemarin</span>
-                    </div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                      Deadline Entri Nilai Modul 4 (Sorting & BST)
-                    </h4>
-                    <p className="text-[11px] text-slate-600 dark:text-neutral-400 leading-relaxed">
-                      Asisten validator wajib menyelesaikan penilaian TP, Jurnal Guided, dan Mandiri maksimal H+2 setelah shift berakhir untuk sinkronisasi nilai ke sistem.
-                    </p>
-                  </div>
-
-                  {/* Directive 3 */}
-                  <div className="p-3.5 rounded-xl border border-slate-200/80 dark:border-neutral-800 bg-slate-50/60 dark:bg-neutral-900/40 space-y-1.5 transition-colors">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[9px] font-mono font-bold text-purple-700 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded uppercase">
-                        Infrastruktur • GCC-01
-                      </span>
-                      <span className="text-[10px] font-mono text-slate-400">3 hari lalu</span>
-                    </div>
-                    <h4 className="text-xs font-bold text-slate-900 dark:text-white leading-snug">
-                      Server Autocheck GCC 14.2 Online
-                    </h4>
-                    <p className="text-[11px] text-slate-600 dark:text-neutral-400 leading-relaxed">
-                      Server compiler lokal beroperasi stabil dengan latensi 4ms. Mendukung eksekusi recursive sorting hingga 100.000 stack frame.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* RIGHT (xl:col-span-7): JADWAL SHIFT PRAKTIKUM */}
-              <div className="xl:col-span-7 bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-neutral-800 pb-3">
-                  <div>
-                    <h3 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm tracking-wide uppercase">
-                      Jadwal Shift Praktikum Mingguan
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono">
-                      15 Kelas S1 Sistem Informasi • Modul 4
-                    </p>
-                  </div>
-                  <span className="text-[11px] font-mono text-slate-400 dark:text-neutral-400">
-                    Telkom University
-                  </span>
-                </div>
-
-                <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin">
-                  <table className="w-full text-left text-xs whitespace-nowrap min-w-[580px]">
-                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider">
-                      <tr>
-                        <th className="px-4 py-3">Kelas</th>
-                        <th className="px-4 py-3">Tipe</th>
-                        <th className="px-4 py-3">Jadwal Shift</th>
-                        <th className="px-4 py-3">Praktikan</th>
-                        <th className="px-4 py-3">Asisten (PIC)</th>
-                        <th className="px-4 py-3 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
-                      {SI50_CLASSES.slice(0, 7).map((cls, idx) => (
-                        <tr
-                          key={cls.code}
-                          onClick={() => setSelectedClassCode(cls.code)}
-                          className={`transition-colors cursor-pointer ${
-                            selectedClassCode === cls.code
-                              ? "bg-purple-50/70 dark:bg-purple-950/30"
-                              : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
-                          }`}
-                        >
-                          <td className="px-4 py-3 font-mono font-bold text-slate-900 dark:text-white">
-                            {cls.code}
-                          </td>
-                          <td className="px-4 py-3">
-                            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                              cls.type === 'Internasional'
-                                ? 'bg-purple-100 dark:bg-purple-900/50 text-purple-900 dark:text-purple-300'
-                                : 'bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300'
-                            }`}>
-                              {cls.type}
-                            </span>
-                          </td>
-                          <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
-                            {cls.defaultShift}
-                          </td>
-                          <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
-                            {cls.totalStudents} Mhs
-                          </td>
-                          <td className="px-4 py-3 font-mono font-semibold text-slate-800 dark:text-neutral-200">
-                            {idx === 0 ? "DEVO & MACY" : idx === 1 ? "MACY & GRGS" : idx === 2 ? "GRGS & SYOW" : idx === 3 ? "MUDI & FIAG" : "IPGA & DSPH"}
-                          </td>
-                          <td className="px-4 py-3 text-center">
-                            <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
-                              idx === 0
-                                ? "bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 border border-purple-200 dark:border-purple-700"
-                                : idx === 1
-                                ? "bg-slate-200 dark:bg-neutral-800 text-slate-800 dark:text-neutral-200"
-                                : "bg-slate-100 dark:bg-neutral-900 text-slate-500 dark:text-neutral-400"
-                            }`}>
-                              {idx === 0 ? "● Sedang Berjalan" : idx === 1 ? "Siap Berikutnya" : "Terjadwal"}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                  ))}
                 </div>
               </div>
             </div>
+
           </div>
         )}
 
         {/* 2. ABSENSI TAB (DUAL: ABSENSI PRAKTIKAN & ABSENSI ASPRAK) */}
-        {activeTab === "absensi" && (
+        {(activeTab === "absensi" || activeTab === "praktikan") && (
           <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
@@ -706,7 +692,7 @@ export default function AssistantDashboard() {
               </div>
 
               {/* Sub-tab switcher */}
-              <div className="flex items-center bg-slate-100 dark:bg-neutral-900 p-1 rounded-xl border border-slate-200/60 dark:border-neutral-800">
+              <div className="flex flex-wrap items-center bg-slate-100 dark:bg-neutral-900 p-1 rounded-xl border border-slate-200/60 dark:border-neutral-800 gap-1">
                 <button
                   type="button"
                   onClick={() => setAbsensiSubTab("praktikan")}
@@ -724,6 +710,13 @@ export default function AssistantDashboard() {
                   }`}
                 >
                   Absensi Asprak & Komdis
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("penilaian")}
+                  className="px-3.5 py-2 rounded-lg text-xs font-bold font-mono text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/60 transition-all cursor-pointer"
+                >
+                  Penilaian LMS →
                 </button>
               </div>
             </div>
@@ -930,6 +923,14 @@ export default function AssistantDashboard() {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("absensi")}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer"
+                  >
+                    <span>← Presensi</span>
+                  </button>
+
                   <Link
                     href="/dashboard/assistant/grading"
                     className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 rounded-xl text-xs font-mono font-bold border border-purple-200 dark:border-purple-800/60 transition-colors"
@@ -1209,7 +1210,7 @@ export default function AssistantDashboard() {
         )}
 
         {/* 5. PERTUKARAN JADWAL TAB (SHIFT SWAP) */}
-        {activeTab === "jadwal" && (
+        {(activeTab === "jadwal" || activeTab === "jadwal_saya" || activeTab === "jadwal_praktikum") && (
           <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
@@ -1325,8 +1326,118 @@ export default function AssistantDashboard() {
           </div>
         )}
 
+        {/* TIMER SESI TAB (Interactive Laboratory Stopwatch / Countdown) */}
+        {activeTab === "timer" && (
+          <div className="bg-white dark:bg-[#0e071a] rounded-[2.2rem] p-6 sm:p-9 border border-purple-200/80 dark:border-purple-950/60 shadow-xs space-y-7 transition-colors">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Timer Sesi Praktikum</h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
+                    120 Menit / Shift
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                  Kontrol durasi sesi lab: Warming Up, Pre-Test, Practice &amp; Bimbingan, serta Jurnal / Post-Test.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-mono font-semibold text-slate-600 dark:text-neutral-300 bg-slate-100 dark:bg-neutral-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-neutral-700">
+                  Shift: {selectedClass.code} ({selectedClass.defaultShift})
+                </span>
+              </div>
+            </div>
+
+            {/* Presets Strip */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { stage: "warmingUp", label: "Warming Up", duration: 600, desc: "10 Menit" },
+                { stage: "preTest", label: "Pre-Test", duration: 900, desc: "15 Menit" },
+                { stage: "practice", label: "Practice", duration: 3600, desc: "60 Menit" },
+                { stage: "postTest", label: "Post-Test", duration: 2100, desc: "35 Menit" },
+              ].map((p) => (
+                <button
+                  key={p.stage}
+                  type="button"
+                  onClick={() => setTimerPreset(p.stage as any, p.duration)}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                    timerStage === p.stage
+                      ? "bg-purple-50 dark:bg-purple-950/60 border-purple-400 dark:border-purple-600 shadow-sm"
+                      : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 hover:bg-slate-100"
+                  }`}
+                >
+                  <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 uppercase font-bold">
+                    Tahap {p.desc}
+                  </div>
+                  <div className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
+                    {p.label}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Massive Digital Timer Display */}
+            <div className="py-12 rounded-[2rem] bg-gradient-to-b from-purple-900 to-indigo-950 text-white flex flex-col items-center justify-center space-y-6 shadow-xl relative overflow-hidden">
+              <div className="absolute inset-0 bg-[radial-gradient(#C084FC_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
+              
+              <div className="relative z-10 text-center space-y-1">
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-purple-300 bg-white/10 px-3 py-1 rounded-full border border-white/15">
+                  {timerStage === "warmingUp" ? "Sesi Warming Up" :
+                   timerStage === "preTest" ? "Sesi Pre-Test" :
+                   timerStage === "practice" ? "Sesi Practice & Bimbingan" : "Sesi Jurnal & Post-Test"}
+                </span>
+                <div className="text-6xl sm:text-7xl lg:text-8xl font-black font-mono tracking-wider text-white drop-shadow-lg">
+                  {formatTimer(timerSeconds)}
+                </div>
+              </div>
+
+              {/* Controls */}
+              <div className="relative z-10 flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTimerRunning(!timerRunning)}
+                  className={`px-6 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer ${
+                    timerRunning
+                      ? "bg-amber-500 hover:bg-amber-600 text-slate-950"
+                      : "bg-emerald-500 hover:bg-emerald-600 text-white"
+                  }`}
+                >
+                  {timerRunning ? (
+                    <>
+                      <Pause size={18} />
+                      <span>Jeda Timer</span>
+                    </>
+                  ) : (
+                    <>
+                      <Play size={18} />
+                      <span>Mulai Timer</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTimerRunning(false);
+                    const defaultDuration =
+                      timerStage === "warmingUp" ? 600 :
+                      timerStage === "preTest" ? 900 :
+                      timerStage === "practice" ? 3600 : 2100;
+                    setTimerSeconds(defaultDuration);
+                  }}
+                  className="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-mono text-xs font-bold flex items-center gap-2 backdrop-blur-md transition-colors cursor-pointer"
+                >
+                  <RotateCcw size={16} />
+                  <span>Reset</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* MODUL & SILABUS TAB */}
-        {activeTab === "modul" && (
+        {(activeTab === "modul" || activeTab === "informasi") && (
           <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>

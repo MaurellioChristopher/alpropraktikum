@@ -9,178 +9,205 @@ import { getAssistantByCode } from "@/data/assistants-roster";
 import {
   Eye,
   EyeOff,
-  Loader2,
   User,
-  Lock,
+  KeyRound,
   ArrowRight,
-  ShieldCheck,
+  Loader2,
+  CheckCircle2,
+  Sparkles,
 } from "lucide-react";
 
 export function LoginForm() {
+  const [tab, setTab] = useState<"masuk" | "aktivasi">("masuk");
   const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState("");
-  const [password, setPassword] = useState("");
+  const [identifier, setIdentifier] = useState("MACY");
+  const [password, setPassword] = useState("macykomdis123");
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   const matchedAsst = getAssistantByCode(identifier);
-  const isKomdis = matchedAsst?.role === "KOMDIS" || identifier === "MACY" || identifier === "GWAN";
+  const isKomdis = matchedAsst?.role === "KOMDIS" || identifier === "MACY";
 
-  // Dynamic placeholder hint for password
   const passwordHint = identifier
     ? isKomdis
-      ? `${identifier}komdis123`
-      : `${identifier}123`
-    : "MACYkomdis123 / DEVO123";
+      ? `${identifier.toLowerCase()}komdis123`
+      : `${identifier.toLowerCase()}123`
+    : "macykomdis123";
+
+  const handleSelectPreset = (code: string, pass: string) => {
+    setIdentifier(code);
+    setPassword(pass);
+  };
 
   return (
-    <div className="relative w-full max-w-[490px] lg:max-w-[520px] group">
-      {/* Soft Ambient Diffuse Glow behind the glass card (Purple Aura) */}
-      <div className="absolute -inset-4 bg-gradient-to-tr from-purple-700/25 via-purple-600/30 to-purple-900/20 dark:from-purple-800/35 dark:via-purple-700/35 dark:to-purple-950/30 rounded-[2.4rem] blur-2xl opacity-80 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-      {/* High-End Double-Bezel Hardware Enclosure with Specular Glint */}
-      <div className="relative z-10 rounded-[2.15rem] p-1.5 bg-gradient-to-b from-white/95 via-purple-50/40 to-white/90 dark:from-[#1D1036] dark:via-[#0E0820] dark:to-black backdrop-blur-2xl border border-purple-100 dark:border-purple-900/40 shadow-[0_24px_60px_-12px_rgba(25,10,45,0.16)] dark:shadow-[0_24px_60px_-12px_rgba(0,0,0,0.6)] overflow-hidden transition-colors">
-        
-        {/* Subtle Specular Sheen across glass surface */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.15rem]">
-          <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-purple-300/10 dark:via-purple-400/5 to-transparent transform -skew-x-20 animate-shimmer" />
-        </div>
-
-        <div className="rounded-[1.8rem] p-4.5 sm:p-5 bg-white/90 dark:bg-[#0D071E] backdrop-blur-xl border border-purple-100/80 dark:border-purple-900/50 space-y-3 transition-colors">
-          
-          {/* Brand Logo & Console Title Header */}
-          <div className="pb-2 border-b border-purple-100 dark:border-purple-950/80 flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="relative h-7 w-9 shrink-0 drop-shadow-sm">
-                <Image
-                  src="/images/edm-emblem-crimson.png"
-                  alt="EDM Laboratory Logo"
-                  fill
-                  sizes="36px"
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              <div>
-                <span className="text-[8.5px] font-mono uppercase tracking-widest text-purple-700 dark:text-purple-400 font-extrabold block">
-                  Autentikasi Internal
-                </span>
-                <h2 className="text-sm sm:text-base font-black text-slate-900 dark:text-white leading-tight tracking-tight">
-                  Portal Asisten Praktikum
-                </h2>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-800 text-[9.5px] font-mono font-semibold text-purple-800 dark:text-purple-300 shadow-2xs">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-              Sesi Aktif
-            </div>
-          </div>
-
-          {/* Authentication Form — 100% Pure Manual Input */}
-          <form action={formAction} className="space-y-3 pt-0.5">
-            {/* Identifier Field */}
-            <div className="space-y-1">
-              <label className="text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
-                Kode Asisten (NIM / ID Lab):
-              </label>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                  <User size={15} />
-                </div>
-                <input
-                  id="identifier"
-                  name="identifier"
-                  type="text"
-                  required
-                  value={identifier}
-                  onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
-                  placeholder="Masukkan Kode (Contoh: MACY / DEVO / GRGS)"
-                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono uppercase shadow-inner font-semibold"
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div className="space-y-1">
-              <div className="flex items-center justify-between">
-                <label className="text-[10px] font-mono uppercase tracking-wider text-slate-600 dark:text-slate-300 font-bold">
-                  Password Sesi:
-                </label>
-                <span className="text-[9px] font-mono text-purple-700 dark:text-purple-300 font-semibold bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-md border border-purple-200/80 dark:border-purple-800/60">
-                  Format: {passwordHint}
-                </span>
-              </div>
-              <div className="relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
-                  <Lock size={15} />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={`Masukkan password (misal: ${passwordHint})...`}
-                  className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-9 pr-9 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono shadow-inner"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer"
-                >
-                  {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                </button>
-              </div>
-            </div>
-
-            {/* Error Message (Refined Red Accent) */}
-            {state?.error && (
-              <div className="text-red-700 dark:text-red-400 text-xs font-mono bg-red-50 dark:bg-red-950/60 p-2 rounded-xl border border-red-200 dark:border-red-900/60 flex items-start gap-2">
-                <span className="font-bold">•</span>
-                <span>{state.error}</span>
-              </div>
-            )}
-
-            {/* Action Button — Fluid Pill with Nested Trailing Icon */}
-            <motion.button
-              whileHover={{ scale: 1.015 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={isPending}
-              className="w-full relative overflow-hidden bg-gradient-to-r from-[#200A3E] via-purple-700 to-purple-600 hover:from-[#2B0E54] hover:via-purple-600 hover:to-purple-500 text-white font-bold text-xs sm:text-[12.5px] tracking-wider uppercase pl-5 pr-1.5 py-2 rounded-2xl shadow-[0_12px_28px_-6px_rgba(124,58,237,0.45)] hover:shadow-[0_16px_32px_-6px_rgba(124,58,237,0.55)] transition-all flex items-center justify-between group disabled:opacity-75 cursor-pointer mt-1"
-            >
-              {/* Dynamic Button Sheen on Hover */}
-              <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-white/25 to-transparent transform -skew-x-20 animate-shimmer" />
-              </div>
-
-              {isPending ? (
-                <div className="flex items-center justify-center gap-2 w-full py-0.5">
-                  <Loader2 size={15} className="animate-spin" />
-                  <span>Memverifikasi Akses Asisten...</span>
-                </div>
-              ) : (
-                <>
-                  <span className="relative z-10">Masuk ke Dashboard Asisten</span>
-                  <div className="relative z-10 w-7 h-7 rounded-full bg-white/20 flex items-center justify-center transition-transform group-hover:translate-x-1 group-hover:scale-105 shrink-0">
-                    <ArrowRight size={14} />
-                  </div>
-                </>
-              )}
-            </motion.button>
-          </form>
-
-          {/* Informative Security Strip */}
-          <div className="pt-1.5 border-t border-purple-100 dark:border-purple-950/80 flex items-center justify-center text-[9.5px] font-mono text-slate-400 dark:text-slate-500">
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
-              <ShieldCheck size={12} className="text-purple-600 dark:text-purple-400" />
-              <span>Internal EDM Laboratory • Sesi Aman</span>
-            </div>
-          </div>
-        </div>
+    <div className="w-full max-w-[440px] bg-white dark:bg-[#120824] rounded-[2rem] p-7 sm:p-9 shadow-[0_20px_50px_rgba(40,16,80,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)] border border-slate-100 dark:border-purple-900/40 transition-all">
+      {/* Title */}
+      <div className="space-y-1 mb-6">
+        <h2 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-1">
+          <span>Masuk</span>
+          <span className="text-purple-600 dark:text-purple-400">.</span>
+        </h2>
+        <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono">
+          Portal Asisten & Praktikan Algoritma Pemrograman
+        </p>
       </div>
+
+      {/* Segmented Pill Tabs matching reference */}
+      <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-neutral-900/90 rounded-2xl mb-6">
+        <button
+          type="button"
+          onClick={() => setTab("masuk")}
+          className={`py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            tab === "masuk"
+              ? "bg-white dark:bg-purple-950 text-slate-900 dark:text-white shadow-xs font-bold"
+              : "text-slate-500 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+          }`}
+        >
+          Masuk
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab("aktivasi")}
+          className={`py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            tab === "aktivasi"
+              ? "bg-white dark:bg-purple-950 text-slate-900 dark:text-white shadow-xs font-bold"
+              : "text-slate-500 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-neutral-200"
+          }`}
+        >
+          Aktivasi
+        </button>
+      </div>
+
+      {tab === "aktivasi" ? (
+        <div className="p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900 text-xs space-y-3 font-mono">
+          <div className="flex items-center gap-2 text-purple-800 dark:text-purple-300 font-bold">
+            <Sparkles size={16} />
+            <span>Aktivasi Akun Praktikan SI&apos;50</span>
+          </div>
+          <p className="text-slate-600 dark:text-neutral-300 leading-relaxed text-[11px]">
+            Akun asisten praktikum (32 asisten) telah teraktivasi otomatis dari sistem laboratorium EDM.
+            Bagi mahasiswa baru SI&apos;50, gunakan NIM dan PIN default dari LMS Telkom University.
+          </p>
+          <button
+            type="button"
+            onClick={() => setTab("masuk")}
+            className="w-full py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl font-bold text-xs transition-colors"
+          >
+            Kembali ke Form Masuk
+          </button>
+        </div>
+      ) : (
+        <form action={formAction} className="space-y-4">
+          {/* Identifier Input */}
+          <div className="space-y-1.5">
+            <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold">
+              NIM / KODE ASISTEN
+            </label>
+            <div className="relative">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <User size={16} />
+              </div>
+              <input
+                id="identifier"
+                name="identifier"
+                type="text"
+                required
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
+                placeholder="NIM atau Kode (e.g. MACY / DEVO)"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50 dark:bg-neutral-900/80 border border-slate-200 dark:border-neutral-800 rounded-2xl text-xs font-mono uppercase text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all font-semibold"
+              />
+            </div>
+          </div>
+
+          {/* Password Input */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold">
+                PIN / PASSWORD
+              </label>
+              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
+                Contoh: {passwordHint}
+              </span>
+            </div>
+            <div className="relative">
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <KeyRound size={16} />
+              </div>
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Masukkan PIN atau password"
+                className="w-full pl-10 pr-10 py-3 bg-slate-50 dark:bg-neutral-900/80 border border-slate-200 dark:border-neutral-800 rounded-2xl text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all font-medium"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          {/* Error Message */}
+          {state?.error && (
+            <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 text-rose-700 dark:text-rose-300 text-xs font-mono">
+              {state.error}
+            </div>
+          )}
+
+          {/* Quick Assistant Account Presets */}
+          <div className="pt-1">
+            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 font-semibold">
+              Preset Cepat Asisten:
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {[
+                { code: "MACY", pass: "macykomdis123", role: "Koor CnI" },
+                { code: "DEVO", pass: "devo123", role: "Korprak" },
+                { code: "GRGS", pass: "grgs123", role: "Sekre" },
+                { code: "SYOW", pass: "syow123", role: "Bendahara" },
+              ].map((p) => (
+                <button
+                  key={p.code}
+                  type="button"
+                  onClick={() => handleSelectPreset(p.code, p.pass)}
+                  className={`text-[10px] font-mono px-2 py-1 rounded-lg border transition-all cursor-pointer ${
+                    identifier === p.code
+                      ? "bg-purple-100 dark:bg-purple-900 text-purple-900 dark:text-purple-200 border-purple-300 dark:border-purple-700 font-bold"
+                      : "bg-slate-50 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 border-slate-200 dark:border-neutral-700 hover:bg-slate-100"
+                  }`}
+                >
+                  {p.code} ({p.role})
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Primary Submit Button matching reference */}
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full mt-2 py-3.5 bg-[#1B112C] hover:bg-[#281842] dark:bg-purple-700 dark:hover:bg-purple-600 text-white rounded-2xl font-bold text-xs sm:text-sm tracking-wide shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+          >
+            {isPending ? (
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span>Memverifikasi Sesi...</span>
+              </>
+            ) : (
+              <>
+                <span>Masuk</span>
+                <ArrowRight size={16} />
+              </>
+            )}
+          </button>
+        </form>
+      )}
     </div>
   );
 }
