@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
 import { SI50_CLASSES, SIClass } from "@/lib/si-classes";
 import { MOODLE_STUDENTS_BY_CLASS, LMS_ALPRO_METADATA } from "@/data/moodle-alpro-students";
+import { ALPRO_ASSISTANTS, ALPRO_DIVISIONS, getAssistantByCode, AssistantProfile } from "@/data/assistants-roster";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import {
@@ -77,11 +78,13 @@ const getStudentsByClass = (classCode: string): StudentGradeRow[] => {
 export default function AssistantDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedClassCode, setSelectedClassCode] = useState<string>("SI5001");
-  const [currentRole, setCurrentRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN">("ASPRAK");
-  const [sessionUser, setSessionUser] = useState<string>("GWAN");
+  const [currentRole, setCurrentRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN">("KOMDIS");
+  const [sessionUser, setSessionUser] = useState<string>("MACY");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [perizinanApproved, setPerizinanApproved] = useState(false);
   const [activeAsprakTask, setActiveAsprakTask] = useState(false);
+  const [rosterSearch, setRosterSearch] = useState("");
+  const [rosterDivisionFilter, setRosterDivisionFilter] = useState("ALL");
 
   React.useEffect(() => {
     if (typeof document !== "undefined") {
@@ -91,17 +94,20 @@ export default function AssistantDashboard() {
         const [k, v] = c.split("=");
         if (k && v) parsed[k] = decodeURIComponent(v);
       }
-      const user = parsed.mock_session || "GWAN";
+      const user = parsed.mock_session || "MACY";
       setSessionUser(user);
+      const asst = getAssistantByCode(user);
       if (parsed.mock_role && (parsed.mock_role === "ASPRAK" || parsed.mock_role === "KOMDIS" || parsed.mock_role === "SEKBEN")) {
         setCurrentRole(parsed.mock_role as "ASPRAK" | "KOMDIS" | "SEKBEN");
+      } else if (asst) {
+        setCurrentRole(asst.role);
       } else {
-        if (user === "GWAN") setCurrentRole("KOMDIS");
-        else if (user === "KEYS" || user === "LEVI") setCurrentRole("SEKBEN");
-        else setCurrentRole("ASPRAK");
+        setCurrentRole("KOMDIS");
       }
     }
   }, []);
+
+  const currentAssistantProfile = getAssistantByCode(sessionUser) || ALPRO_ASSISTANTS[4];
 
   // Absensi sub-tab: 'praktikan' | 'asprak'
   const [absensiSubTab, setAbsensiSubTab] = useState<"praktikan" | "asprak">("praktikan");
@@ -137,10 +143,10 @@ export default function AssistantDashboard() {
 
   // State Pertukaran Jadwal
   const [swaps, setSwaps] = useState([
-    { id: 1, req: "GWAN", reqRole: "TUTOR", target: "LEVI", targetRole: "VALIDATOR", shiftOut: "Modul 4 / SI5001", shiftIn: "Modul 4 / SI5004", status: "PENDING" },
-    { id: 2, req: "IZIN", reqRole: "KOMDIS", target: "AL-05", targetRole: "KOMDIS", shiftOut: "Modul 4 / SI5007", shiftIn: "Modul 4 / SI50INT", status: "APPROVED" },
+    { id: 1, req: "MACY", reqRole: "KOOR CNI", target: "DEVO", targetRole: "KORPRAK", shiftOut: "Modul 4 / SI5001", shiftIn: "Modul 4 / SI5004", status: "PENDING" },
+    { id: 2, req: "GRGS", reqRole: "SEKRETARIS 1", target: "SYOW", targetRole: "BENDAHARA", shiftOut: "Modul 4 / SI5007", shiftIn: "Modul 4 / SI50INT", status: "APPROVED" },
   ]);
-  const [targetAsisten, setTargetAsisten] = useState("");
+  const [targetAsisten, setTargetAsisten] = useState("DEVO");
   const [shiftSource, setShiftSource] = useState("Modul 4 / SI5001");
   const [shiftTarget, setShiftTarget] = useState("Modul 4 / SI5002");
 
@@ -218,20 +224,20 @@ export default function AssistantDashboard() {
   const handleAddSwap = (e: React.FormEvent) => {
     e.preventDefault();
     if (!targetAsisten) return;
+    const tgtAsst = getAssistantByCode(targetAsisten);
     setSwaps([
       {
         id: Date.now(),
-        req: "GWAN",
-        reqRole: "TUTOR",
+        req: currentAssistantProfile.code,
+        reqRole: currentAssistantProfile.position.toUpperCase(),
         target: targetAsisten.toUpperCase(),
-        targetRole: "VALIDATOR",
+        targetRole: tgtAsst ? tgtAsst.position.toUpperCase() : "ASISTEN JAGA",
         shiftOut: shiftSource,
         shiftIn: shiftTarget,
         status: "PENDING",
       },
       ...swaps,
     ]);
-    setTargetAsisten("");
   };
 
   return (
@@ -396,24 +402,28 @@ export default function AssistantDashboard() {
                       Tim Asisten Jaga:
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-900/40 text-purple-900 dark:text-purple-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Lead PIC</span>
-                      <strong>IZIN (Korprak)</strong>
+                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Korprak</span>
+                      <strong>DEVO (Devin)</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Koor Komdis</span>
-                      <strong>GWAN</strong>
+                      <span className="text-[9px] font-bold uppercase text-purple-600 dark:text-purple-400">Koor CnI</span>
+                      <strong>MACY (Maurel)</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Sekre</span>
-                      <strong>KEYS</strong>
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Sekre 1</span>
+                      <strong>GRGS (Gracia)</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Validator</span>
-                      <strong>LEVI</strong>
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Bendahara</span>
+                      <strong>SYOW (Syalfa)</strong>
                     </span>
                     <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
-                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Logistik</span>
-                      <strong>AL-04</strong>
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Koor MD</span>
+                      <strong>MUDI (Daffa)</strong>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 bg-slate-100 dark:bg-neutral-800/80 border border-slate-200/60 dark:border-neutral-700/60 text-slate-800 dark:text-neutral-200 px-2.5 py-1 rounded-lg text-xs font-medium">
+                      <span className="text-[9px] font-bold uppercase text-slate-500 dark:text-neutral-400">Koor TnC</span>
+                      <strong>FIAG (Figo)</strong>
                     </span>
                   </div>
                 </div>
@@ -656,7 +666,7 @@ export default function AssistantDashboard() {
                             {cls.totalStudents} Mhs
                           </td>
                           <td className="px-4 py-3 font-mono font-semibold text-slate-800 dark:text-neutral-200">
-                            {idx === 0 ? "IZIN & GWAN" : idx === 1 ? "GWAN & LEVI" : "LEVI & AL-04"}
+                            {idx === 0 ? "DEVO & MACY" : idx === 1 ? "MACY & GRGS" : idx === 2 ? "GRGS & SYOW" : idx === 3 ? "MUDI & FIAG" : "IPGA & DSPH"}
                           </td>
                           <td className="px-4 py-3 text-center">
                             <span className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full ${
@@ -859,10 +869,12 @@ export default function AssistantDashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { role: "LEAD PIC", code: "IZIN", name: "Muhammad Izin", time: "07:15 WIB", status: "Tepat Waktu", roleType: "KOMDIS" },
-                    { role: "TUTOR (PENGANJAR)", code: "GWAN", name: "Andi Prasetyo", time: "07:20 WIB", status: "Tepat Waktu", roleType: "ASPRAK" },
-                    { role: "VALIDATOR NILAI", code: "LEVI", name: "Levina Sekar", time: "07:24 WIB", status: "Tepat Waktu", roleType: "SEKBEN" },
-                    { role: "LOGISTIK & LAB PC", code: "AL-04", name: "Alif Pratama", time: "07:28 WIB", status: "Tepat Waktu", roleType: "ASPRAK" },
+                    { role: "LEAD PIC (KORPRAK)", code: "DEVO", name: "Devin Octavian", time: "07:15 WIB", status: "Tepat Waktu", roleType: "ASPRAK", division: "Koordinator" },
+                    { role: "KOOR CNI (KOMDIS)", code: "MACY", name: "Maurellio Christopher Yonathan", time: "07:18 WIB", status: "Tepat Waktu", roleType: "KOMDIS", division: "Compliance & Integrity" },
+                    { role: "SEKRETARIS 1 (BPH)", code: "GRGS", name: "Gracia Gebriella Sianturi", time: "07:22 WIB", status: "Tepat Waktu", roleType: "SEKBEN", division: "Sekretaris & Bendahara" },
+                    { role: "BENDAHARA (BPH)", code: "SYOW", name: "Syalfa Oktaviana Wijaya", time: "07:24 WIB", status: "Tepat Waktu", roleType: "SEKBEN", division: "Sekretaris & Bendahara" },
+                    { role: "KOOR MD (MODUL)", code: "MUDI", name: "Muhammad Daffa Izzati", time: "07:25 WIB", status: "Tepat Waktu", roleType: "ASPRAK", division: "Module Development" },
+                    { role: "KOOR TNC (SYSTEM)", code: "FIAG", name: "Figo Al Ghifari", time: "07:26 WIB", status: "Tepat Waktu", roleType: "ASPRAK", division: "Tech & Systems" },
                   ].map((asp) => (
                     <div key={asp.code} className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0e071a] shadow-xs flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -1219,13 +1231,17 @@ export default function AssistantDashboard() {
                 <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold">
                   Kode Asisten Target (Swap With)
                 </label>
-                <input
-                  type="text"
+                <select
                   value={targetAsisten}
                   onChange={(e) => setTargetAsisten(e.target.value)}
-                  placeholder="Contoh: LEVI / IZIN"
-                  className="w-full bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white font-mono uppercase focus:outline-none focus:ring-2 focus:ring-purple-500/30"
-                />
+                  className="w-full bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/30 cursor-pointer"
+                >
+                  {ALPRO_ASSISTANTS.filter((a) => a.code !== currentAssistantProfile.code).map((asst) => (
+                    <option key={`target-${asst.code}`} value={asst.code}>
+                      {asst.code} — {asst.name} ({asst.position})
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div className="flex-1 space-y-1.5 w-full">
@@ -1630,37 +1646,21 @@ export default function AssistantDashboard() {
                     <div className="space-y-0.5 pb-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
-                          {sessionUser === "GWAN"
-                            ? "Andi Pratama"
-                            : sessionUser === "IZIN"
-                            ? "M. Izin Alamsyah"
-                            : sessionUser === "KEYS"
-                            ? "Keysha Aurelia"
-                            : sessionUser === "LEVI"
-                            ? "Levina Sekar"
-                            : `Asisten ${sessionUser}`}
+                          {currentAssistantProfile.name}
                         </h2>
                         <span className="font-mono text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800">
-                          {sessionUser}
+                          {currentAssistantProfile.code}
                         </span>
                       </div>
                       <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono">
-                        NIM: {sessionUser === "GWAN" ? "1202230001" : sessionUser === "IZIN" ? "1202230002" : sessionUser === "KEYS" ? "1202230003" : "1202230045"} • S1 Sistem Informasi (SI&apos;50)
+                        NIM: {currentAssistantProfile.nim} • Kelas Asal: {currentAssistantProfile.originClass} • Telkom University
                       </p>
-                      <div className="flex items-center gap-2 pt-0.5">
-                        <span className="text-[10px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded-full border border-purple-200/80 dark:border-purple-800/80">
-                          {sessionUser === "GWAN"
-                            ? "Koordinator Komisi Disiplin (Koor Komdis)"
-                            : sessionUser === "IZIN"
-                            ? "Koordinator Praktikum (Korprak)"
-                            : sessionUser === "KEYS"
-                            ? "Sekretaris Laboratorium (Sekre)"
-                            : sessionUser === "LEVI"
-                            ? "Bendahara Laboratorium (Sekben)"
-                            : "Asisten Praktikum (Asprak)"}
+                      <div className="flex items-center gap-2 pt-0.5 flex-wrap">
+                        <span className="text-[10px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-full border border-purple-200/80 dark:border-purple-800/80">
+                          {currentAssistantProfile.position} ({currentAssistantProfile.division})
                         </span>
                         <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
-                          Aktif Mengajar 2026
+                          Aktif Mengajar 2026/2027
                         </span>
                       </div>
                     </div>
@@ -1670,19 +1670,19 @@ export default function AssistantDashboard() {
                   <div className="flex items-center gap-2 pt-2 sm:pt-0">
                     <button
                       type="button"
-                      onClick={() => alert("Fitur edit profil tersinkronisasi otomatis dengan Database SSO Telkom University.")}
+                      onClick={() => alert("Profil telah disinkronkan dengan Data Asisten Resmi EDM Laboratory Telkom University.")}
                       className="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                       <Edit3 size={14} />
-                      <span>Edit Profil</span>
+                      <span>Data Resmi</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => alert("Permohonan ganti password telah diteruskan ke administrator Lab EDM.")}
+                      onClick={() => alert(`Format password login akun ${currentAssistantProfile.code}: ${currentAssistantProfile.code.toLowerCase()}${currentAssistantProfile.role === "KOMDIS" ? "komdis123" : "123"}`)}
                       className="px-3.5 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                       <Key size={14} />
-                      <span>Ganti Password</span>
+                      <span>Cek Password</span>
                     </button>
                   </div>
                 </div>
@@ -1690,24 +1690,24 @@ export default function AssistantDashboard() {
                 {/* Quick Performance & Assignment Stats Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-4 border-t border-slate-100 dark:border-neutral-800 text-center">
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Kelas Dibina</div>
-                    <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">15 Kelas</div>
-                    <div className="text-[10px] text-purple-600 dark:text-purple-400 font-mono">SI5001 - SI50INT</div>
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Divisi Lab</div>
+                    <div className="text-base font-bold text-slate-900 dark:text-white mt-0.5 truncate">{currentAssistantProfile.division}</div>
+                    <div className="text-[10px] text-purple-600 dark:text-purple-400 font-mono">{currentAssistantProfile.position}</div>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Jam Praktikum</div>
-                    <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">32 Jam</div>
-                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">Tuntas Semester Ini</div>
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Total Mahasiswa</div>
+                    <div className="text-lg font-bold text-slate-900 dark:text-white mt-0.5">568 Mhs</div>
+                    <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">15 Kelas SI&apos;50</div>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Presensi Asprak</div>
-                    <div className="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">100%</div>
-                    <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono">14/14 Shift Hadir</div>
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">ID LINE</div>
+                    <div className="text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5 font-mono">{currentAssistantProfile.lineId}</div>
+                    <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-mono">Kontak Asisten</div>
                   </div>
                   <div className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-100 dark:border-neutral-800/60">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Rating Asisten</div>
-                    <div className="text-lg font-bold text-purple-700 dark:text-purple-300 mt-0.5">4.92 / 5.0</div>
-                    <div className="text-[10px] text-amber-500 font-mono">★★★★★ (45 Review)</div>
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Tim Laboratorium</div>
+                    <div className="text-lg font-bold text-purple-700 dark:text-purple-300 mt-0.5">32 Asisten</div>
+                    <div className="text-[10px] text-purple-600 font-mono">EDM Laboratory</div>
                   </div>
                 </div>
               </div>
@@ -1715,68 +1715,79 @@ export default function AssistantDashboard() {
 
             {/* Profile Content 2-Column Split */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-              {/* Left Column: Data Diri & Akademik */}
+              {/* Left Column: Data Diri & Kontak Asisten */}
               <div className="lg:col-span-7 bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
                   <div className="flex items-center gap-2">
                     <User size={18} className="text-purple-600 dark:text-purple-400" />
                     <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-wider">
-                      Informasi Personal & Akademik
+                      Informasi Asisten Praktikum
                     </h3>
                   </div>
-                  <span className="text-[10px] font-mono text-slate-400">Terverifikasi Telkom SSO</span>
+                  <span className="text-[10px] font-mono text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-800 font-bold">
+                    EDM Lab Official
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
                     <div className="text-[10px] font-mono text-slate-400 uppercase">Nama Lengkap</div>
                     <div className="font-semibold text-slate-900 dark:text-white">
-                      {sessionUser === "GWAN"
-                        ? "Andi Pratama, S.Kom"
-                        : sessionUser === "IZIN"
-                        ? "M. Izin Alamsyah, S.Kom"
-                        : sessionUser === "KEYS"
-                        ? "Keysha Aurelia"
-                        : sessionUser === "LEVI"
-                        ? "Levina Sekar"
-                        : `Asisten ${sessionUser}`}
+                      {currentAssistantProfile.name}
                     </div>
                   </div>
 
                   <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
                     <div className="text-[10px] font-mono text-slate-400 uppercase">Kode Lab / ID Asisten</div>
-                    <div className="font-mono font-bold text-purple-700 dark:text-purple-300">{sessionUser}</div>
+                    <div className="font-mono font-bold text-purple-700 dark:text-purple-300">{currentAssistantProfile.code}</div>
                   </div>
 
                   <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
                     <div className="text-[10px] font-mono text-slate-400 uppercase">Nomor Induk Mahasiswa (NIM)</div>
                     <div className="font-mono font-semibold text-slate-900 dark:text-white">
-                      {sessionUser === "GWAN" ? "1202230001" : sessionUser === "IZIN" ? "1202230002" : sessionUser === "KEYS" ? "1202230003" : "1202230045"}
+                      {currentAssistantProfile.nim}
                     </div>
                   </div>
 
                   <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
-                    <div className="text-[10px] font-mono text-slate-400 uppercase">Program Studi / Fakultas</div>
-                    <div className="font-semibold text-slate-900 dark:text-white">S1 Sistem Informasi • FRI</div>
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">Kelas Asal • Angkatan</div>
+                    <div className="font-semibold text-slate-900 dark:text-white">{currentAssistantProfile.originClass} • S1 Sistem Informasi</div>
                   </div>
 
                   <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
                     <div className="text-[10px] font-mono text-slate-400 uppercase flex items-center gap-1">
                       <Mail size={12} />
-                      <span>Email SSO Institusi</span>
+                      <span>Email Student Telkom</span>
                     </div>
-                    <div className="font-mono text-slate-800 dark:text-slate-200 truncate">
-                      {sessionUser.toLowerCase()}@student.telkomuniversity.ac.id
+                    <div className="font-mono text-slate-800 dark:text-slate-200 truncate" title={currentAssistantProfile.studentEmail}>
+                      {currentAssistantProfile.studentEmail}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase flex items-center gap-1">
+                      <Mail size={12} />
+                      <span>Email Pribadi</span>
+                    </div>
+                    <div className="font-mono text-slate-800 dark:text-slate-200 truncate" title={currentAssistantProfile.personalEmail}>
+                      {currentAssistantProfile.personalEmail}
                     </div>
                   </div>
 
                   <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
                     <div className="text-[10px] font-mono text-slate-400 uppercase flex items-center gap-1">
                       <Phone size={12} />
-                      <span>WhatsApp / Telepon</span>
+                      <span>No. WhatsApp / HP</span>
                     </div>
-                    <div className="font-mono text-slate-800 dark:text-slate-200">
-                      +62 812-9876-5432
+                    <div className="font-mono font-semibold text-slate-800 dark:text-slate-200">
+                      {currentAssistantProfile.phone}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 p-3 rounded-xl bg-slate-50/70 dark:bg-neutral-900/40 border border-slate-100 dark:border-neutral-800">
+                    <div className="text-[10px] font-mono text-slate-400 uppercase">ID LINE</div>
+                    <div className="font-mono font-semibold text-emerald-600 dark:text-emerald-400">
+                      @{currentAssistantProfile.lineId}
                     </div>
                   </div>
 
@@ -1810,9 +1821,9 @@ export default function AssistantDashboard() {
 
                   <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
                     {currentRole === "KOMDIS"
-                      ? "Komisi Disiplin: Berwenang memberi flag sanksi keterlambatan praktikan, verifikasi surat izin, dan validasi kepatuhan shift asprak."
+                      ? "Compliance & Integrity (Komdis): Berwenang memberi flag sanksi keterlambatan praktikan, verifikasi surat izin, dan validasi kepatuhan shift asprak."
                       : currentRole === "SEKBEN"
-                      ? "Sekretaris/Bendahara (Inti): Pengelolaan administrasi perizinan, surat izin, dan logistik kas ruangan praktikum."
+                      ? "Sekretaris & Bendahara (BPH): Pengelolaan administrasi praktikum, rekap absensi, surat izin, dan kas laboratorium."
                       : "Asisten Praktikum (Asprak): Pengampu materi shift, bimbingan modul, live rating, dan input nilai praktikan."}
                   </p>
 
@@ -1853,7 +1864,7 @@ export default function AssistantDashboard() {
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
                       <span className="text-slate-500 dark:text-neutral-400 font-mono">Format Password Sesi</span>
                       <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                        {sessionUser === "GWAN" ? "GWANkomdis123" : `${sessionUser}123`}
+                        {currentAssistantProfile.code.toLowerCase()}{currentAssistantProfile.role === "KOMDIS" ? "komdis123" : "123"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
@@ -1869,6 +1880,149 @@ export default function AssistantDashboard() {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* FULL 32-ASSISTANT DIRECTORY TABLE & DIVISION FILTER */}
+            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                      Direktori Tim Asisten & Divisi Laboratorium EDM
+                    </h3>
+                    <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 px-2.5 py-0.5 rounded-full">
+                      32 Asisten Resmi
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                    Daftar lengkap seluruh asisten praktikum Algoritma & Pemrograman beserta divisi, kontak WhatsApp, dan ID Line.
+                  </p>
+                </div>
+
+                {/* Search input */}
+                <div className="relative min-w-[240px]">
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    type="text"
+                    placeholder="Cari Asisten (Nama/Kode/NIM)..."
+                    value={rosterSearch}
+                    onChange={(e) => setRosterSearch(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-mono focus:outline-none focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              {/* Division Filter Badges */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {[
+                  { id: "ALL", label: "Semua (32)" },
+                  { id: "Koordinator", label: "Koordinator (1)" },
+                  { id: "Sekretaris & Bendahara", label: "BPH/Sekben (3)" },
+                  { id: "Compliance & Integrity", label: "CnI / Komdis (7)" },
+                  { id: "Creative & Multimedia", label: "CnM (7)" },
+                  { id: "Tech & Systems", label: "TnC (8)" },
+                  { id: "Module Development", label: "MD (6)" },
+                ].map((f) => (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => setRosterDivisionFilter(f.id)}
+                    className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
+                      rosterDivisionFilter === f.id
+                        ? "bg-purple-700 text-white shadow-xs"
+                        : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* Roster Table */}
+              <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[500px]">
+                <table className="w-full text-left text-xs whitespace-nowrap min-w-[950px]">
+                  <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
+                    <tr>
+                      <th className="px-4 py-3">Kode</th>
+                      <th className="px-4 py-3">Nama Lengkap</th>
+                      <th className="px-4 py-3">NIM</th>
+                      <th className="px-4 py-3">Kelas Asal</th>
+                      <th className="px-4 py-3">Jabatan & Divisi</th>
+                      <th className="px-4 py-3">ID LINE</th>
+                      <th className="px-4 py-3">No. HP / WhatsApp</th>
+                      <th className="px-4 py-3">Email Student</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                    {ALPRO_ASSISTANTS
+                      .filter((a) => {
+                        const matchDiv = rosterDivisionFilter === "ALL" || a.division === rosterDivisionFilter;
+                        const matchSearch =
+                          !rosterSearch ||
+                          a.name.toLowerCase().includes(rosterSearch.toLowerCase()) ||
+                          a.code.toLowerCase().includes(rosterSearch.toLowerCase()) ||
+                          a.nim.includes(rosterSearch) ||
+                          a.lineId.toLowerCase().includes(rosterSearch.toLowerCase());
+                        return matchDiv && matchSearch;
+                      })
+                      .map((asst) => {
+                        const isCurrent = asst.code === sessionUser;
+                        return (
+                          <tr
+                            key={asst.code}
+                            className={`transition-colors ${
+                              isCurrent
+                                ? "bg-purple-50/80 dark:bg-purple-950/40 font-semibold"
+                                : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
+                            }`}
+                          >
+                            <td className="px-4 py-3">
+                              <span className="inline-flex items-center gap-1 font-mono font-bold text-xs px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+                                {asst.code}
+                                {isCurrent && <span className="text-[10px] text-emerald-600 dark:text-emerald-400">●</span>}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                              {asst.name}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
+                              {asst.nim}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
+                              {asst.originClass}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                                asst.division === "Koordinator"
+                                  ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300"
+                                  : asst.division === "Sekretaris & Bendahara"
+                                  ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
+                                  : asst.division === "Compliance & Integrity"
+                                  ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
+                                  : asst.division === "Creative & Multimedia"
+                                  ? "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300"
+                                  : asst.division === "Tech & Systems"
+                                  ? "bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300"
+                                  : "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300"
+                              }`}>
+                                {asst.position}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                              @{asst.lineId}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-slate-700 dark:text-neutral-300">
+                              {asst.phone}
+                            </td>
+                            <td className="px-4 py-3 font-mono text-[11px] text-slate-500 dark:text-neutral-400 truncate max-w-[200px]" title={asst.studentEmail}>
+                              {asst.studentEmail}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

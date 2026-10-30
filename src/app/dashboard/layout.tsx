@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { DashboardHeader } from "@/components/aureo/dashboard-header";
+import { getAssistantByCode } from "@/data/assistants-roster";
 
 export default async function DashboardLayout({
   children,
@@ -7,8 +8,9 @@ export default async function DashboardLayout({
   children: React.ReactNode;
 }) {
   const cookieStore = await cookies();
-  const sessionUser = cookieStore.get("mock_session")?.value || "GWAN";
-  const defaultRole = sessionUser === "GWAN" ? "KOMDIS" : (sessionUser === "KEYS" || sessionUser === "LEVI") ? "SEKBEN" : "ASPRAK";
+  const sessionUser = cookieStore.get("mock_session")?.value || "MACY";
+  const matched = getAssistantByCode(sessionUser);
+  const defaultRole = matched?.role || "KOMDIS";
   const userRole = (cookieStore.get("mock_role")?.value as "ASPRAK" | "KOMDIS" | "SEKBEN") || defaultRole;
 
   return (

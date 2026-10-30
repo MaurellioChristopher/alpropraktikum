@@ -1,19 +1,19 @@
 "use client";
-
 import { ArrowLeftRight, Check, X, ArrowLeft, ShieldCheck, GraduationCap } from "lucide-react";
 import { useState } from "react";
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
 import { SI50_CLASSES } from "@/lib/si-classes";
+import { ALPRO_ASSISTANTS } from "@/data/assistants-roster";
 import Link from "next/link";
 
 export default function SwapEngineDashboard() {
   const [swaps, setSwaps] = useState([
-    { id: 1, req: "GWAN", reqRole: "TUTOR", target: "LEVI", targetRole: "VALIDATOR", shiftOut: "Modul 4 / SI5001", shiftIn: "Modul 4 / SI5004", status: "PENDING" },
-    { id: 2, req: "IZIN", reqRole: "LEAD_PIC", target: "AL-05", targetRole: "LEAD_PIC", shiftOut: "Modul 4 / SI5007", shiftIn: "Modul 4 / SI50INT", status: "APPROVED" },
-    { id: 3, req: "LEVI", reqRole: "VALIDATOR", target: "GWAN", targetRole: "TUTOR", shiftOut: "Modul 4 / SI5012", shiftIn: "Modul 4 / SI5002", status: "APPROVED" },
+    { id: 1, req: "MACY", reqRole: "KOOR CNI", target: "DEVO", targetRole: "KORPRAK", shiftOut: "Modul 4 / SI5001", shiftIn: "Modul 4 / SI5004", status: "PENDING" },
+    { id: 2, req: "GRGS", reqRole: "SEKRETARIS", target: "SYOW", targetRole: "BENDAHARA", shiftOut: "Modul 4 / SI5007", shiftIn: "Modul 4 / SI50INT", status: "APPROVED" },
+    { id: 3, req: "MUDI", reqRole: "KOOR MD", target: "FIAG", targetRole: "KOOR TNC", shiftOut: "Modul 4 / SI5012", shiftIn: "Modul 4 / SI5002", status: "APPROVED" },
   ]);
 
-  const [targetAsisten, setTargetAsisten] = useState("");
+  const [targetAsisten, setTargetAsisten] = useState("DEVO");
   const [shiftSource, setShiftSource] = useState("Modul 4 / SI5001");
   const [shiftTarget, setShiftTarget] = useState("Modul 4 / SI5002");
 
@@ -23,17 +23,16 @@ export default function SwapEngineDashboard() {
     setSwaps([
       {
         id: Date.now(),
-        req: "GWAN",
-        reqRole: "TUTOR",
+        req: "MACY",
+        reqRole: "KOOR CNI",
         target: targetAsisten.toUpperCase(),
-        targetRole: "VALIDATOR",
+        targetRole: "ASISTEN JAGA",
         shiftOut: shiftSource,
         shiftIn: shiftTarget,
         status: "PENDING",
       },
       ...swaps,
     ]);
-    setTargetAsisten("");
   };
 
   return (
@@ -65,15 +64,19 @@ export default function SwapEngineDashboard() {
         <form onSubmit={handleAddSwap} className="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6 flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 space-y-2 w-full">
             <label className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
-              Target Asisten (Kode)
+              Target Asisten Pengganti
             </label>
-            <input
-              type="text"
+            <select
               value={targetAsisten}
               onChange={(e) => setTargetAsisten(e.target.value)}
-              placeholder="Contoh: LEVI"
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 font-mono uppercase focus:outline-none focus:ring-2 focus:ring-rose-500/30"
-            />
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 font-mono focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+            >
+              {ALPRO_ASSISTANTS.map((a) => (
+                <option key={a.code} value={a.code}>
+                  {a.code} — {a.name} ({a.position})
+                </option>
+              ))}
+            </select>
           </div>
 
           <div className="flex-1 space-y-2 w-full">

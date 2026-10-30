@@ -1,10 +1,10 @@
 "use client";
-
 import React, { useState } from "react";
 import Image from "next/image";
 import { logoutAction } from "@/app/(auth)/actions/auth";
 import { Calendar, Bell, ChevronDown, LogOut, User, Shield, CheckCircle2, RefreshCw } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { getAssistantByCode } from "@/data/assistants-roster";
 
 interface DashboardHeaderProps {
   assistantCode?: string;
@@ -13,13 +13,15 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({
-  assistantCode = "GWAN",
-  currentRole = "ASPRAK",
+  assistantCode = "MACY",
+  currentRole = "KOMDIS",
   onRoleChange,
 }: DashboardHeaderProps) {
   const [showDropdown, setShowDropdown] = useState(false);
   const [notificationCount, setNotificationCount] = useState(2);
   const [activeRole, setActiveRole] = useState(currentRole);
+
+  const currentAsst = getAssistantByCode(assistantCode);
 
   const handleSwitchRole = (role: "ASPRAK" | "KOMDIS" | "SEKBEN") => {
     setActiveRole(role);
@@ -116,17 +118,13 @@ export function DashboardHeader({
 
             <div className="hidden sm:flex flex-col text-left">
               <span className="text-xs font-semibold text-white leading-tight">
-                {assistantCode === "GWAN"
-                  ? "Gwan (Koor Komdis)"
-                  : assistantCode === "IZIN"
-                  ? "Izin (Korprak)"
-                  : assistantCode === "KEYS"
-                  ? "Keys (Sekre)"
-                  : assistantCode === "LEVI"
-                  ? "Levi (Sekben)"
+                {currentAsst
+                  ? `${currentAsst.name} (${currentAsst.position})`
                   : `${assistantCode} (${activeRole})`}
               </span>
-              <span className="text-[10px] font-mono text-purple-300">ID: {assistantCode} • {activeRole}</span>
+              <span className="text-[10px] font-mono text-purple-300">
+                {currentAsst ? `${currentAsst.code} • ${currentAsst.division}` : `ID: ${assistantCode} • ${activeRole}`}
+              </span>
             </div>
 
             <ChevronDown size={14} className="text-slate-400" />
@@ -134,20 +132,17 @@ export function DashboardHeader({
 
           {/* Profile Dropdown */}
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 py-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white dark:bg-slate-900 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 py-2.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
                 <div className="font-bold text-xs text-slate-900 dark:text-white">
-                  {assistantCode === "GWAN"
-                    ? "Andi Pratama (Koor Komdis)"
-                    : assistantCode === "IZIN"
-                    ? "M. Izin Alamsyah (Korprak)"
-                    : assistantCode === "KEYS"
-                    ? "Keysha Aurelia (Sekre)"
-                    : assistantCode === "LEVI"
-                    ? "Levina Sekar (Sekben)"
-                    : `Asisten ${assistantCode}`}
+                  {currentAsst ? currentAsst.name : `Asisten ${assistantCode}`}
                 </div>
-                <div className="text-[11px] font-mono text-slate-500 dark:text-slate-400">ID: {assistantCode} • Telkom University</div>
+                <div className="text-[11px] font-mono text-purple-600 dark:text-purple-400 font-semibold mt-0.5">
+                  {currentAsst ? `${currentAsst.position} • Divisi ${currentAsst.division}` : `ID: ${assistantCode}`}
+                </div>
+                <div className="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5">
+                  {currentAsst ? `NIM: ${currentAsst.nim} • ${currentAsst.originClass}` : "Laboratorium EDM Telkom University"}
+                </div>
               </div>
 
               {/* Quick Switch Role Inside Dashboard */}

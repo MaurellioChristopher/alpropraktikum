@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { getAssistantByCode, getAssistantByNim } from "@/data/assistants-roster";
 
 export async function loginAction(prevState: any, formData: FormData) {
   const identifier = (formData.get("identifier") as string)?.trim().toUpperCase();
@@ -14,28 +15,29 @@ export async function loginAction(prevState: any, formData: FormData) {
 
   const cookieStore = await cookies();
 
-  // Pemetaan default berdasarkan kode asisten:
-  // - GWAN: Koor Komdis (KOMDIS)
-  // - IZIN: Korprak (ASPRAK)
-  // - KEYS: Sekre (SEKBEN)
-  // - LEVI: Sekben (SEKBEN)
+  // Pemetaan dinamis dari 32 data asisten resmi laboratorium EDM:
+  const matchedAssistant = getAssistantByCode(identifier) || getAssistantByNim(identifier);
+
   let resolvedRole: "ASPRAK" | "KOMDIS" | "SEKBEN" = "ASPRAK";
   let assistantName = `Asisten ${identifier}`;
+  let assistantCode = identifier;
 
-  if (identifier === "GWAN") {
+  if (matchedAssistant) {
+    resolvedRole = matchedAssistant.role;
+    assistantName = `${matchedAssistant.name} (${matchedAssistant.position})`;
+    assistantCode = matchedAssistant.code;
+  } else if (identifier === "GWAN" || identifier.includes("KOMDIS")) {
     resolvedRole = "KOMDIS";
-    assistantName = "Andi Pratama (Koor Komdis)";
+    assistantName = "Maurellio C. Y. (Koor CnI)";
+    assistantCode = "MACY";
   } else if (identifier === "IZIN") {
     resolvedRole = "ASPRAK";
-    assistantName = "M. Izin Alamsyah (Korprak)";
-  } else if (identifier === "KEYS") {
+    assistantName = "Devin Octavian (Koordinator)";
+    assistantCode = "DEVO";
+  } else if (identifier === "KEYS" || identifier.includes("SEKBEN")) {
     resolvedRole = "SEKBEN";
-    assistantName = "Keysha (Sekre)";
-  } else if (identifier === "LEVI") {
-    resolvedRole = "SEKBEN";
-    assistantName = "Levina Sekar (Sekben)";
-  } else if (identifier.includes("KOMDIS")) {
-    resolvedRole = "KOMDIS";
+    assistantName = "Gracia Gebriella (Sekretaris 1)";
+    assistantCode = "GRGS";
   }
 
   // 1. JIKA SUPABASE TERKONFIGURASI: Cek ke Database Supabase
@@ -96,21 +98,22 @@ export async function loginAction(prevState: any, formData: FormData) {
   // - Jika role lain (Asprak/Sekben): KODE123 (contoh: IZIN123, KEYS123)
   const isKomdis = resolvedRole === "KOMDIS";
   const expectedPassword = isKomdis
-    ? `${identifier.toLowerCase()}komdis123`
-    : `${identifier.toLowerCase()}123`;
+    ? `${assistantCode.toLowerCase()}komdis123`
+    : `${assistantCode.toLowerCase()}123`;
 
   const isValidManualPassword =
     password.toLowerCase() === expectedPassword ||
+    password.toLowerCase() === `${identifier.toLowerCase()}123` ||
     password === "asisten2026"; // toleransi backwards compatibility
 
   if (!isValidManualPassword) {
-    const hint = isKomdis ? `${identifier}komdis123` : `${identifier}123`;
+    const hint = isKomdis ? `${assistantCode}komdis123` : `${assistantCode}123`;
     return {
-      error: `Password sesi salah. Format password untuk kode ${identifier}: ${hint}`,
+      error: `Password sesi salah. Format password untuk kode ${assistantCode}: ${hint}`,
     };
   }
 
-  cookieStore.set("mock_session", identifier, { path: "/" });
+  cookieStore.set("mock_session", assistantCode, { path: "/" });
   cookieStore.set("mock_role", resolvedRole, { path: "/" });
   cookieStore.set("assistant_name", assistantName, { path: "/" });
 

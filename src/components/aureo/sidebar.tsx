@@ -75,12 +75,12 @@ export function AureoSidebar() {
         <div className="bg-[#12091F] rounded-[6px] p-3 border border-[#27272A] flex flex-col gap-3">
           <div className="flex justify-between items-center">
             <span className="text-xs text-[var(--color-bone)] font-medium">Asisten Aktif</span>
-            <span className="text-[9px] font-mono bg-[rgba(197,166,124,0.2)] text-[var(--color-aureo-gold)] px-2 py-0.5 rounded-full">
-              TUTOR
+            <span className="text-[9px] font-mono bg-purple-900/60 text-purple-300 border border-purple-800 px-2 py-0.5 rounded-full">
+              KOOR CNI
             </span>
           </div>
           <div className="flex justify-between items-end">
-            <span className="font-mono text-sm text-[var(--color-bone)]">GWAN</span>
+            <span className="font-mono text-sm text-[var(--color-bone)] font-bold">MACY</span>
             <form action={logoutAction}>
               <button className="text-[var(--color-steel)] hover:text-[var(--color-edm-crimson)] transition-colors">
                 <LogOut size={16} />

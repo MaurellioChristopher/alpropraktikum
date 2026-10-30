@@ -5,6 +5,7 @@ import Image from "next/image";
 import { loginAction } from "@/app/(auth)/actions/auth";
 import { useActionState } from "react";
 import { motion } from "motion/react";
+import { getAssistantByCode } from "@/data/assistants-roster";
 import {
   Eye,
   EyeOff,
@@ -21,13 +22,15 @@ export function LoginForm() {
   const [password, setPassword] = useState("");
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
+  const matchedAsst = getAssistantByCode(identifier);
+  const isKomdis = matchedAsst?.role === "KOMDIS" || identifier === "MACY" || identifier === "GWAN";
+
   // Dynamic placeholder hint for password
-  const passwordHint =
-    identifier === "GWAN"
-      ? "GWANkomdis123"
-      : identifier
-      ? `${identifier}123`
-      : "KODE123";
+  const passwordHint = identifier
+    ? isKomdis
+      ? `${identifier}komdis123`
+      : `${identifier}123`
+    : "MACYkomdis123 / DEVO123";
 
   return (
     <div className="relative w-full max-w-[490px] lg:max-w-[520px] group">
@@ -91,7 +94,7 @@ export function LoginForm() {
                   required
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
-                  placeholder="Masukkan Kode (Contoh: GWAN / IZIN / KEYS)"
+                  placeholder="Masukkan Kode (Contoh: MACY / DEVO / GRGS)"
                   className="w-full bg-white dark:bg-[#140C2C] border border-slate-300 dark:border-purple-900/50 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500/25 focus:border-purple-600 dark:focus:border-purple-500 transition-all font-mono uppercase shadow-inner font-semibold"
                 />
               </div>

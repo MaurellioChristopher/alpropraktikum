@@ -301,8 +301,7 @@ export default function Home() {
                     <div className="p-4 rounded-xl bg-purple-50/50 dark:bg-[#140C2C] border border-purple-200/70 dark:border-purple-900/60 text-xs space-y-1">
                       <div><strong className="text-slate-700 dark:text-slate-200">Institusi:</strong> S1 Sistem Informasi • Telkom University</div>
                       <div><strong className="text-slate-700 dark:text-slate-200">Lokasi:</strong> Gedung Laboratorium Terpadu Lantai 3, Telkom University</div>
-                      <div><strong className="text-slate-700 dark:text-slate-200">Kelas Aktif:</strong> 15 Kelas (SI5001 s.d. SI5014 & SI50INT)</div>
-                      <div><strong className="text-slate-700 dark:text-slate-200">Koordinator Asisten:</strong> GWAN, IZIN, LEVI</div>
+                      <div><strong className="text-slate-700 dark:text-slate-200">Tim Koordinator:</strong> DEVO (Korprak), MACY (Koor CnI), GRGS (Sekretaris), SYOW (Bendahara), MUDI (Koor MD), FIAG (Koor TnC), IPGA (Koor CnM)</div>
                     </div>
                   </div>
                 </div>

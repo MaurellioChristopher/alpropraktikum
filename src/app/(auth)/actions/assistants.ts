@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { ALPRO_ASSISTANTS } from "@/data/assistants-roster";
 
 export interface AssistantRecord {
   id?: string;
@@ -8,22 +9,32 @@ export interface AssistantRecord {
   nim?: string;
   name: string;
   role: "ASPRAK" | "KOMDIS" | "SEKBEN";
+  position?: string;
+  division?: string;
+  phone?: string;
+  lineId?: string;
   password?: string;
   email?: string;
   is_active?: boolean;
 }
 
 /**
- * Mengambil daftar asisten aktif dari database Supabase
+ * Mengambil daftar asisten aktif dari database Supabase atau fallback data roster resmi
  */
 export async function getAssistants(): Promise<AssistantRecord[]> {
   if (!isSupabaseConfigured()) {
-    // Fallback data demo jika belum connect ke Supabase
-    return [
-      { code: "GWAN", nim: "1202230001", name: "Andi P. (Koor Komdis)", role: "KOMDIS" },
-      { code: "IZIN", nim: "1202230002", name: "M. Izin (Korprak)", role: "ASPRAK" },
-      { code: "KEYS", nim: "1202230003", name: "Keysha (Sekre)", role: "SEKBEN" },
-    ];
+    return ALPRO_ASSISTANTS.map((a) => ({
+      code: a.code,
+      nim: a.nim,
+      name: `${a.name} (${a.position})`,
+      role: a.role,
+      position: a.position,
+      division: a.division,
+      phone: a.phone,
+      lineId: a.lineId,
+      email: a.studentEmail,
+      is_active: true,
+    }));
   }
 
   try {
