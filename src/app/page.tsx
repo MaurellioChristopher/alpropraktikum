@@ -271,7 +271,7 @@ export default function Home() {
                 </p>
                 <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-[11px] font-mono text-slate-700 dark:text-neutral-300 space-y-1.5">
                   <div>• <strong>Lokasi Praktikum:</strong> Ruang R1 Lantai 8 TULT (Telkom University Landmark Tower).</div>
-                  <div>• <strong>Ruang Asisten &amp; Lab:</strong> Gedung Laboratorium Terpadu Lt. 3, Telkom University, Bandung.</div>
+                  <div>• <strong>Ruang Asisten &amp; Lab:</strong> Gedung Laboratorium Lt. 8, Telkom University, Bandung.</div>
                 </div>
               </div>
             </motion.div>

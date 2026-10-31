@@ -108,11 +108,16 @@ export function DashboardSidebar({
       <div className="space-y-4">
         <div className="flex items-center justify-between relative px-1 pt-1">
           <div className="flex items-center gap-3">
-            {/* White rounded square logo container matching Image 1 */}
+            {/* White rounded square logo container with official EDM logo */}
             <div className="w-11 h-11 rounded-2xl bg-white shadow-md flex items-center justify-center shrink-0 p-1.5 transition-transform hover:scale-105">
-              <div className="w-full h-full rounded-xl bg-gradient-to-tr from-purple-700 to-indigo-600 flex items-center justify-center text-white font-mono font-black text-sm shadow-inner">
-                &lt;/&gt;
-              </div>
+              <Image
+                src="/images/edm-ribbon-logo.png"
+                alt="EDM Laboratory Logo"
+                width={36}
+                height={36}
+                className="w-full h-full object-contain"
+                priority
+              />
             </div>
 
             {!collapsed && (
