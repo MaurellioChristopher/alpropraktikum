@@ -2358,14 +2358,6 @@ export default function AssistantDashboard() {
                       <Edit3 size={14} />
                       <span>Data Resmi</span>
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => alert(`Format password login akun ${currentAssistantProfile.code}: ${getExpectedPassword(currentAssistantProfile.code)}`)}
-                      className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                    >
-                      <Key size={14} />
-                      <span>Cek Password</span>
-                    </button>
                   </div>
                 </div>
 
@@ -2544,9 +2536,9 @@ export default function AssistantDashboard() {
 
                   <div className="space-y-2 text-xs">
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
-                      <span className="text-slate-500 dark:text-neutral-400 font-mono">Format Password Sesi</span>
-                      <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                        {getExpectedPassword(currentAssistantProfile.code)}
+                      <span className="text-slate-500 dark:text-neutral-400 font-mono">Kata Sandi Akun</span>
+                      <span className="font-mono font-semibold text-slate-900 dark:text-white tracking-widest">
+                        ••••••••••••
                       </span>
                     </div>
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">

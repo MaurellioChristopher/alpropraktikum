@@ -4,11 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { loginAction } from "@/app/(auth)/actions/auth";
 import { useActionState } from "react";
-import {
-  getAssistantByCode,
-  getAssistantByNim,
-  getExpectedPassword,
-} from "@/data/assistants-roster";
+
 import {
   Eye,
   EyeOff,
@@ -26,14 +22,6 @@ export function LoginForm() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [state, formAction, isPending] = useActionState(loginAction, null);
-
-  const matchedAsst = identifier.trim()
-    ? getAssistantByCode(identifier.trim()) || getAssistantByNim(identifier.trim())
-    : null;
-
-  const passwordHint = matchedAsst
-    ? getExpectedPassword(matchedAsst.code)
-    : "KODEASISTENALPRO123 / KODEASISTENADMINR1";
 
   return (
     <div className="w-full max-w-[460px] bg-white/95 dark:bg-[#130728]/95 backdrop-blur-xl rounded-[2.2rem] p-7 sm:p-9 shadow-[0_25px_60px_-15px_rgba(79,40,150,0.12)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)] border border-purple-100/90 dark:border-purple-900/50 transition-all relative">
@@ -130,9 +118,6 @@ export function LoginForm() {
               <label className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-neutral-400 font-bold">
                 PIN / PASSWORD
               </label>
-              <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold">
-                Sandi: {passwordHint}
-              </span>
             </div>
             <div className="relative">
               <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-600 dark:text-purple-400">

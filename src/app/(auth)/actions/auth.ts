@@ -37,15 +37,8 @@ export async function loginAction(prevState: any, formData: FormData) {
   const isPasswordValid = password.toUpperCase() === expectedPassword.toUpperCase();
 
   if (!isPasswordValid) {
-    let hint = `${assistantCode}ALPRO123`;
-    if (accessLevel === "ADMIN_BESAR") {
-      hint = "MACY194545";
-    } else if (accessLevel === "ADMIN") {
-      hint = `${assistantCode}ADMINR1`;
-    }
-
     return {
-      error: `Password salah. Format password untuk ${assistantCode}: ${hint}`,
+      error: "Password salah. Silakan periksa kembali kata sandi akun Anda.",
     };
   }
 
