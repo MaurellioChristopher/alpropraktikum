@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { logoutAction } from "@/app/(auth)/actions/auth";
 import {
@@ -32,13 +32,26 @@ export function DashboardHeader({
   const [showDropdown, setShowDropdown] = useState(false);
   const [notificationCount, setNotificationCount] = useState(2);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [activeCode, setActiveCode] = useState(assistantCode);
 
-  const currentAsst = getAssistantByCode(assistantCode) || {
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const rawCookies = document.cookie ? document.cookie.split("; ") : [];
+      for (const c of rawCookies) {
+        const [k, v] = c.split("=");
+        if (k === "mock_session" && v) {
+          setActiveCode(decodeURIComponent(v));
+        }
+      }
+    }
+  }, [assistantCode]);
+
+  const currentAsst = getAssistantByCode(activeCode || assistantCode) || {
     name: "Maurellio Christopher Yonathan",
     code: "MACY",
-    position: "Koor CnI",
+    position: "Koor CnI (Admin Besar)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "SUPER_ADMIN",
   };
 
   const handleRefresh = () => {
@@ -114,19 +127,19 @@ export function DashboardHeader({
         </div>
 
         {/* User Pill matching Image 1: Avatar Initial + Name */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer"
+            className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer shrink-0"
           >
-            <div className="w-7 h-7 rounded-full bg-amber-400 text-slate-900 font-mono font-bold text-xs flex items-center justify-center shadow-xs">
+            <div className="w-7 h-7 rounded-full bg-amber-400 text-slate-900 font-mono font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
               {currentAsst.code.slice(0, 2)}
             </div>
-            <span className="text-xs font-bold text-slate-800 dark:text-white max-w-[120px] truncate">
+            <span className="text-xs font-bold text-slate-800 dark:text-white whitespace-nowrap">
               {currentAsst.name.split(" ")[0]}
             </span>
-            <ChevronDown size={13} className="text-slate-400" />
+            <ChevronDown size={13} className="text-slate-400 shrink-0" />
           </button>
 
           {/* User Dropdown */}
