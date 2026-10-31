@@ -150,11 +150,11 @@ export function DashboardSidebar({
                 onClick={() => handleSelectTab(item.id)}
                 className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                   active
-                    ? "bg-white text-purple-900 shadow-md font-bold scale-[1.02]"
+                    ? "bg-white text-[#3E2D6F] shadow-md font-bold scale-[1.02]"
                     : "text-white/85 hover:text-white hover:bg-white/10"
                 }`}
               >
-                <Icon size={18} className={active ? "text-purple-700" : "text-white/90"} />
+                <Icon size={18} className={active ? "text-[#4C3B82]" : "text-white/90"} />
                 {!collapsed && <span>{item.label}</span>}
               </button>
             );
@@ -170,11 +170,11 @@ export function DashboardSidebar({
           onClick={() => handleSelectTab("akun")}
           className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
             activeTab === "akun"
-              ? "bg-white text-purple-900 font-bold"
+              ? "bg-white text-[#3E2D6F] font-bold shadow-xs"
               : "text-white/80 hover:text-white hover:bg-white/10"
           }`}
         >
-          <Settings size={17} />
+          <Settings size={17} className={activeTab === "akun" ? "text-[#4C3B82]" : "text-white/90"} />
           {!collapsed && <span>Pengaturan</span>}
         </button>
 
@@ -217,7 +217,7 @@ export function DashboardSidebar({
       <aside
         className={`hidden lg:flex shrink-0 ${
           collapsed ? "w-20" : "w-64"
-        } bg-gradient-to-b from-[#7C3AED] via-[#6D28D9] to-[#3B0764] dark:from-[#261047] dark:via-[#190832] dark:to-[#0D041A] rounded-[2.2rem] shadow-[0_20px_50px_rgba(40,16,80,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] sticky top-6 h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-400/20`}
+        } bg-gradient-to-b from-[#4C3B82] via-[#3E2D6F] to-[#2B1B52] dark:from-[#261543] dark:via-[#1B0D33] dark:to-[#100620] rounded-[2.2rem] shadow-[0_20px_50px_rgba(40,16,80,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] sticky top-6 h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-300/20 dark:border-purple-800/30`}
       >
         {sidebarBody}
       </aside>
@@ -229,7 +229,7 @@ export function DashboardSidebar({
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-72 max-w-[85vw] h-full bg-gradient-to-b from-[#7C3AED] via-[#6D28D9] to-[#3B0764] text-white shadow-2xl z-10 flex flex-col">
+          <div className="relative w-72 max-w-[85vw] h-full bg-gradient-to-b from-[#4C3B82] via-[#3E2D6F] to-[#2B1B52] text-white shadow-2xl z-10 flex flex-col">
             <div className="absolute top-4 right-4 z-20">
               <button
                 type="button"
