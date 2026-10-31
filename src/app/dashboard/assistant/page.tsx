@@ -228,6 +228,12 @@ export default function AssistantDashboard() {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+  }, [activeTab]);
+
   const switchTab = (tab: string, skipHistoryPush = false) => {
     if (tab === activeTab) return;
     if (!skipHistoryPush) {
@@ -242,6 +248,7 @@ export default function AssistantDashboard() {
         url.searchParams.set("tab", tab);
       }
       window.history.pushState({ tab }, "", url.toString());
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
     }
   };
 
@@ -618,7 +625,7 @@ export default function AssistantDashboard() {
               <div className="hidden lg:block flex-1 min-h-[140px] pointer-events-none" />
 
               {/* Right: Floating Status Card with Real Duty Telemetry */}
-              <div className="relative z-10 w-full lg:w-80 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3.5">
+              <div className="relative z-10 w-full lg:w-80 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3.5 lg:self-center shrink-0">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 dark:text-purple-300 font-bold">
                     MINGGU INI • MODUL 1
