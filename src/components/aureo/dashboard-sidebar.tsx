@@ -23,7 +23,7 @@ import { getAssistantByCode } from "@/data/assistants-roster";
 
 interface DashboardSidebarProps {
   activeTab?: string;
-  role?: "ASPRAK" | "KOMDIS" | "SEKBEN";
+  role?: "ASPRAK" | "KOMDIS" | "SEKBEN" | "ADMIN" | "SUPER_ADMIN";
   onTabChange?: (tab: string) => void;
   isMobileOpen?: boolean;
   onCloseMobile?: () => void;
@@ -54,9 +54,9 @@ export function DashboardSidebar({
   const currentProfile = getAssistantByCode(sessionUser) || {
     name: "Maurellio Christopher Yonathan",
     code: "MACY",
-    position: "Koor CnI",
+    position: "Koor CnI (Admin Besar)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "SUPER_ADMIN" as const,
   };
 
   const navItems = [

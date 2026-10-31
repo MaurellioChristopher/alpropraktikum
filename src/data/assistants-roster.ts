@@ -4,6 +4,9 @@
  * Total: 32 Asisten (6 Divisi: Koordinator, BPH/Sekben, CnI, CnM, TnC, MD)
  */
 
+export type AssistantRole = "ASPRAK" | "KOMDIS" | "SEKBEN" | "ADMIN" | "SUPER_ADMIN";
+export type AccessLevel = "ADMIN_BESAR" | "ADMIN" | "ASPRAK";
+
 export interface AssistantProfile {
   nim: string;
   name: string;
@@ -15,7 +18,7 @@ export interface AssistantProfile {
   lineId: string;
   position: string;
   division: "Koordinator" | "Sekretaris & Bendahara" | "Compliance & Integrity" | "Creative & Multimedia" | "Tech & Systems" | "Module Development";
-  role: "ASPRAK" | "KOMDIS" | "SEKBEN";
+  role: AssistantRole;
 }
 
 export const ALPRO_ASSISTANTS: AssistantProfile[] = [
@@ -28,9 +31,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "devin191006@gmail.com",
     code: "DEVO",
     lineId: "devinoctavian",
-    position: "Koordinator",
+    position: "Koordinator (Executive Board)",
     division: "Koordinator",
-    role: "ASPRAK",
+    role: "ADMIN",
   },
   {
     nim: "102022400331",
@@ -41,9 +44,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "allegrch@gmail.com",
     code: "GRGS",
     lineId: "graciagebriella",
-    position: "Sekretaris 1",
+    position: "Sekretaris 1 (Executive Board)",
     division: "Sekretaris & Bendahara",
-    role: "SEKBEN",
+    role: "ADMIN",
   },
   {
     nim: "102022500050",
@@ -54,9 +57,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "30arzikysamudra@gmail.com",
     code: "ARSM",
     lineId: "arzikyy",
-    position: "Sekretaris 2",
+    position: "Sekretaris 2 (Executive Board)",
     division: "Sekretaris & Bendahara",
-    role: "SEKBEN",
+    role: "ADMIN",
   },
   {
     nim: "102022400228",
@@ -67,9 +70,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "syalfaoktawijaya@gmail.com",
     code: "SYOW",
     lineId: "soktavianaw",
-    position: "Bendahara",
+    position: "Bendahara (Executive Board)",
     division: "Sekretaris & Bendahara",
-    role: "SEKBEN",
+    role: "ADMIN",
   },
   {
     nim: "102022430009",
@@ -80,9 +83,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "route.to.maurel@gmail.com",
     code: "MACY",
     lineId: "reach.rel",
-    position: "Koor CnI",
+    position: "Koor CnI (Admin Besar)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "SUPER_ADMIN",
   },
   {
     nim: "102022430017",
@@ -93,9 +96,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "adnanhidryan@gmail.com",
     code: "ADDH",
     lineId: "adn_dinata",
-    position: "Compliance & Integrity",
+    position: "Compliance & Integrity (Admin)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "ADMIN",
   },
   {
     nim: "102022500126",
@@ -106,9 +109,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "irenamaulani0706@gmail.com",
     code: "IREM",
     lineId: "renilau",
-    position: "Compliance & Integrity",
+    position: "Compliance & Integrity (Admin)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "ADMIN",
   },
   {
     nim: "102022500040",
@@ -119,9 +122,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "tcandysyaqila@gmail.com",
     code: "TICS",
     lineId: "timdy_",
-    position: "Compliance & Integrity",
+    position: "Compliance & Integrity (Admin)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "ADMIN",
   },
   {
     nim: "102022500251",
@@ -132,9 +135,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "rajabhibhawa@gmail.com",
     code: "RAAP",
     lineId: "rja432",
-    position: "Compliance & Integrity",
+    position: "Compliance & Integrity (Admin)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "ADMIN",
   },
   {
     nim: "102022500273",
@@ -145,9 +148,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "callysturn@gmail.com",
     code: "INTC",
     lineId: "intan.callysta",
-    position: "Compliance & Integrity",
+    position: "Compliance & Integrity (Admin)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "ADMIN",
   },
   {
     nim: "102022500122",
@@ -158,9 +161,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "patas.bogors@gmail.com",
     code: "ADRP",
     lineId: "1204060516",
-    position: "Compliance & Integrity",
+    position: "Compliance & Integrity (Admin)",
     division: "Compliance & Integrity",
-    role: "KOMDIS",
+    role: "ADMIN",
   },
   {
     nim: "102022400137",
@@ -499,3 +502,60 @@ export const ALPRO_DIVISIONS = [
     description: "Penyusunan materi modul praktikum, problem set kuis, studi kasus guided, dan soal ujian praktikum.",
   },
 ];
+
+/**
+ * Cek apakah asisten termasuk Executive Board (Koordinator, Sekretaris & Bendahara)
+ */
+export function isExecutiveBoard(codeOrNim: string): boolean {
+  const asst = getAssistantByCode(codeOrNim) || getAssistantByNim(codeOrNim);
+  if (!asst) return false;
+  return asst.division === "Koordinator" || asst.division === "Sekretaris & Bendahara";
+}
+
+/**
+ * Cek apakah asisten termasuk Compliance & Integrity (CnI / Komdis)
+ */
+export function isComplianceAndIntegrity(codeOrNim: string): boolean {
+  const asst = getAssistantByCode(codeOrNim) || getAssistantByNim(codeOrNim);
+  if (!asst) return false;
+  return asst.division === "Compliance & Integrity";
+}
+
+/**
+ * Level Hak Akses Resmi:
+ * - "ADMIN_BESAR" : MACY (Super Admin dengan otoritas tertinggi)
+ * - "ADMIN"       : Anggota Executive Board & Compliance and Integrity
+ * - "ASPRAK"      : Asisten Praktikum Biasa (CnM, TnC, MD)
+ */
+export function getAssistantAccessLevel(codeOrNim: string): AccessLevel {
+  const normalized = codeOrNim.trim().toUpperCase();
+  if (normalized === "MACY" || normalized === "102022430009") return "ADMIN_BESAR";
+  const asst = getAssistantByCode(normalized) || getAssistantByNim(normalized);
+  if (!asst) return "ASPRAK";
+  if (asst.code === "MACY") return "ADMIN_BESAR";
+  if (isExecutiveBoard(asst.code) || isComplianceAndIntegrity(asst.code)) {
+    return "ADMIN";
+  }
+  return "ASPRAK";
+}
+
+/**
+ * Aturan Sandi Sesuai Ketentuan Resmi:
+ * 1. MACY (Admin Besar)                              : MACY194545
+ * 2. ADMIN (Executive Board & Compliance and Integrity): ${KODEASISTEN}ADMINR1
+ * 3. AKUN BIASA (CnM, TnC, MD)                       : ${KODEASISTEN}ALPRO123
+ */
+export function getExpectedPassword(codeOrNim: string): string {
+  const normalized = codeOrNim.trim().toUpperCase();
+  const asst = getAssistantByCode(normalized) || getAssistantByNim(normalized);
+  const code = asst ? asst.code : normalized;
+
+  if (code === "MACY") {
+    return "MACY194545";
+  }
+  const level = getAssistantAccessLevel(code);
+  if (level === "ADMIN" || level === "ADMIN_BESAR") {
+    return `${code}ADMINR1`;
+  }
+  return `${code}ALPRO123`;
+}

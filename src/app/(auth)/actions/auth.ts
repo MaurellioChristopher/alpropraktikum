@@ -3,119 +3,66 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { getAssistantByCode, getAssistantByNim } from "@/data/assistants-roster";
+import {
+  getAssistantByCode,
+  getAssistantByNim,
+  getAssistantAccessLevel,
+  getExpectedPassword,
+} from "@/data/assistants-roster";
 
 export async function loginAction(prevState: any, formData: FormData) {
   const identifier = (formData.get("identifier") as string)?.trim().toUpperCase();
   const password = (formData.get("password") as string)?.trim();
 
   if (!identifier || !password) {
-    return { error: "Harap isi Kode Asisten dan password sesi." };
+    return { error: "Harap isi Kode Asisten / NIM dan password sesi." };
   }
 
   const cookieStore = await cookies();
 
-  // Pemetaan dinamis dari 32 data asisten resmi laboratorium EDM:
+  // 1. Verifikasi Asisten Resmi Laboratorium EDM (32 Asisten Resmi)
   const matchedAssistant = getAssistantByCode(identifier) || getAssistantByNim(identifier);
 
-  let resolvedRole: "ASPRAK" | "KOMDIS" | "SEKBEN" = "ASPRAK";
-  let assistantName = `Asisten ${identifier}`;
-  let assistantCode = identifier;
-
-  if (matchedAssistant) {
-    resolvedRole = matchedAssistant.role;
-    assistantName = `${matchedAssistant.name} (${matchedAssistant.position})`;
-    assistantCode = matchedAssistant.code;
-  } else if (identifier === "GWAN" || identifier.includes("KOMDIS")) {
-    resolvedRole = "KOMDIS";
-    assistantName = "Maurellio C. Y. (Koor CnI)";
-    assistantCode = "MACY";
-  } else if (identifier === "IZIN") {
-    resolvedRole = "ASPRAK";
-    assistantName = "Devin Octavian (Koordinator)";
-    assistantCode = "DEVO";
-  } else if (identifier === "KEYS" || identifier.includes("SEKBEN")) {
-    resolvedRole = "SEKBEN";
-    assistantName = "Gracia Gebriella (Sekretaris 1)";
-    assistantCode = "GRGS";
-  }
-
-  // 1. JIKA SUPABASE TERKONFIGURASI: Cek ke Database Supabase
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await createClient();
-
-      // Cari asisten berdasarkan kode atau NIM
-      const { data: assistant, error } = await supabase
-        .from("assistants")
-        .select("*")
-        .or(`code.ilike.${identifier},nim.eq.${identifier}`)
-        .eq("is_active", true)
-        .maybeSingle();
-
-      if (error) {
-        console.error("Supabase Query Error:", error);
-      }
-
-      if (assistant) {
-        // Gunakan role & nama dari database
-        const dbRole = (assistant.role as "ASPRAK" | "KOMDIS" | "SEKBEN") || resolvedRole;
-        const dbName = assistant.name || assistantName;
-
-        const dbExpectedPassword =
-          dbRole === "KOMDIS"
-            ? `${assistant.code.toLowerCase()}komdis123`
-            : `${assistant.code.toLowerCase()}123`;
-
-        const isValid =
-          password.toLowerCase() === dbExpectedPassword ||
-          assistant.password === password ||
-          password === "asisten2026";
-
-        if (!isValid) {
-          const hint = dbRole === "KOMDIS" ? `${assistant.code}komdis123` : `${assistant.code}123`;
-          return { error: `Password salah. Format password untuk ${assistant.code}: ${hint}` };
-        }
-
-        // Simpan sesi asisten
-        cookieStore.set("mock_session", assistant.code, { path: "/" });
-        cookieStore.set("mock_role", dbRole, { path: "/" });
-        cookieStore.set("assistant_name", dbName, { path: "/" });
-
-        redirect("/dashboard/assistant");
-      }
-    } catch (err: any) {
-      if (err?.digest?.startsWith("NEXT_REDIRECT")) {
-        throw err;
-      }
-      console.error("Login Supabase Exception:", err);
-    }
-  }
-
-  // 2. VERIFIKASI SECARA MANUAL (Fallback Offline Sesuai Aturan Dinamis Pengguna):
-  // Rule password dinamis:
-  // - Jika role Komdis: KODEkomdis123 (contoh: GWANkomdis123)
-  // - Jika role lain (Asprak/Sekben): KODE123 (contoh: IZIN123, KEYS123)
-  const isKomdis = resolvedRole === "KOMDIS";
-  const expectedPassword = isKomdis
-    ? `${assistantCode.toLowerCase()}komdis123`
-    : `${assistantCode.toLowerCase()}123`;
-
-  const isValidManualPassword =
-    password.toLowerCase() === expectedPassword ||
-    password.toLowerCase() === `${identifier.toLowerCase()}123` ||
-    password === "asisten2026"; // toleransi backwards compatibility
-
-  if (!isValidManualPassword) {
-    const hint = isKomdis ? `${assistantCode}komdis123` : `${assistantCode}123`;
+  if (!matchedAssistant) {
     return {
-      error: `Password sesi salah. Format password untuk kode ${assistantCode}: ${hint}`,
+      error: "Identitas tidak ditemukan. Harap masukkan Kode Asisten resmi atau NIM Anda.",
     };
   }
 
+  const assistantCode = matchedAssistant.code;
+  const accessLevel = getAssistantAccessLevel(assistantCode);
+  const expectedPassword = getExpectedPassword(assistantCode);
+
+  // Verifikasi kecocokan sandi (case-insensitive untuk kenyamanan pengguna)
+  const isPasswordValid = password.toUpperCase() === expectedPassword.toUpperCase();
+
+  if (!isPasswordValid) {
+    let hint = `${assistantCode}ALPRO123`;
+    if (accessLevel === "ADMIN_BESAR") {
+      hint = "MACY194545";
+    } else if (accessLevel === "ADMIN") {
+      hint = `${assistantCode}ADMINR1`;
+    }
+
+    return {
+      error: `Password salah. Format password untuk ${assistantCode}: ${hint}`,
+    };
+  }
+
+  // 2. Simpan Sesi & Hak Akses Berdasarkan Departemen Resmi
+  // - "SUPER_ADMIN" : Khusus MACY (Admin Besar)
+  // - "ADMIN"       : Executive Board & Compliance and Integrity
+  // - "ASPRAK"      : Akun Biasa (Creative & Multimedia, Tech & Systems, Module Development)
+  const sessionRole =
+    accessLevel === "ADMIN_BESAR"
+      ? "SUPER_ADMIN"
+      : accessLevel === "ADMIN"
+      ? "ADMIN"
+      : "ASPRAK";
+
   cookieStore.set("mock_session", assistantCode, { path: "/" });
-  cookieStore.set("mock_role", resolvedRole, { path: "/" });
-  cookieStore.set("assistant_name", assistantName, { path: "/" });
+  cookieStore.set("mock_role", sessionRole, { path: "/" });
+  cookieStore.set("assistant_name", `${matchedAssistant.name} (${matchedAssistant.position})`, { path: "/" });
 
   redirect("/dashboard/assistant");
 }

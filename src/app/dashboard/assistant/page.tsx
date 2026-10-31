@@ -6,7 +6,14 @@ import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
 import { DashboardHeader } from "@/components/aureo/dashboard-header";
 import { SI50_CLASSES, SIClass } from "@/lib/si-classes";
 import { MOODLE_STUDENTS_BY_CLASS, LMS_ALPRO_METADATA } from "@/data/moodle-alpro-students";
-import { ALPRO_ASSISTANTS, ALPRO_DIVISIONS, getAssistantByCode, AssistantProfile } from "@/data/assistants-roster";
+import {
+  ALPRO_ASSISTANTS,
+  ALPRO_DIVISIONS,
+  getAssistantByCode,
+  getAssistantAccessLevel,
+  getExpectedPassword,
+  AssistantProfile,
+} from "@/data/assistants-roster";
 import {
   ALPRO_15_SHIFTS,
   ShiftSchedule,
@@ -100,7 +107,7 @@ export default function AssistantDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [tabHistory, setTabHistory] = useState<string[]>(["dashboard"]);
   const [selectedClassCode, setSelectedClassCode] = useState<string>("SI5001");
-  const [currentRole, setCurrentRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN">("KOMDIS");
+  const [currentRole, setCurrentRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN" | "ADMIN" | "SUPER_ADMIN">("SUPER_ADMIN");
   const [sessionUser, setSessionUser] = useState<string>("MACY");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [perizinanApproved, setPerizinanApproved] = useState(false);
@@ -119,12 +126,19 @@ export default function AssistantDashboard() {
       const user = parsed.mock_session || "MACY";
       setSessionUser(user);
       const asst = getAssistantByCode(user);
-      if (parsed.mock_role && (parsed.mock_role === "ASPRAK" || parsed.mock_role === "KOMDIS" || parsed.mock_role === "SEKBEN")) {
-        setCurrentRole(parsed.mock_role as "ASPRAK" | "KOMDIS" | "SEKBEN");
+      if (
+        parsed.mock_role &&
+        (parsed.mock_role === "ASPRAK" ||
+          parsed.mock_role === "KOMDIS" ||
+          parsed.mock_role === "SEKBEN" ||
+          parsed.mock_role === "ADMIN" ||
+          parsed.mock_role === "SUPER_ADMIN")
+      ) {
+        setCurrentRole(parsed.mock_role as any);
       } else if (asst) {
         setCurrentRole(asst.role);
       } else {
-        setCurrentRole("KOMDIS");
+        setCurrentRole("SUPER_ADMIN");
       }
     }
 
@@ -455,7 +469,7 @@ export default function AssistantDashboard() {
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]">
                   Hai, {currentAssistantProfile.name.split(" ")[0]}!<br />
                   <span className="font-extrabold text-slate-800 dark:text-neutral-100">
-                    Semangat buat praktikumnya hari ini!
+                    Mau apa nih? Semangat ngaspraknya!
                   </span>
                 </h1>
                 <div>
@@ -2059,14 +2073,14 @@ export default function AssistantDashboard() {
 
         {/* PELANGGARAN & SANKSI KOMDIS TAB */}
         {activeTab === "komdis" && (
-          currentRole !== "KOMDIS" ? (
+          (currentRole !== "KOMDIS" && currentRole !== "ADMIN" && currentRole !== "SUPER_ADMIN" && sessionUser !== "MACY") ? (
             <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-950/60 shadow-xs text-center max-w-lg mx-auto space-y-4 my-12 transition-colors">
               <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center mx-auto">
                 <Shield size={28} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Dibatasi — Khusus Komisi Disiplin (Komdis)</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Dibatasi — Khusus Admin & Compliance and Integrity</h3>
               <p className="text-xs text-slate-500 dark:text-neutral-400 leading-relaxed">
-                Fitur pencatatan pelanggaran, tata tertib, dan sanksi praktikan hanya dapat diakses oleh asisten berwenang Komdis. Anda saat ini aktif sebagai <strong>{currentRole}</strong>.
+                Fitur pengawasan, tata tertib, dan sanksi praktikan dikhususkan bagi Administrator (Executive Board & Compliance and Integrity) serta Super Admin (MACY). Anda saat ini aktif sebagai <strong>{currentRole}</strong>.
               </p>
               <button
                 type="button"
@@ -2165,14 +2179,14 @@ export default function AssistantDashboard() {
 
         {/* INVENTARIS & KAS LAB TAB (SEKBEN) */}
         {activeTab === "inventaris" && (
-          currentRole !== "SEKBEN" ? (
+          (currentRole !== "SEKBEN" && currentRole !== "ADMIN" && currentRole !== "SUPER_ADMIN" && sessionUser !== "MACY") ? (
             <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-950/60 shadow-xs text-center max-w-lg mx-auto space-y-4 my-12 transition-colors">
               <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 flex items-center justify-center mx-auto">
                 <Package size={28} />
               </div>
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Dibatasi — Khusus Sekben (Role Inti)</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">Akses Dibatasi — Khusus Admin & Executive Board</h3>
               <p className="text-xs text-slate-500 dark:text-neutral-400 leading-relaxed">
-                Fitur inventaris alat dan pembukuan kas laboratorium EDM hanya dapat diakses oleh Sekretaris & Bendahara (Sekben). Anda saat ini aktif sebagai <strong>{currentRole}</strong>.
+                Fitur inventaris alat dan pembukuan kas laboratorium EDM dikhususkan bagi Administrator (Executive Board & Compliance and Integrity) serta Super Admin (MACY). Anda saat ini aktif sebagai <strong>{currentRole}</strong>.
               </p>
               <button
                 type="button"
@@ -2346,7 +2360,7 @@ export default function AssistantDashboard() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => alert(`Format password login akun ${currentAssistantProfile.code}: ${currentAssistantProfile.code.toLowerCase()}${currentAssistantProfile.role === "KOMDIS" ? "komdis123" : "123"}`)}
+                      onClick={() => alert(`Format password login akun ${currentAssistantProfile.code}: ${getExpectedPassword(currentAssistantProfile.code)}`)}
                       className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                       <Key size={14} />
@@ -2488,25 +2502,25 @@ export default function AssistantDashboard() {
                   </div>
 
                   <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
-                    {currentRole === "KOMDIS"
-                      ? "Compliance & Integrity (Komdis): Berwenang memberi flag sanksi keterlambatan praktikan, verifikasi surat izin, dan validasi kepatuhan shift asprak."
-                      : currentRole === "SEKBEN"
-                      ? "Sekretaris & Bendahara (BPH): Pengelolaan administrasi praktikum, rekap absensi, surat izin, dan kas laboratorium."
-                      : "Asisten Praktikum (Asprak): Pengampu materi shift, bimbingan modul, live rating, dan input nilai praktikan."}
+                    {currentRole === "SUPER_ADMIN"
+                      ? "Super Admin (MACY): Otoritas tertinggi sistem, kendali penuh seluruh modul, inventaris, perizinan, dan penugasan laboratorium."
+                      : currentRole === "ADMIN"
+                      ? "Administrator (Executive Board & Compliance and Integrity): Akses penuh inventaris, rekap kehadiran, pembukuan kas, serta tata tertib komdis."
+                      : "Asisten Praktikum (Asprak Biasa): Pengampu shift materi praktikum, bimbingan modul, penilaian, dan live rating."}
                   </p>
 
                   {/* Simulasi Role Switcher with Clean Pills */}
                   <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 space-y-2">
                     <div className="text-[10px] font-mono text-slate-400 uppercase font-bold">
-                      Simulasi Ganti Role (Testing Hak Akses):
+                      Tingkat Hak Akses Pengguna:
                     </div>
                     <div className="grid grid-cols-3 gap-1.5">
-                      {(["ASPRAK", "KOMDIS", "SEKBEN"] as const).map((r) => (
+                      {(["SUPER_ADMIN", "ADMIN", "ASPRAK"] as const).map((r) => (
                         <button
                           key={r}
                           type="button"
                           onClick={() => setCurrentRole(r)}
-                          className={`py-2 rounded-xl text-xs font-mono font-bold transition-all cursor-pointer ${
+                          className={`py-2 rounded-xl text-[11px] font-mono font-bold transition-all cursor-pointer ${
                             currentRole === r
                               ? "bg-purple-700 text-white shadow-xs"
                               : "bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700"
@@ -2532,7 +2546,7 @@ export default function AssistantDashboard() {
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
                       <span className="text-slate-500 dark:text-neutral-400 font-mono">Format Password Sesi</span>
                       <span className="font-mono font-semibold text-slate-900 dark:text-white">
-                        {currentAssistantProfile.code.toLowerCase()}{currentAssistantProfile.role === "KOMDIS" ? "komdis123" : "123"}
+                        {getExpectedPassword(currentAssistantProfile.code)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">

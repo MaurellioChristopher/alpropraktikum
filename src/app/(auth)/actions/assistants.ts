@@ -1,14 +1,14 @@
 "use server";
 
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
-import { ALPRO_ASSISTANTS } from "@/data/assistants-roster";
+import { ALPRO_ASSISTANTS, getExpectedPassword, AssistantRole } from "@/data/assistants-roster";
 
 export interface AssistantRecord {
   id?: string;
   code: string;
   nim?: string;
   name: string;
-  role: "ASPRAK" | "KOMDIS" | "SEKBEN";
+  role: AssistantRole;
   position?: string;
   division?: string;
   phone?: string;
@@ -77,7 +77,7 @@ export async function addAssistant(assistant: AssistantRecord) {
         nim: assistant.nim?.trim() || null,
         name: assistant.name.trim(),
         role: assistant.role,
-        password: assistant.password || "asisten2026",
+        password: assistant.password || getExpectedPassword(assistant.code),
         email: assistant.email || null,
         is_active: true,
       })

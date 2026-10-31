@@ -4,8 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { loginAction } from "@/app/(auth)/actions/auth";
 import { useActionState } from "react";
-import { motion } from "motion/react";
-import { getAssistantByCode } from "@/data/assistants-roster";
+import {
+  getAssistantByCode,
+  getAssistantByNim,
+  getExpectedPassword,
+} from "@/data/assistants-roster";
 import {
   Eye,
   EyeOff,
@@ -20,23 +23,17 @@ import {
 export function LoginForm() {
   const [tab, setTab] = useState<"masuk" | "aktivasi">("masuk");
   const [showPassword, setShowPassword] = useState(false);
-  const [identifier, setIdentifier] = useState("MACY");
-  const [password, setPassword] = useState("macykomdis123");
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
-  const matchedAsst = getAssistantByCode(identifier);
-  const isKomdis = matchedAsst?.role === "KOMDIS" || identifier === "MACY";
+  const matchedAsst = identifier.trim()
+    ? getAssistantByCode(identifier.trim()) || getAssistantByNim(identifier.trim())
+    : null;
 
-  const passwordHint = identifier
-    ? isKomdis
-      ? `${identifier.toLowerCase()}komdis123`
-      : `${identifier.toLowerCase()}123`
-    : "macykomdis123";
-
-  const handleSelectPreset = (code: string, pass: string) => {
-    setIdentifier(code);
-    setPassword(pass);
-  };
+  const passwordHint = matchedAsst
+    ? getExpectedPassword(matchedAsst.code)
+    : "KODEASISTENALPRO123 / KODEASISTENADMINR1";
 
   return (
     <div className="w-full max-w-[460px] bg-white/95 dark:bg-[#130728]/95 backdrop-blur-xl rounded-[2.2rem] p-7 sm:p-9 shadow-[0_25px_60px_-15px_rgba(79,40,150,0.12)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.7)] border border-purple-100/90 dark:border-purple-900/50 transition-all relative">
@@ -168,38 +165,7 @@ export function LoginForm() {
             </div>
           )}
 
-          {/* Quick Assistant Account Presets with colored roles */}
-          <div className="pt-1.5 space-y-1.5">
-            <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 uppercase tracking-wider font-bold">
-              Akses Cepat Asisten Praktikum:
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {[
-                { code: "MACY", pass: "macykomdis123", role: "Koordinator", color: "from-purple-50 to-indigo-50 dark:from-purple-950/60 dark:to-indigo-950/60 text-purple-900 dark:text-purple-200 border-purple-300 dark:border-purple-700" },
-                { code: "DEVO", pass: "devo123", role: "Korprak", color: "from-blue-50 to-indigo-50 dark:from-blue-950/60 dark:to-indigo-950/60 text-blue-900 dark:text-blue-200 border-blue-300 dark:border-blue-700" },
-                { code: "GRGS", pass: "grgs123", role: "Sekretaris", color: "from-emerald-50 to-teal-50 dark:from-emerald-950/60 dark:to-teal-950/60 text-emerald-900 dark:text-emerald-200 border-emerald-300 dark:border-emerald-700" },
-                { code: "SYOW", pass: "syow123", role: "Bendahara", color: "from-amber-50 to-orange-50 dark:from-amber-950/60 dark:to-orange-950/60 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-700" },
-              ].map((p) => (
-                <button
-                  key={p.code}
-                  type="button"
-                  onClick={() => handleSelectPreset(p.code, p.pass)}
-                  className={`text-left p-2 rounded-xl border transition-all cursor-pointer ${
-                    identifier === p.code
-                      ? "bg-purple-100 dark:bg-purple-900 text-purple-950 dark:text-white border-purple-500 shadow-xs font-bold scale-[1.02]"
-                      : "bg-[#FBFBFE] dark:bg-neutral-900/60 hover:bg-purple-50/50 dark:hover:bg-purple-950/40 text-slate-700 dark:text-neutral-300 border-slate-200 dark:border-neutral-800"
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-bold text-xs">{p.code}</span>
-                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-slate-500 dark:text-neutral-300">
-                      {p.role}
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
+
 
           {/* Primary Submit Button */}
           <button
