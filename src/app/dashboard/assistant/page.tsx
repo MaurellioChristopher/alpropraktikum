@@ -2288,7 +2288,7 @@ export default function AssistantDashboard() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute top-3.5 right-4 flex items-center gap-2 z-10">
                   <span className="text-[11px] font-mono font-bold text-purple-950 dark:text-purple-200 bg-white/85 dark:bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-purple-200/70 dark:border-purple-800/60 shadow-xs">
-                    Lab Terpadu Lt. 3 • EDM Lab
+                    R1 Lantai 8 TULT • EDM Lab
                   </span>
                 </div>
               </div>

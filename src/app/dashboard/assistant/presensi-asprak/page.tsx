@@ -347,7 +347,7 @@ export default function PresensiAsprakPage() {
                   <span>Ruang Laboratorium</span>
                 </div>
                 <div className="text-sm font-bold text-white">
-                  Lab EDM 1 (Gd. Pelangi Lt. 2)
+                  R1 Lantai 8 TULT
                 </div>
                 <div className="text-[11px] font-mono text-emerald-300 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />

@@ -62,7 +62,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "07:30",
     endTime: "09:30",
     timeDisplay: "07.30 - 09.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-blue-100/90",
@@ -82,7 +82,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "10:30",
     endTime: "12:30",
     timeDisplay: "10.30 - 12.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-rose-200/90",
@@ -102,7 +102,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "14:30",
     endTime: "16:30",
     timeDisplay: "14.30 - 16.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-rose-100/90",
@@ -124,7 +124,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "07:30",
     endTime: "09:30",
     timeDisplay: "07.30 - 09.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-teal-100/90",
@@ -144,7 +144,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "10:30",
     endTime: "12:30",
     timeDisplay: "10.30 - 12.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-teal-100/90",
@@ -164,7 +164,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "14:30",
     endTime: "16:30",
     timeDisplay: "14.30 - 16.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-amber-100/90",
@@ -186,7 +186,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "09:30",
     endTime: "11:30",
     timeDisplay: "09.30 - 11.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-emerald-100/90",
@@ -206,7 +206,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "13:30",
     endTime: "15:30",
     timeDisplay: "13.30 - 15.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-orange-200/90",
@@ -228,7 +228,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "07:30",
     endTime: "09:30",
     timeDisplay: "07.30 - 09.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-rose-200/90",
@@ -248,7 +248,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "14:30",
     endTime: "16:30",
     timeDisplay: "14.30 - 16.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-purple-100/90",
@@ -270,7 +270,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "07:30",
     endTime: "09:30",
     timeDisplay: "07.30 - 09.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-sky-200/90",
@@ -290,7 +290,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "13:30",
     endTime: "15:30",
     timeDisplay: "13.30 - 15.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-amber-200/90",
@@ -312,7 +312,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "07:30",
     endTime: "09:30",
     timeDisplay: "07.30 - 09.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-blue-200/90",
@@ -332,7 +332,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "10:30",
     endTime: "12:30",
     timeDisplay: "10.30 - 12.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-slate-200/90",
@@ -352,7 +352,7 @@ export const ALPRO_15_SHIFTS: ShiftSchedule[] = [
     startTime: "14:30",
     endTime: "16:30",
     timeDisplay: "14.30 - 16.30",
-    room: "Lab EDM 1 (Gd. Pelangi Lt. 2)",
+    room: "R1 Lantai 8 TULT",
     totalGroups: 7,
     color: {
       bgLight: "bg-rose-300/80",
