@@ -62,9 +62,15 @@ export function DashboardHeader({
         </button>
 
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs">
-          <span className="text-purple-600 dark:text-purple-400 font-mono font-bold text-xs">
-            &lt;/&gt;
-          </span>
+          <div className="relative w-4 h-4 shrink-0">
+            <Image
+              src="/images/edm-emblem-crimson.png"
+              alt="EDM Logo"
+              fill
+              sizes="16px"
+              className="object-contain"
+            />
+          </div>
           <span className="text-xs font-bold text-slate-800 dark:text-white">
             Praktikum ALPRO
           </span>

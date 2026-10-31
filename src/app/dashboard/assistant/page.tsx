@@ -19,6 +19,8 @@ import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import {
   Lock,
+  ArrowLeft,
+  FileText,
   Edit3,
   Play,
   Pause,
@@ -65,6 +67,12 @@ import {
   Calendar,
   Key,
 } from "lucide-react";
+import {
+  PraktikanCardIllustration,
+  DokumentasiCardIllustration,
+  JadwalCardIllustration,
+  SlideModulCardIllustration,
+} from "@/components/aureo/akses-cepat-illustrations";
 
 interface StudentGradeRow {
   nim: string;
@@ -91,6 +99,7 @@ const getStudentsByClass = (classCode: string): StudentGradeRow[] => {
 
 export default function AssistantDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [tabHistory, setTabHistory] = useState<string[]>(["dashboard"]);
   const [selectedClassCode, setSelectedClassCode] = useState<string>("SI5001");
   const [currentRole, setCurrentRole] = useState<"ASPRAK" | "KOMDIS" | "SEKBEN">("KOMDIS");
   const [sessionUser, setSessionUser] = useState<string>("MACY");
@@ -119,7 +128,59 @@ export default function AssistantDashboard() {
         setCurrentRole("KOMDIS");
       }
     }
+
+    if (typeof window !== "undefined") {
+      const handlePop = () => {
+        const params = new URLSearchParams(window.location.search);
+        const t = params.get("tab") || "dashboard";
+        setActiveTab(t);
+      };
+      window.addEventListener("popstate", handlePop);
+      const params = new URLSearchParams(window.location.search);
+      const initialTab = params.get("tab");
+      if (initialTab) {
+        setActiveTab(initialTab);
+        setTabHistory(["dashboard", initialTab]);
+      }
+      return () => window.removeEventListener("popstate", handlePop);
+    }
   }, []);
+
+  const switchTab = (tab: string, skipHistoryPush = false) => {
+    if (tab === activeTab) return;
+    if (!skipHistoryPush) {
+      setTabHistory((prev) => [...prev, activeTab]);
+    }
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (tab === "dashboard" || tab === "beranda") {
+        url.searchParams.delete("tab");
+      } else {
+        url.searchParams.set("tab", tab);
+      }
+      window.history.pushState({ tab }, "", url.toString());
+    }
+  };
+
+  const handleBackNavigation = () => {
+    if (tabHistory.length > 1) {
+      const prev = tabHistory[tabHistory.length - 1];
+      setTabHistory((history) => history.slice(0, -1));
+      setActiveTab(prev || "dashboard");
+      if (typeof window !== "undefined") {
+        const url = new URL(window.location.href);
+        if (!prev || prev === "dashboard" || prev === "beranda") {
+          url.searchParams.delete("tab");
+        } else {
+          url.searchParams.set("tab", prev);
+        }
+        window.history.pushState({ tab: prev || "dashboard" }, "", url.toString());
+      }
+    } else {
+      switchTab("dashboard");
+    }
+  };
 
   const currentAssistantProfile = getAssistantByCode(sessionUser) || ALPRO_ASSISTANTS[4];
   const duty = getAssistantDutyStatus(sessionUser);
@@ -295,7 +356,7 @@ export default function AssistantDashboard() {
       <DashboardSidebar
         role={currentRole}
         activeTab={activeTab}
-        onTabChange={(tab) => setActiveTab(tab)}
+        onTabChange={(tab) => switchTab(tab)}
         isMobileOpen={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
@@ -310,6 +371,42 @@ export default function AssistantDashboard() {
           onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
           onRoleChange={(r) => setCurrentRole(r)}
         />
+
+        {/* GLOBAL BACK NAVIGATION & BREADCRUMB (When inside any feature tab) */}
+        {activeTab !== "dashboard" && activeTab !== "beranda" && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white dark:bg-[#0e071a] p-3.5 sm:px-5 rounded-2xl border border-slate-200/80 dark:border-purple-950/60 shadow-xs transition-colors">
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={handleBackNavigation}
+                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/70 dark:hover:bg-purple-900 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60 transition-all cursor-pointer group shadow-2xs"
+                title="Kembali ke layar sebelumnya"
+              >
+                <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
+                <span>Kembali ke Beranda</span>
+              </button>
+              <span className="text-slate-300 dark:text-neutral-700 font-mono text-xs">/</span>
+              <span className="text-xs font-mono font-bold text-slate-800 dark:text-neutral-200">
+                {activeTab === "absensi" || activeTab === "praktikan" ? "Presensi & Nilai Praktikan" :
+                 activeTab === "dokumentasi" ? "Dokumentasi Praktikum Lab EDM" :
+                 activeTab === "jadwal" || activeTab === "jadwal_saya" ? "Jadwal Saya" :
+                 activeTab === "jadwal_praktikum" ? "Jadwal Praktikum ALPRO 26/27" :
+                 activeTab === "penilaian" ? "Penilaian Praktikan" :
+                 activeTab === "timer" ? "Timer Sesi Praktikum" :
+                 activeTab === "modul" || activeTab === "informasi" ? "Modul & Silabus" :
+                 activeTab === "komdis" ? "Laporan Pelanggaran Komdis" :
+                 activeTab === "inventaris" ? "Inventaris & Hardware Lab" : "Profil Akun"}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-neutral-400">
+              <span className="hidden sm:inline">Shift Saat Ini:</span>
+              <span className="font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-1 rounded-lg border border-purple-200/60 dark:border-purple-900/40">
+                Shift {ongoingShift.activeShift?.shiftNumber || 4} • {ongoingShift.activeShift?.className || "SI-50-04"}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* MOBILE & TABLET TOP ACTION BAR (< lg) */}
         <div className="lg:hidden bg-white dark:bg-[#0e071a] rounded-2xl p-3 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-2.5 transition-colors">
@@ -350,7 +447,7 @@ export default function AssistantDashboard() {
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => switchTab(tab.id)}
                   className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
                     isActive
                       ? "bg-purple-700 text-white shadow-xs font-bold"
@@ -500,109 +597,149 @@ export default function AssistantDashboard() {
               </div>
             </div>
 
-            {/* AKSES CEPAT (4 Bento Cards matching Image 1) */}
-            <div className="space-y-3">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
-                Akses cepat
-              </h3>
+            {/* AKSES CEPAT (4 Illustrated Bento Cards matching Image 1) */}
+            <div className="space-y-3.5">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
+                  Akses cepat
+                </h3>
+                <span className="text-xs font-mono text-slate-400 dark:text-neutral-500">
+                  Quick Access • Modul 4
+                </span>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
                 {/* Card 1: Praktikan */}
                 <div
-                  onClick={() => setActiveTab("absensi")}
-                  className="rounded-3xl p-5 bg-gradient-to-br from-[#EEF4FF] to-[#E0ECFF] dark:from-[#131A33] dark:to-[#0C1226] border border-blue-100 dark:border-blue-900/40 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between min-h-[140px]"
+                  onClick={() => switchTab("absensi")}
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#EFF5FF] via-[#E8F1FE] to-[#DFECFE] dark:from-[#0F1836] dark:via-[#0B122B] dark:to-[#070C1E] border border-blue-200/80 dark:border-blue-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px] relative overflow-hidden"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-neutral-800 shadow-xs flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform">
-                      <CheckSquare size={24} />
-                    </div>
-                    <span className="w-7 h-7 rounded-full bg-amber-500 text-white font-bold font-mono text-xs flex items-center justify-center shadow-xs">
-                      A
-                    </span>
+                  {/* Top Illustration Area (Vector Art: Clipboard, checkmarks, pencil, A badge) */}
+                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                    <PraktikanCardIllustration />
                   </div>
-                  <div className="space-y-0.5 pt-3">
-                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
-                      <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-                      Praktikan
+
+                  {/* Bottom Floating White Pill Card */}
+                  <div className="bg-white dark:bg-[#121B38] rounded-2xl p-3.5 shadow-[0_4px_18px_rgba(37,99,235,0.08)] dark:shadow-[0_4px_18px_rgba(0,0,0,0.4)] border border-blue-100/70 dark:border-blue-900/40 relative z-10 transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <CheckSquare size={13} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">
+                          Praktikan
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
+                          18 praktikan · 3 kelompok
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                      568 praktikan • 15 kelas SI&apos;50
-                    </p>
                   </div>
                 </div>
 
                 {/* Card 2: Dokumentasi */}
                 <div
-                  onClick={() => setActiveTab("dokumentasi")}
-                  className="rounded-3xl p-5 bg-gradient-to-br from-[#ECFDF5] to-[#D1FAE5] dark:from-[#06291C] dark:to-[#041E14] border border-emerald-100 dark:border-emerald-900/40 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between min-h-[140px]"
+                  onClick={() => switchTab("dokumentasi")}
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#EEFAF3] via-[#E5F7EC] to-[#DCF3E5] dark:from-[#082216] dark:via-[#051A10] dark:to-[#03120B] border border-emerald-200/80 dark:border-emerald-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px] relative overflow-hidden"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-neutral-800 shadow-xs flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform">
-                      <Camera size={24} />
-                    </div>
+                  {/* Top Illustration Area (Vector Art: Photo frames & sleek camera with blue lens) */}
+                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                    <DokumentasiCardIllustration />
                   </div>
-                  <div className="space-y-0.5 pt-3">
-                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-                      Dokumentasi
+
+                  {/* Bottom Floating White Pill Card */}
+                  <div className="bg-white dark:bg-[#0E261B] rounded-2xl p-3.5 shadow-[0_4px_18px_rgba(16,185,129,0.08)] dark:shadow-[0_4px_18px_rgba(0,0,0,0.4)] border border-emerald-100/70 dark:border-emerald-900/40 relative z-10 transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <Camera size={13} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">
+                          Dokumentasi
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
+                          Foto &amp; video praktikum
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                      Foto &amp; video praktikum Lab EDM
-                    </p>
                   </div>
                 </div>
 
                 {/* Card 3: Jadwal Saya */}
                 <div
-                  onClick={() => setActiveTab("jadwal")}
-                  className="rounded-3xl p-5 bg-gradient-to-br from-[#FFF7ED] to-[#FFEDD5] dark:from-[#2B1706] dark:to-[#1F1004] border border-amber-100 dark:border-amber-900/40 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between min-h-[140px]"
+                  onClick={() => switchTab("jadwal")}
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#FFF3E8] via-[#FFEBD7] to-[#FFE2C5] dark:from-[#291708] dark:via-[#1F1105] dark:to-[#140A02] border border-amber-200/80 dark:border-amber-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px] relative overflow-hidden"
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="w-12 h-12 rounded-2xl bg-white dark:bg-neutral-800 shadow-xs flex items-center justify-center text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform">
-                      <Calendar size={24} />
-                    </div>
+                  {/* Top Illustration Area (Vector Art: Desk calendar with orange bar & analog clock) */}
+                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                    <JadwalCardIllustration />
                   </div>
-                  <div className="space-y-0.5 pt-3">
-                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
-                      Jadwal Saya
+
+                  {/* Bottom Floating White Pill Card */}
+                  <div className="bg-white dark:bg-[#2C190D] rounded-2xl p-3.5 shadow-[0_4px_18px_rgba(249,115,22,0.08)] dark:shadow-[0_4px_18px_rgba(0,0,0,0.4)] border border-amber-100/70 dark:border-amber-900/40 relative z-10 transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-lg bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <Calendar size={13} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white leading-tight">
+                          Jadwal Saya
+                        </div>
+                        <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
+                          3 kelas penugasan
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                      3 kelas penugasan shift jaga
-                    </p>
                   </div>
                 </div>
 
-                {/* Card 4: PPT Modul 4 */}
+                {/* Card 4: PPT Modul 1 */}
                 <div
-                  className="rounded-3xl p-5 bg-gradient-to-br from-[#F5F3FF] to-[#EDE9FE] dark:from-[#1D1036] dark:to-[#120824] border border-purple-100 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all flex flex-col justify-between min-h-[140px]"
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#F3EEFF] via-[#EAE2FD] to-[#DFD4FC] dark:from-[#1D1036] dark:via-[#150A29] dark:to-[#0D051C] border border-purple-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[240px] relative overflow-hidden group"
                 >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1.5 font-bold text-sm text-slate-900 dark:text-white">
-                      <BookOpen size={16} className="text-purple-600" />
-                      PPT Modul 4
-                    </div>
-                    <p className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                      Slide praktikum minggu ini
-                    </p>
+                  {/* Top Illustration Area (Vector Art: Yellow folder with fanning slides) */}
+                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                    <SlideModulCardIllustration />
                   </div>
-                  <div className="flex items-center gap-2 pt-3">
-                    <button
-                      type="button"
-                      onClick={() => alert("Membuka Slide Modul 4 Reguler...")}
-                      className="flex-1 py-1.5 px-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-mono font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <span>Reguler</span>
-                      <span>↗</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => alert("Membuka Slide Modul 4 Internasional...")}
-                      className="flex-1 py-1.5 px-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-mono font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <span>Inter</span>
-                      <span>↗</span>
-                    </button>
+
+                  {/* Bottom Floating White Card with Reguler & Inter Action Buttons */}
+                  <div className="bg-white dark:bg-[#1A0E33] rounded-2xl p-3 shadow-[0_4px_18px_rgba(147,51,234,0.08)] dark:shadow-[0_4px_18px_rgba(0,0,0,0.4)] border border-purple-100/70 dark:border-purple-900/40 relative z-10 space-y-2 transition-colors">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#2563EB] flex items-center justify-center text-white shrink-0 shadow-xs">
+                        <BookOpen size={11} strokeWidth={2.5} />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-bold text-xs text-slate-900 dark:text-white leading-tight">
+                          PPT Modul 1
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 truncate">
+                          Slide praktikum minggu ini
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                      <a
+                        href="https://drive.google.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 py-1 px-2.5 bg-[#1B64F2] hover:bg-blue-700 text-white rounded-full text-[11px] font-mono font-bold flex items-center justify-center gap-1 shadow-xs transition-colors cursor-pointer"
+                        title="Unduh slide presentasi modul reguler"
+                      >
+                        <span>Reguler</span>
+                        <span className="text-[10px]">↗</span>
+                      </a>
+                      <a
+                        href="https://drive.google.com"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 py-1 px-2.5 bg-[#1B64F2] hover:bg-blue-700 text-white rounded-full text-[11px] font-mono font-bold flex items-center justify-center gap-1 shadow-xs transition-colors cursor-pointer"
+                        title="Unduh slide presentasi modul kelas internasional"
+                      >
+                        <span>Inter</span>
+                        <span className="text-[10px]">↗</span>
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -618,7 +755,7 @@ export default function AssistantDashboard() {
                   </h3>
                   <button
                     type="button"
-                    onClick={() => setActiveTab("jadwal")}
+                    onClick={() => switchTab("jadwal")}
                     className="text-xs font-mono font-semibold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>Lihat semua</span>
@@ -661,7 +798,7 @@ export default function AssistantDashboard() {
                           type="button"
                           onClick={() => {
                             setSelectedClassCode(myShift.shift.classCode);
-                            setActiveTab("absensi");
+                            switchTab("absensi");
                           }}
                           className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold font-mono transition-colors cursor-pointer shadow-xs"
                         >
@@ -784,7 +921,7 @@ export default function AssistantDashboard() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("penilaian")}
+                  onClick={() => switchTab("penilaian")}
                   className="px-3.5 py-2 rounded-lg text-xs font-bold font-mono text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-950/60 transition-all cursor-pointer"
                 >
                   Penilaian LMS →
@@ -996,7 +1133,7 @@ export default function AssistantDashboard() {
                 <div className="flex flex-wrap items-center gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setActiveTab("absensi")}
+                    onClick={() => switchTab("absensi")}
                     className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer"
                   >
                     <span>← Presensi</span>
@@ -1850,7 +1987,7 @@ export default function AssistantDashboard() {
                               type="button"
                               onClick={() => {
                                 if (shiftDetail) setSelectedClassCode(shiftDetail.classCode);
-                                setActiveTab("absensi");
+                                switchTab("absensi");
                                 setSelectedShiftForModal(null);
                               }}
                               className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-mono font-bold rounded-xl transition-colors cursor-pointer"
@@ -2696,7 +2833,7 @@ export default function AssistantDashboard() {
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0e071a]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-purple-950/60 px-3 py-2 flex items-center justify-around shadow-lg">
         <button
           type="button"
-          onClick={() => setActiveTab("dashboard")}
+          onClick={() => switchTab("dashboard")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
             activeTab === "dashboard" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
@@ -2707,7 +2844,7 @@ export default function AssistantDashboard() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("absensi")}
+          onClick={() => switchTab("absensi")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
             activeTab === "absensi" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
@@ -2718,7 +2855,7 @@ export default function AssistantDashboard() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("penilaian")}
+          onClick={() => switchTab("penilaian")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
             activeTab === "penilaian" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}
@@ -2729,7 +2866,7 @@ export default function AssistantDashboard() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("jadwal")}
+          onClick={() => switchTab("jadwal")}
           className={`flex flex-col items-center gap-0.5 text-[10px] font-semibold transition-colors cursor-pointer ${
             activeTab === "jadwal" ? "text-purple-600 dark:text-purple-400 font-bold" : "text-slate-500 hover:text-slate-900 dark:text-neutral-400 dark:hover:text-white"
           }`}

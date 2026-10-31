@@ -18,6 +18,7 @@ import {
   ChevronRight,
   Shield,
 } from "lucide-react";
+import { useRouter, usePathname } from "next/navigation";
 import { logoutAction } from "@/app/(auth)/actions/auth";
 import { getAssistantByCode } from "@/data/assistants-roster";
 
@@ -36,6 +37,8 @@ export function DashboardSidebar({
   isMobileOpen = false,
   onCloseMobile,
 }: DashboardSidebarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [sessionUser, setSessionUser] = useState("MACY");
 
@@ -71,11 +74,17 @@ export function DashboardSidebar({
 
   const handleSelectTab = (tabId: string) => {
     if (tabId === "presensi_asprak") {
-      if (typeof window !== "undefined") {
-        window.location.href = "/dashboard/assistant/presensi-asprak";
-        return;
-      }
+      router.push("/dashboard/assistant/presensi-asprak");
+      if (onCloseMobile) onCloseMobile();
+      return;
     }
+
+    if (pathname !== "/dashboard/assistant") {
+      router.push(`/dashboard/assistant?tab=${tabId}`);
+      if (onCloseMobile) onCloseMobile();
+      return;
+    }
+
     if (onTabChange) onTabChange(tabId);
     if (onCloseMobile) onCloseMobile();
   };
@@ -99,8 +108,15 @@ export function DashboardSidebar({
       <div className="space-y-4">
         <div className="flex items-center justify-between pb-3 border-b border-white/15">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center font-mono font-bold text-base shadow-inner">
-              &lt;/&gt;
+            <div className="relative w-9 h-9 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center p-1.5 shadow-inner shrink-0 overflow-hidden">
+              <Image
+                src="/images/edm-emblem-white.png"
+                alt="EDM Laboratory Logo"
+                fill
+                sizes="36px"
+                className="object-contain p-1.5"
+                priority
+              />
             </div>
             {!collapsed && (
               <div>

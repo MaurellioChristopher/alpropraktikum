@@ -67,8 +67,15 @@ export default function Home() {
 
           {/* Top Logo & Branding */}
           <div className="relative z-10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-white/90 dark:bg-purple-900/60 shadow-xs border border-white/80 dark:border-purple-750 flex items-center justify-center text-purple-700 dark:text-purple-300 font-mono font-bold text-lg">
-              &lt;/&gt;
+            <div className="relative w-10 h-10 rounded-2xl bg-white/90 dark:bg-purple-900/60 shadow-xs border border-white/80 dark:border-purple-750 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+              <Image
+                src="/images/edm-emblem-crimson.png"
+                alt="EDM Logo"
+                fill
+                sizes="40px"
+                className="object-contain p-2"
+                priority
+              />
             </div>
             <div>
               <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400">
