@@ -37,68 +37,94 @@ export default function Home() {
     <main className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F7F6FD] dark:bg-[#070312] text-slate-900 dark:text-white font-sans selection:bg-purple-600 selection:text-white transition-colors duration-300">
       
       {/* ============================================================ */}
-      {/* LEFT COLUMN: FULLSCREEN BRAND HERO WITH OFFICIAL ARTWORK      */}
+      {/* LEFT COLUMN: FULLSCREEN BRAND HERO WITH GIANT BLENDED MASCOT  */}
       {/* ============================================================ */}
-      <section className="lg:w-[57%] xl:w-[60%] min-h-screen lg:h-screen flex flex-col justify-between p-6 sm:p-8 lg:p-10 xl:p-12 relative overflow-hidden bg-gradient-to-br from-[#F5F1FF] via-[#EDE7FD] to-[#DFD5FC] dark:from-[#17092F] dark:via-[#110523] dark:to-[#080213] border-b lg:border-b-0 lg:border-r border-purple-200/70 dark:border-purple-950/70">
+      <section className="lg:w-[57%] xl:w-[60%] min-h-screen lg:h-screen flex flex-col justify-between p-7 sm:p-10 lg:p-12 xl:p-16 relative overflow-hidden bg-gradient-to-br from-[#F5F1FF] via-[#EDE7FD] to-[#DFD5FC] dark:from-[#17092F] dark:via-[#110523] dark:to-[#080213] border-b lg:border-b-0 lg:border-r border-purple-200/70 dark:border-purple-950/70">
         
         {/* Subtle Ambient Background Glows */}
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-purple-400/20 dark:bg-purple-600/10 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-indigo-400/20 dark:bg-indigo-600/10 blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-purple-400/25 dark:bg-purple-600/15 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-[500px] h-[500px] rounded-full bg-indigo-400/20 dark:bg-indigo-600/10 blur-3xl pointer-events-none" />
 
-        {/* Top Header & Compact Punchy Hero Title */}
-        <div className="relative z-10 space-y-2.5">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 dark:bg-purple-900/50 border border-purple-200/80 dark:border-purple-800/60 text-[11px] font-mono font-bold text-purple-800 dark:text-purple-300 backdrop-blur-md shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-purple-600 dark:bg-purple-400 animate-pulse" />
-            <span>PORTAL AKADEMIK RESMI • PRAKTIKUM 2026/2027</span>
+        {/* GIANT MASCOT WATERMARK / HERO BACKGROUND ("disaruin ke text") */}
+        <div className="absolute right-[-8%] sm:right-[-4%] bottom-[-4%] lg:bottom-[-2%] w-[105%] sm:w-[95%] lg:w-[110%] xl:w-[100%] h-[80%] lg:h-[90%] pointer-events-none select-none z-0">
+          <div className="relative w-full h-full opacity-45 sm:opacity-50 dark:opacity-35 transition-opacity duration-300">
+            <Image
+              src="/images/landing-hero-alpro-edm.png"
+              alt="Background Maskot EDM Laboratory"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              className="object-contain object-bottom-right drop-shadow-xl"
+            />
+          </div>
+        </div>
+
+        {/* Top Header: Official EDM Logo & Identification */}
+        <div className="relative z-10 flex items-center gap-3.5">
+          <div className="relative w-12 h-12 rounded-2xl bg-white/95 dark:bg-purple-900/60 shadow-[0_4px_16px_rgba(40,16,80,0.12)] border border-white/90 dark:border-purple-700/50 flex items-center justify-center p-2.5 shrink-0 overflow-hidden">
+            <Image
+              src="/images/edm-emblem-crimson.png"
+              alt="Logo Resmi EDM"
+              fill
+              sizes="48px"
+              className="object-contain p-1.5"
+              priority
+            />
+          </div>
+          <div>
+            <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400">
+              EDM LABORATORY
+            </div>
+            <div className="text-sm sm:text-base font-extrabold text-slate-800 dark:text-neutral-200 leading-none tracking-tight">
+              Enterprise Data Management • ALPRO
+            </div>
+          </div>
+        </div>
+
+        {/* Center: MASSIVE TYPOGRAPHY OVERLAPPING THE MASCOT ("nabrakin aja gapapa") */}
+        <div className="relative z-10 my-auto py-8 lg:py-10 space-y-6 sm:space-y-7 max-w-2xl">
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white/90 dark:bg-purple-900/70 border border-purple-200/80 dark:border-purple-800/80 text-xs font-mono font-bold text-purple-900 dark:text-purple-200 backdrop-blur-md shadow-xs">
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-600 dark:bg-purple-400 animate-pulse" />
+            <span>PORTAL RESMI PRAKTIKUM 2026/2027</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl xl:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-none">
-            ALPRO <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 dark:from-purple-300 dark:via-indigo-300 dark:to-purple-200">Practicum.</span>
+          {/* Huge Editorial Headline */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-7xl xl:text-8xl 2xl:text-[5.5rem] font-black text-slate-950 dark:text-white tracking-tight leading-[0.95]">
+            ALPRO <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 dark:from-purple-300 dark:via-indigo-300 dark:to-purple-200">
+              Practicum.
+            </span>
           </h1>
 
-          <p className="text-xs sm:text-sm text-slate-600 dark:text-neutral-300 leading-relaxed font-sans max-w-lg">
+          {/* Subtitle */}
+          <p className="text-base sm:text-lg lg:text-xl font-medium text-slate-800 dark:text-neutral-100 leading-relaxed font-sans max-w-xl">
             Sistem Manajemen Praktikum Algoritma &amp; Pemrograman S1 Sistem Informasi Telkom University. Terintegrasi penuh dengan 15 Kelas SI&apos;50 dan 32 Asisten Resmi EDM.
           </p>
 
-          {/* Quick Key Badges */}
-          <div className="flex flex-wrap gap-2 pt-0.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
-              <Users size={12} className="text-purple-600 dark:text-purple-400" />
+          {/* Large Elevated Feature Chips */}
+          <div className="flex flex-wrap gap-2.5 pt-2">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-mono font-bold bg-white/90 dark:bg-purple-950/80 text-purple-950 dark:text-purple-200 border border-purple-200 dark:border-purple-800/80 shadow-xs backdrop-blur-md">
+              <Users size={16} className="text-purple-600 dark:text-purple-400" />
               15 Kelas SI&apos;50
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
-              <ShieldCheck size={12} className="text-purple-600 dark:text-purple-400" />
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-mono font-bold bg-white/90 dark:bg-purple-950/80 text-purple-950 dark:text-purple-200 border border-purple-200 dark:border-purple-800/80 shadow-xs backdrop-blur-md">
+              <ShieldCheck size={16} className="text-purple-600 dark:text-purple-400" />
               32 Asisten Resmi
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
-              <MapPin size={12} className="text-purple-600 dark:text-purple-400" />
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-mono font-bold bg-white/90 dark:bg-purple-950/80 text-purple-950 dark:text-purple-200 border border-purple-200 dark:border-purple-800/80 shadow-xs backdrop-blur-md">
+              <MapPin size={16} className="text-purple-600 dark:text-purple-400" />
               R1 Lt. 8 TULT
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
-              <Sparkles size={12} className="text-purple-600 dark:text-purple-400" />
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs sm:text-sm font-mono font-bold bg-white/90 dark:bg-purple-950/80 text-purple-950 dark:text-purple-200 border border-purple-200 dark:border-purple-800/80 shadow-xs backdrop-blur-md">
+              <Sparkles size={16} className="text-purple-600 dark:text-purple-400" />
               Lab EDM Lt. 3
             </span>
           </div>
         </div>
 
-        {/* Center: Official EDM Artwork (Logo, Code, Charts & 3 Mascots) */}
-        <div className="relative flex-1 w-full min-h-[340px] flex items-center justify-center my-auto py-2 select-none pointer-events-none">
-          {/* Radial Ambient Glow */}
-          <div className="absolute w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-purple-400/25 dark:bg-purple-600/15 blur-3xl pointer-events-none" />
-          <div className="relative w-full h-full max-h-[500px] xl:max-h-[560px] 2xl:max-h-[640px] drop-shadow-[0_22px_45px_rgba(79,40,150,0.18)]">
-            <Image
-              src="/images/landing-hero-alpro-edm.png"
-              alt="Landing Hero ALPRO & Logo EDM Laboratory"
-              fill
-              sizes="(max-width: 1024px) 100vw, 60vw"
-              className="object-contain"
-              priority
-            />
-          </div>
-        </div>
-
         {/* Bottom Footnote Bar */}
-        <div className="relative z-10 flex items-center justify-between text-xs font-mono text-purple-950/70 dark:text-neutral-400 border-t border-purple-200/70 dark:border-purple-900/40 pt-3">
+        <div className="relative z-10 flex items-center justify-between text-xs sm:text-sm font-mono text-purple-950/80 dark:text-neutral-300 border-t border-purple-200/70 dark:border-purple-900/40 pt-4">
           <span className="font-semibold">Enterprise Data Management Laboratory</span>
           <span>Telkom University © 2026/2027</span>
         </div>
