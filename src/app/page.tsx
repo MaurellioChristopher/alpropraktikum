@@ -13,8 +13,10 @@ import {
   BookOpen,
   Info,
   X,
-  ExternalLink,
   Sparkles,
+  MapPin,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function Home() {
@@ -32,121 +34,142 @@ export default function Home() {
   ];
 
   return (
-    <main className="min-h-screen w-full bg-[#F2F4F8] dark:bg-[#070312] text-slate-900 dark:text-white flex items-center justify-center p-3 sm:p-6 lg:p-10 font-sans selection:bg-purple-600 selection:text-white transition-colors duration-300">
+    <main className="min-h-screen w-full flex flex-col lg:flex-row bg-[#F7F6FD] dark:bg-[#070312] text-slate-900 dark:text-white font-sans selection:bg-purple-600 selection:text-white transition-colors duration-300">
       
-      {/* Top Floating Controls */}
-      <div className="fixed top-5 right-6 z-40 flex items-center gap-2">
-        <button
-          type="button"
-          onClick={() => setActiveModal("modul")}
-          className="px-3 py-1.5 rounded-full bg-white/80 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 backdrop-blur-md hover:bg-white transition-all cursor-pointer shadow-xs"
-        >
-          Silabus
-        </button>
-        <button
-          type="button"
-          onClick={() => setActiveModal("tentang")}
-          className="px-3 py-1.5 rounded-full bg-white/80 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 backdrop-blur-md hover:bg-white transition-all cursor-pointer shadow-xs"
-        >
-          Tentang Lab
-        </button>
-        <div className="bg-white/80 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800 rounded-full p-1 backdrop-blur-md shadow-xs">
-          <ThemeToggle />
-        </div>
-      </div>
-
-      {/* Main Split Grid (Max 1440px) */}
-      <div className="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-stretch min-h-[640px] sm:min-h-[720px]">
+      {/* ============================================================ */}
+      {/* LEFT COLUMN: FULLSCREEN BRAND HERO WITH OFFICIAL 3 MASCOTS   */}
+      {/* ============================================================ */}
+      <section className="lg:w-[58%] xl:w-[62%] min-h-screen lg:h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-14 relative overflow-hidden bg-gradient-to-br from-[#EAE5FF] via-[#EDE8FD] to-[#DFD6F9] dark:from-[#17092E] dark:via-[#110524] dark:to-[#080212] border-b lg:border-b-0 lg:border-r border-purple-200/70 dark:border-purple-950/70">
         
-        {/* LEFT COLUMN: Large Lilac/Purple Squircle Card with Mascot */}
-        <div className="lg:col-span-7 bg-gradient-to-br from-[#EAE4F8] via-[#EDE9FE] to-[#DFD6F9] dark:from-[#1C0D38] dark:via-[#140828] dark:to-[#0A0414] border border-purple-200/80 dark:border-purple-900/50 rounded-[2.5rem] p-7 sm:p-10 lg:p-12 flex flex-col justify-between relative overflow-hidden shadow-[0_15px_40px_rgba(40,16,80,0.06)] dark:shadow-[0_15px_50px_rgba(0,0,0,0.5)]">
-          
-          {/* Subtle Ambient Glows */}
-          <div className="absolute top-0 right-0 w-80 h-80 rounded-full bg-purple-400/20 blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-indigo-400/15 blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Glows */}
+        <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-purple-400/20 dark:bg-purple-600/10 blur-3xl pointer-events-none" />
+        <div className="absolute bottom-10 left-10 w-96 h-96 rounded-full bg-indigo-400/20 dark:bg-indigo-600/10 blur-3xl pointer-events-none" />
 
-          {/* Top Logo & Branding */}
-          <div className="relative z-10 flex items-center gap-3">
-            <div className="relative w-10 h-10 rounded-2xl bg-white/90 dark:bg-purple-900/60 shadow-xs border border-white/80 dark:border-purple-750 flex items-center justify-center p-2 shrink-0 overflow-hidden">
-              <Image
-                src="/images/edm-emblem-crimson.png"
-                alt="EDM Logo"
-                fill
-                sizes="40px"
-                className="object-contain p-2"
-                priority
-              />
-            </div>
-            <div>
-              <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400">
-                EDM LABORATORY
-              </div>
-              <div className="text-sm font-bold text-slate-800 dark:text-neutral-200 leading-none">
-                ALPRO Practicum
-              </div>
-            </div>
+        {/* Top Header: Official EDM Logo & Identification */}
+        <div className="relative z-10 flex items-center gap-3.5">
+          <div className="relative w-11 h-11 rounded-2xl bg-white/95 dark:bg-purple-900/60 shadow-[0_4px_14px_rgba(40,16,80,0.1)] border border-white/90 dark:border-purple-700/50 flex items-center justify-center p-2 shrink-0 overflow-hidden">
+            <Image
+              src="/images/edm-emblem-crimson.png"
+              alt="Logo Resmi EDM"
+              fill
+              sizes="44px"
+              className="object-contain p-1.5"
+              priority
+            />
           </div>
-
-          {/* Center Content: Headline & Mascot */}
-          <div className="relative z-10 my-6 sm:my-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-            {/* Huge Clean Typography */}
-            <div className="md:col-span-7 space-y-4">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05]">
-                ALPRO<br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-indigo-600 dark:from-purple-300 dark:to-indigo-300">
-                  Practicum
-                </span>
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-600 dark:text-neutral-300 leading-relaxed font-sans max-w-sm">
-                Sistem Manajemen Praktikum Algoritma &amp; Pemrograman S1 Sistem Informasi Telkom University. Terintegrasi langsung dengan 15 Kelas SI&apos;50 dan 32 Asisten Resmi EDM.
-              </p>
-              
-              {/* Badges */}
-              <div className="flex flex-wrap gap-2 pt-2">
-                <span className="px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/80 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800 shadow-2xs">
-                  15 Kelas SI&apos;50
-                </span>
-                <span className="px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/80 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800 shadow-2xs">
-                  32 Asisten Resmi
-                </span>
-                <span className="px-3 py-1 rounded-full text-[11px] font-mono font-semibold bg-white/80 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 border border-purple-200 dark:border-purple-800 shadow-2xs">
-                  Lab EDM Lt. 3
-                </span>
-              </div>
+          <div>
+            <div className="text-[11px] font-mono font-bold uppercase tracking-widest text-purple-700 dark:text-purple-400">
+              EDM LABORATORY
             </div>
-
-            {/* Mascot Showcase with Ground Shadow */}
-            <div className="md:col-span-5 flex flex-col items-center justify-center relative">
-              <div className="relative w-48 h-56 sm:w-56 sm:h-64 lg:w-60 lg:h-72 drop-shadow-2xl">
-                <Image
-                  src="/images/edm-mascot.png"
-                  alt="Maskot Resmi EDM Laboratory"
-                  fill
-                  priority
-                  sizes="(max-width: 768px) 192px, 240px"
-                  className="object-contain"
-                />
-              </div>
-              {/* Ground Shadow */}
-              <div className="w-32 sm:w-40 h-4 bg-purple-900/20 dark:bg-purple-950/50 rounded-full blur-md -mt-2" />
+            <div className="text-sm font-extrabold text-slate-800 dark:text-neutral-200 leading-none tracking-tight">
+              Enterprise Data Management • ALPRO
             </div>
-          </div>
-
-          {/* Bottom Footnote */}
-          <div className="relative z-10 flex items-center justify-between text-[11px] font-mono text-purple-900/70 dark:text-neutral-400 border-t border-purple-200/60 dark:border-purple-900/40 pt-4">
-            <span>Enterprise Data Management</span>
-            <span>Telkom University © 2026/2027</span>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Minimalist Login Form Container */}
-        <div className="lg:col-span-5 flex items-center justify-center">
+        {/* Center Hero: Large Bold Typography & Overview */}
+        <div className="relative z-10 my-auto py-6 sm:py-8 space-y-4 sm:space-y-5 max-w-xl">
+          {/* Status Badge */}
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 dark:bg-purple-900/50 border border-purple-200/80 dark:border-purple-800/60 text-xs font-mono font-bold text-purple-800 dark:text-purple-300 backdrop-blur-md shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-purple-600 dark:bg-purple-400 animate-pulse" />
+            <span>PORTAL RESMI PRAKTIKUM 2026/2027</span>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-4xl sm:text-5xl xl:text-6xl 2xl:text-7xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.05]">
+            ALPRO <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 dark:from-purple-300 dark:via-indigo-300 dark:to-purple-200">
+              Practicum.
+            </span>
+          </h1>
+
+          {/* Description */}
+          <p className="text-xs sm:text-sm lg:text-base text-slate-600 dark:text-neutral-300 leading-relaxed font-sans max-w-lg">
+            Sistem Manajemen Praktikum Algoritma &amp; Pemrograman S1 Sistem Informasi Telkom University. Terintegrasi langsung dengan 15 Kelas SI&apos;50, 32 Asisten Resmi EDM, dan Ruang Praktikum R1 Lantai 8 TULT / Lab Terpadu Lt. 3.
+          </p>
+
+          {/* Feature Badges */}
+          <div className="flex flex-wrap gap-2 pt-1">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
+              <Users size={12} className="text-purple-600 dark:text-purple-400" />
+              15 Kelas SI&apos;50
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
+              <ShieldCheck size={12} className="text-purple-600 dark:text-purple-400" />
+              32 Asisten Resmi
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
+              <MapPin size={12} className="text-purple-600 dark:text-purple-400" />
+              R1 Lt. 8 TULT
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white/85 dark:bg-purple-900/60 text-purple-950 dark:text-purple-200 border border-purple-200/80 dark:border-purple-800/50 shadow-2xs">
+              <Sparkles size={12} className="text-purple-600 dark:text-purple-400" />
+              Lab EDM Lt. 3
+            </span>
+          </div>
+        </div>
+
+        {/* Bottom Hero: Official 3 Mascot Illustration Showcase */}
+        <div className="relative z-10 w-full flex flex-col items-center justify-end select-none pointer-events-none mt-auto pt-2">
+          <div className="relative w-full max-w-lg sm:max-w-xl h-52 sm:h-64 lg:h-72 xl:h-80 drop-shadow-[0_20px_35px_rgba(79,40,150,0.18)]">
+            <Image
+              src="/images/edm-3maskot-cutout.png"
+              alt="Maskot Resmi EDM Laboratory - 3 Maskot Kucing EDM"
+              fill
+              sizes="(max-width: 1024px) 100vw, 60vw"
+              className="object-contain object-bottom"
+              priority
+            />
+          </div>
+        </div>
+
+        {/* Bottom Footnote Bar */}
+        <div className="relative z-10 flex items-center justify-between text-xs font-mono text-purple-950/70 dark:text-neutral-400 border-t border-purple-200/70 dark:border-purple-900/40 pt-4 mt-2">
+          <span className="font-semibold">Enterprise Data Management Laboratory</span>
+          <span>Telkom University © 2026/2027</span>
+        </div>
+      </section>
+
+      {/* ============================================================ */}
+      {/* RIGHT COLUMN: FULLSCREEN SLEEK LOGIN CONSOLE & CONTROLS      */}
+      {/* ============================================================ */}
+      <section className="lg:w-[42%] xl:w-[38%] min-h-screen lg:h-screen flex flex-col justify-between p-6 sm:p-10 lg:p-12 xl:p-14 bg-white dark:bg-[#0C0418] relative z-20 overflow-y-auto">
+        
+        {/* Top Controls Row */}
+        <div className="w-full flex items-center justify-end gap-2 pb-6">
+          <button
+            type="button"
+            onClick={() => setActiveModal("modul")}
+            className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-purple-50 dark:bg-purple-950/70 hover:dark:bg-purple-900/60 border border-slate-200 dark:border-purple-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 transition-all cursor-pointer shadow-2xs"
+          >
+            Silabus
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveModal("tentang")}
+            className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-purple-50 dark:bg-purple-950/70 hover:dark:bg-purple-900/60 border border-slate-200 dark:border-purple-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 transition-all cursor-pointer shadow-2xs"
+          >
+            Tentang Lab
+          </button>
+          <div className="bg-slate-100 dark:bg-purple-950/70 border border-slate-200 dark:border-purple-800 rounded-full p-1 shadow-2xs">
+            <ThemeToggle />
+          </div>
+        </div>
+
+        {/* Center: Beautifully Integrated Login Console */}
+        <div className="my-auto w-full flex items-center justify-center py-6">
           <LoginForm />
         </div>
 
-      </div>
+        {/* Bottom Support Text */}
+        <div className="text-center pt-6 text-[11px] font-mono text-slate-400 dark:text-neutral-500">
+          Butuh bantuan akses? Hubungi Koordinator Asisten Praktikum di Ruang R1 Lt. 8 TULT / Lab EDM Lt. 3.
+        </div>
+      </section>
 
-      {/* SILABUS MODAL */}
+      {/* ============================================================ */}
+      {/* MODAL: SILABUS MODUL                                         */}
+      {/* ============================================================ */}
       <AnimatePresence>
         {activeModal === "modul" && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
@@ -164,7 +187,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -189,7 +212,9 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* TENTANG MODAL */}
+      {/* ============================================================ */}
+      {/* MODAL: TENTANG LAB                                           */}
+      {/* ============================================================ */}
       <AnimatePresence>
         {activeModal === "tentang" && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
@@ -207,7 +232,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={() => setActiveModal(null)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -220,8 +245,9 @@ export default function Home() {
                 <p>
                   Mengampu mata kuliah praktikum fundamental pemrograman dan struktur data untuk seluruh mahasiswa angkatan 2026 (SI&apos;50) dengan dukungan 32 asisten praktikum terverifikasi.
                 </p>
-                <div className="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 text-[11px] font-mono text-purple-900 dark:text-purple-200">
-                  📍 Gedung Laboratorium Terpadu Lt. 3, Telkom University, Bandung.
+                <div className="p-3 rounded-2xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 text-[11px] font-mono text-purple-900 dark:text-purple-200 space-y-1">
+                  <div>📍 <strong>Lokasi Praktikum:</strong> Ruang R1 Lantai 8 TULT (Telkom University Landmark Tower).</div>
+                  <div>🏢 <strong>Ruang Asisten &amp; Lab:</strong> Gedung Laboratorium Terpadu Lt. 3, Telkom University, Bandung.</div>
                 </div>
               </div>
             </motion.div>
