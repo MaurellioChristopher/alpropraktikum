@@ -200,7 +200,7 @@ export default function GradingDashboard() {
               >
                 {SI50_CLASSES.map((cls) => (
                   <option key={cls.code} value={cls.code}>
-                    {cls.code.replace("SI50", "SI-49-")}
+                    {cls.name} ({cls.code})
                   </option>
                 ))}
               </select>

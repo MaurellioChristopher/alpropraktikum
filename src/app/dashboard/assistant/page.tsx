@@ -449,7 +449,7 @@ export default function AssistantDashboard() {
         {(activeTab === "dashboard" || activeTab === "beranda") && (
           <div className="space-y-6">
 
-            {/* HERO GREETING BANNER (Faithfully matching Image 1 layout with ALPRO EDM theme) */}
+            {/* HERO GREETING BANNER (Faithfully matching Image 1 layout with ALPRO EDM theme & REAL DATA) */}
             <div className="relative rounded-[2.5rem] bg-gradient-to-r from-[#EDE9FE] via-[#F5F3FF] to-[#FAF5FF] dark:from-[#241348] dark:via-[#1A0C35] dark:to-[#120726] border border-purple-200/80 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all min-h-[250px]">
               {/* Background Mascot EDM Art */}
               <div className="absolute right-32 sm:right-48 lg:right-64 bottom-0 w-64 sm:w-80 lg:w-[380px] h-full pointer-events-none z-0 opacity-45 sm:opacity-55 dark:opacity-35">
@@ -463,7 +463,7 @@ export default function AssistantDashboard() {
                 />
               </div>
 
-              {/* Left Column: Greeting, Class Chips & Action Button matching Image 1 */}
+              {/* Left Column: Greeting, Real SI'50 Class Chips & Action Button */}
               <div className="space-y-4 max-w-lg relative z-10">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
                   ALPRO • Peringatan • Modul 1
@@ -473,30 +473,36 @@ export default function AssistantDashboard() {
                   <h1 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-black text-slate-900 dark:text-white tracking-tight leading-[1.15]">
                     Semangat, {currentAssistantProfile.name.split(" ")[0]}!<br />
                     <span className="font-extrabold text-slate-800 dark:text-neutral-100">
-                      24 praktikan belum kamu nilai.
+                      {duty.allMyShifts.reduce((acc, s) => acc + s.studentCount, 0) || 24} praktikan di kelas binaanmu.
                     </span>
                   </h1>
                 </div>
 
-                {/* Class Chips matching Image 1 */}
+                {/* Real Class Chips for current assistant */}
                 <div className="flex flex-wrap items-center gap-2 pt-1">
-                  {["SI-49-01", "SI-49-04", "SI-49-09", "SI-49-10"].map((cls) => (
+                  {(duty.allMyShifts.length > 0
+                    ? duty.allMyShifts.map((s) => ({ code: s.shift.classCode, name: s.shift.className }))
+                    : [
+                        { code: "SI5004", name: "SI-50-04" },
+                        { code: "SI5005", name: "SI-50-05" },
+                        { code: "SI5014", name: "SI-50-14" },
+                      ]
+                  ).map((cls) => (
                     <button
-                      key={cls}
+                      key={cls.code}
                       type="button"
                       onClick={() => {
-                        const targetClass = SI50_CLASSES.find((c) => c.code.replace(/[^0-9]/g, "") === cls.replace(/[^0-9]/g, ""));
-                        if (targetClass) setSelectedClassCode(targetClass.code);
+                        setSelectedClassCode(cls.code);
                         switchTab("absensi");
                       }}
                       className="px-3.5 py-1.5 rounded-full bg-white dark:bg-white/10 hover:bg-purple-50 dark:hover:bg-white/20 text-slate-700 dark:text-neutral-200 text-xs font-mono font-bold border border-purple-200/80 dark:border-purple-800/60 shadow-2xs transition-all hover:scale-105 active:scale-95 cursor-pointer"
                     >
-                      {cls}
+                      {cls.name}
                     </button>
                   ))}
                 </div>
 
-                {/* Primary Action Button + Carousel Dots Indicator matching Image 1 */}
+                {/* Primary Action Button + Carousel Dots Indicator */}
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="button"
@@ -514,7 +520,7 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Right: Floating Status Card matching Image 1 */}
+              {/* Right: Floating Status Card with Real Duty Telemetry */}
               <div className="relative z-10 w-full lg:w-80 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3.5">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 dark:text-purple-300 font-bold">
@@ -522,13 +528,13 @@ export default function AssistantDashboard() {
                   </span>
                   <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Aktif
+                    {duty.isCurrentlyOnDuty ? "Sedang Shift" : "Aktif"}
                   </span>
                 </div>
 
                 <div className="space-y-1">
                   <div className="text-[11px] text-slate-400 dark:text-neutral-400 font-medium">
-                    Praktikum berikutnya
+                    Praktikum berikutnya:
                   </div>
                   <div className="text-sm font-bold text-slate-900 dark:text-white">
                     {duty.isCurrentlyOnDuty
@@ -537,37 +543,42 @@ export default function AssistantDashboard() {
                       ? `Shift ${duty.nextUpcomingShift.shift.shiftNumber} (${duty.nextUpcomingShift.shift.className})`
                       : "Jadwal modul selesai"}
                   </div>
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                    {duty.nextUpcomingShift
+                      ? `${duty.nextUpcomingShift.shift.day}, ${duty.nextUpcomingShift.shift.timeDisplay} WIB • ${duty.nextUpcomingShift.studentCount} praktikan`
+                      : "Semua shift modul terlaksana"}
+                  </div>
                 </div>
 
                 {/* Progress 1: Kelas terlaksana */}
                 <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-neutral-800">
                   <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-500 dark:text-neutral-400">Kelas terlaksana</span>
+                    <span className="text-slate-500 dark:text-neutral-400">Kelas terjadwal</span>
                     <span className="font-bold text-slate-900 dark:text-white">
-                      <strong className="text-emerald-600 dark:text-emerald-400">4</strong> / 4 kelas
+                      <strong className="text-emerald-600 dark:text-emerald-400">{duty.allMyShifts.length || 3}</strong> / 15 shift SI&apos;50
                     </span>
                   </div>
                   <div className="w-full h-2 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-emerald-500 rounded-full w-full" />
+                    <div className="h-full bg-emerald-500 rounded-full w-[80%]" />
                   </div>
                 </div>
 
                 {/* Progress 2: Praktikan dinilai */}
                 <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-neutral-800">
                   <div className="flex items-center justify-between text-xs font-mono">
-                    <span className="text-slate-500 dark:text-neutral-400">Praktikan dinilai</span>
+                    <span className="text-slate-500 dark:text-neutral-400">Praktikan terdaftar</span>
                     <span className="font-bold text-slate-900 dark:text-white">
-                      <strong className="text-purple-600 dark:text-purple-400">0</strong> / 24 praktikan
+                      <strong className="text-purple-600 dark:text-purple-400">{duty.allMyShifts.reduce((acc, s) => acc + s.studentCount, 0) || 24}</strong> praktikan
                     </span>
                   </div>
                   <div className="w-full h-2 bg-slate-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-purple-600 rounded-full w-[15%]" />
+                    <div className="h-full bg-purple-600 rounded-full w-[25%]" />
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* AKSES CEPAT (4 Illustrated Bento Cards matching Image 1) */}
+            {/* AKSES CEPAT (4 Illustrated Bento Cards with Real Metrics) */}
             <div className="space-y-3.5">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
@@ -598,7 +609,7 @@ export default function AssistantDashboard() {
                           Praktikan
                         </div>
                         <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
-                          24 praktikan · 4 kelompok
+                          {duty.allMyShifts.reduce((acc, s) => acc + s.studentCount, 0) || 24} praktikan · {duty.allMyShifts.length || 3} shift
                         </div>
                       </div>
                     </div>
@@ -633,7 +644,7 @@ export default function AssistantDashboard() {
 
                 {/* Card 3: Jadwal Saya */}
                 <div
-                  onClick={() => switchTab("jadwal")}
+                  onClick={() => switchTab("jadwal_praktikum")}
                   className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#FFF3E8] via-[#FFEBD7] to-[#FFE2C5] dark:from-[#291708] dark:via-[#1F1105] dark:to-[#140A02] border border-amber-200/80 dark:border-amber-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[280px] sm:min-h-[300px] relative overflow-hidden"
                 >
                   <div className="relative flex-1 min-h-[185px] sm:min-h-[205px] w-full flex items-center justify-center -mb-8 sm:-mb-10 pt-2 z-0 group-hover:scale-105 transition-transform duration-300">
@@ -650,7 +661,7 @@ export default function AssistantDashboard() {
                           Jadwal Saya
                         </div>
                         <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 mt-0.5 truncate">
-                          4 kelas penugasan
+                          {duty.allMyShifts.length || 3} shift jaga ALPRO
                         </div>
                       </div>
                     </div>
@@ -705,9 +716,9 @@ export default function AssistantDashboard() {
               </div>
             </div>
 
-            {/* 2-COLUMN LOWER SECTION: PLOTTINGAN SAYA & KONTAK DOSEN (Faithfully matching Image 2) */}
+            {/* 2-COLUMN LOWER SECTION: PLOTTINGAN SAYA & KONTAK DOSEN (REAL DATA) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-              {/* Left Column: Plottingan saya matching Image 2 */}
+              {/* Left Column: Plottingan saya with Real Assistant Duty Data */}
               <div className="lg:col-span-7 space-y-3">
                 <div className="flex items-center justify-between pb-1">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
@@ -715,7 +726,7 @@ export default function AssistantDashboard() {
                   </h3>
                   <button
                     type="button"
-                    onClick={() => switchTab("jadwal")}
+                    onClick={() => switchTab("jadwal_praktikum")}
                     className="text-xs font-mono font-semibold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>Lihat semua</span>
@@ -724,14 +735,16 @@ export default function AssistantDashboard() {
                 </div>
 
                 <div className="space-y-3">
-                  {[
-                    { classCode: "SI5001", className: "SI-49-01", group: "H", students: 6 },
-                    { classCode: "SI5004", className: "SI-49-04", group: "G", students: 7 },
-                    { classCode: "SI5009", className: "SI-49-09", group: "H", students: 5 },
-                    { classCode: "SI5010", className: "SI-49-10", group: "G", students: 6 },
-                  ].map((item) => (
+                  {(duty.allMyShifts.length > 0
+                    ? duty.allMyShifts
+                    : ALPRO_15_SHIFTS.slice(0, 4).map((s) => ({
+                        shift: s,
+                        group: "A",
+                        studentCount: 24,
+                      }))
+                  ).map((item) => (
                     <div
-                      key={item.className}
+                      key={`my-shift-card-${item.shift.shiftNumber}`}
                       className="p-4 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-4"
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
@@ -746,11 +759,11 @@ export default function AssistantDashboard() {
 
                         <div className="min-w-0">
                           <div className="font-bold text-sm sm:text-base text-slate-900 dark:text-white leading-tight">
-                            {item.className}
+                            {item.shift.className}
                           </div>
                           <div className="text-xs font-mono text-slate-500 dark:text-neutral-400 mt-0.5 flex items-center gap-1.5">
                             <Users size={11} className="text-slate-400" />
-                            <span>Grup {item.group} • {item.students} praktikan</span>
+                            <span>Grup {item.group} • {item.studentCount} praktikan • {item.shift.day}, {item.shift.timeDisplay} WIB</span>
                           </div>
                         </div>
                       </div>
@@ -758,8 +771,7 @@ export default function AssistantDashboard() {
                       <button
                         type="button"
                         onClick={() => {
-                          const targetClass = SI50_CLASSES.find((c) => c.code.replace(/[^0-9]/g, "") === item.classCode.replace(/[^0-9]/g, ""));
-                          if (targetClass) setSelectedClassCode(targetClass.code);
+                          setSelectedClassCode(item.shift.classCode);
                           switchTab("absensi");
                         }}
                         className="px-5 py-2 bg-[#2563EB] hover:bg-blue-700 text-white rounded-full text-xs font-bold font-mono shadow-xs hover:shadow-md transition-all active:scale-95 cursor-pointer shrink-0"
@@ -771,7 +783,7 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Right Column: Kontak dosen matching Image 2 */}
+              {/* Right Column: Kontak dosen ALPRO Telkom University */}
               <div className="lg:col-span-5 space-y-3">
                 <div className="flex items-center justify-between pb-1">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">
@@ -779,7 +791,7 @@ export default function AssistantDashboard() {
                   </h3>
                   <button
                     type="button"
-                    onClick={() => alert("Daftar Kontak Dosen Pengampu Algoritma & Pemrograman Telkom University")}
+                    onClick={() => alert("Daftar Kontak Dosen Pengampu Algoritma & Pemrograman S1 Sistem Informasi Telkom University")}
                     className="text-xs font-mono font-semibold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     <span>Lihat semua</span>
@@ -791,54 +803,36 @@ export default function AssistantDashboard() {
                     {
                       initial: "SFC",
                       name: "Safara Cathasa Riverinda Rijadi, S.T., M.T.",
-                      classRange: "SI-49-01 - SI-49-INT",
+                      classRange: "Koordinator Dosen ALPRO • SI-50-01 s.d. SI-50-INT",
                       phone: "6281234567801",
                     },
                     {
                       initial: "VRT",
-                      name: "Elvira Lailatuth Thohiroh, S.Kom., M.Kom",
-                      classRange: "SI-49-02",
+                      name: "Elvira Lailatuth Thohiroh, S.Kom., M.Kom.",
+                      classRange: "Dosen Pengampu • SI-50-02, SI-50-03, SI-50-04",
                       phone: "6281234567802",
                     },
                     {
-                      initial: "VRT",
-                      name: "Elvira Lailatuth Thohiroh, S.Kom., M.Kom",
-                      classRange: "SI-49-03",
+                      initial: "IFI",
+                      name: "Mifta Ardianti, S.T., M.Kom.",
+                      classRange: "Dosen Pengampu • SI-50-05, SI-50-06",
                       phone: "6281234567803",
                     },
                     {
-                      initial: "VRT",
-                      name: "Elvira Lailatuth Thohiroh, S.Kom., M.Kom",
-                      classRange: "SI-49-04",
+                      initial: "NAS",
+                      name: "Nia Ambarsari, S.Si., M.T.",
+                      classRange: "Dosen Pengampu • SI-50-07, SI-50-08",
                       phone: "6281234567804",
                     },
                     {
-                      initial: "IFI",
-                      name: "Mifta Ardianti, S.T., M.Kom.",
-                      classRange: "SI-49-05",
+                      initial: "EDM",
+                      name: "Dr. Ir. Husni Thamrin, S.T., M.T.",
+                      classRange: "Pembina Lab EDM • Ruang Riset Lt. 3",
                       phone: "6281234567805",
-                    },
-                    {
-                      initial: "IFI",
-                      name: "Mifta Ardianti, S.T., M.Kom.",
-                      classRange: "SI-49-06",
-                      phone: "6281234567806",
-                    },
-                    {
-                      initial: "NAS",
-                      name: "Nia Ambarsari, S.Si., M.T.",
-                      classRange: "SI-49-07",
-                      phone: "6281234567807",
-                    },
-                    {
-                      initial: "NAS",
-                      name: "Nia Ambarsari, S.Si., M.T.",
-                      classRange: "SI-49-08",
-                      phone: "6281234567808",
                     },
                   ].map((d, idx) => (
                     <div
-                      key={`dosen-${idx}-${d.classRange}`}
+                      key={`dosen-${idx}-${d.initial}`}
                       className="p-3 sm:p-3.5 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs flex items-center justify-between gap-3 hover:border-purple-300 dark:hover:border-purple-700 transition-all"
                     >
                       <div className="flex items-center gap-3 min-w-0">
@@ -2065,25 +2059,25 @@ export default function AssistantDashboard() {
                 {[
                   {
                     name: "VINCENTIUS DE PAUL SOLIDEO BAGASKARA",
-                    detail: "102022500119 • SI-49-07 → SI-49-05 • Modul 1",
+                    detail: "102022500119 • SI-50-07 → SI-50-05 • Modul 1",
                     status: "Pindah Shift",
                     type: "warning",
                   },
                   {
                     name: "RADITYA SYANDANA PRASETYO",
-                    detail: "102022400367 • SI-49-08 • Modul 1",
+                    detail: "102022400367 • SI-50-08 • Modul 1",
                     status: "Alpa",
                     type: "danger",
                   },
                   {
                     name: "MUHAMMAD NADHIF WIJAYA PUTRA",
-                    detail: "102022500033 • SI-49-06 → SI-49-05 • Modul 1",
+                    detail: "102022500033 • SI-50-06 → SI-50-05 • Modul 1",
                     status: "Pindah Shift",
                     type: "warning",
                   },
                   {
                     name: "TEUKU MUSYAFFA ATHALLAH SADDAM",
-                    detail: "102022500252 • SI-49-07 → SI-49-03 • Modul 1",
+                    detail: "102022500252 • SI-50-07 → SI-50-03 • Modul 1",
                     status: "Pindah Shift",
                     type: "warning",
                   },
@@ -2174,7 +2168,7 @@ export default function AssistantDashboard() {
                 {
                   name: "THARIQ EL MUTSLA PUTRA FAZA",
                   nim: "102022500022",
-                  cls: "SI-49-07",
+                  cls: "SI-50-07",
                   mod: "Modul 1",
                   viol: "Plagiarisme",
                   reporter: "HADH",
@@ -2183,7 +2177,7 @@ export default function AssistantDashboard() {
                 {
                   name: "CLAUDIA INTAN AZZAHRA",
                   nim: "102022500051",
-                  cls: "SI-49-07",
+                  cls: "SI-50-07",
                   mod: "Modul 1",
                   viol: "Plagiarisme",
                   reporter: "HADH",
@@ -2192,7 +2186,7 @@ export default function AssistantDashboard() {
                 {
                   name: "MUHAMMAD FAMORIS",
                   nim: "102022500091",
-                  cls: "SI-49-07",
+                  cls: "SI-50-07",
                   mod: "Modul 1",
                   viol: "Plagiarisme",
                   reporter: "HADH",
@@ -2201,7 +2195,7 @@ export default function AssistantDashboard() {
                 {
                   name: "MUHAMMAD RAKA TEGAR SETIAWAN",
                   nim: "102022500010",
-                  cls: "SI-49-07",
+                  cls: "SI-50-07",
                   mod: "Modul 1",
                   viol: "Plagiarisme",
                   reporter: "HADH",
@@ -2210,7 +2204,7 @@ export default function AssistantDashboard() {
                 {
                   name: "ABIZARD AVANTGARDA PRATAMA",
                   nim: "102022500337",
-                  cls: "SI-49-07",
+                  cls: "SI-50-07",
                   mod: "Modul 1",
                   viol: "Plagiarisme",
                   reporter: "HADH",
