@@ -75,8 +75,15 @@ export function DashboardHeader({
         </button>
 
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs shrink-0">
-          <div className="w-5 h-5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-mono font-black text-[11px] shadow-2xs">
-            &lt;&gt;
+          <div className="w-5 h-5 rounded-md bg-white dark:bg-purple-950/50 border border-slate-200/80 dark:border-purple-800/60 flex items-center justify-center p-0.5 shadow-2xs shrink-0">
+            <Image
+              src="/images/edm-ribbon-logo.png"
+              alt="EDM Logo"
+              width={16}
+              height={16}
+              className="w-full h-full object-contain"
+              priority
+            />
           </div>
           <span className="text-xs font-bold text-slate-800 dark:text-white">
             Praktikum ALPRO
