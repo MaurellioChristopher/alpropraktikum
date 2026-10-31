@@ -25,7 +25,6 @@ import {
   Play,
   Pause,
   RotateCcw,
-  Timer,
   MessageSquare,
   Clock,
   Users,
@@ -229,36 +228,6 @@ export default function AssistantDashboard() {
   const [shiftSource, setShiftSource] = useState("Modul 4 / SI5001");
   const [shiftTarget, setShiftTarget] = useState("Modul 4 / SI5002");
 
-  // State Timer Sesi Praktikum
-  const [timerSeconds, setTimerSeconds] = useState(600); // 10 minutes default (Warming Up)
-  const [timerRunning, setTimerRunning] = useState(false);
-  const [timerStage, setTimerStage] = useState<"warmingUp" | "preTest" | "practice" | "postTest">("warmingUp");
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (timerRunning && timerSeconds > 0) {
-      interval = setInterval(() => {
-        setTimerSeconds((prev) => (prev > 0 ? prev - 1 : 0));
-      }, 1000);
-    } else if (timerSeconds === 0 && timerRunning) {
-      setTimerRunning(false);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [timerRunning, timerSeconds]);
-
-  const setTimerPreset = (stage: "warmingUp" | "preTest" | "practice" | "postTest", secs: number) => {
-    setTimerStage(stage);
-    setTimerSeconds(secs);
-    setTimerRunning(false);
-  };
-
-  const formatTimer = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-  };
 
   const selectedClass = SI50_CLASSES.find((c) => c.code === selectedClassCode) || SI50_CLASSES[0];
 
@@ -392,7 +361,6 @@ export default function AssistantDashboard() {
                  activeTab === "jadwal" || activeTab === "jadwal_saya" ? "Jadwal Saya" :
                  activeTab === "jadwal_praktikum" ? "Jadwal Praktikum ALPRO 26/27" :
                  activeTab === "penilaian" ? "Penilaian Praktikan" :
-                 activeTab === "timer" ? "Timer Sesi Praktikum" :
                  activeTab === "modul" || activeTab === "informasi" ? "Modul & Silabus" :
                  activeTab === "komdis" ? "Laporan Pelanggaran Komdis" :
                  activeTab === "inventaris" ? "Inventaris & Hardware Lab" : "Profil Akun"}
@@ -417,8 +385,7 @@ export default function AssistantDashboard() {
                activeTab === "informasi" || activeTab === "modul" ? "👥 Informasi Praktikan" :
                activeTab === "komdis" ? "🚩 Laporan Kecurangan" :
                activeTab === "dokumentasi" ? "📷 Dokumentasi" :
-               activeTab === "jadwal" || activeTab === "jadwal_saya" ? "📅 Jadwal" :
-               activeTab === "timer" ? "⏱️ Timer Sesi" : "👤 Profil Akun"}
+               activeTab === "jadwal" || activeTab === "jadwal_saya" ? "📅 Jadwal" : "👤 Profil Akun"}
             </span>
 
             <button
@@ -438,7 +405,6 @@ export default function AssistantDashboard() {
               { id: "absensi", label: "Praktikan", icon: CheckSquare },
               { id: "modul", label: "Silabus", icon: BookOpen },
               { id: "jadwal", label: "Jadwal", icon: Calendar },
-              { id: "timer", label: "Timer", icon: Timer },
               { id: "dokumentasi", label: "Dokumentasi", icon: Camera },
             ].map((tab) => {
               const Icon = tab.icon;
@@ -2015,115 +1981,7 @@ export default function AssistantDashboard() {
           </div>
         )}
 
-        {/* TIMER SESI TAB (Interactive Laboratory Stopwatch / Countdown) */}
-        {activeTab === "timer" && (
-          <div className="bg-white dark:bg-[#0e071a] rounded-[2.2rem] p-6 sm:p-9 border border-purple-200/80 dark:border-purple-950/60 shadow-xs space-y-7 transition-colors">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Timer Sesi Praktikum</h2>
-                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
-                    120 Menit / Shift
-                  </span>
-                </div>
-                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
-                  Kontrol durasi sesi lab: Warming Up, Pre-Test, Practice &amp; Bimbingan, serta Jurnal / Post-Test.
-                </p>
-              </div>
 
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-semibold text-slate-600 dark:text-neutral-300 bg-slate-100 dark:bg-neutral-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-neutral-700">
-                  Shift: {selectedClass.code} ({selectedClass.defaultShift})
-                </span>
-              </div>
-            </div>
-
-            {/* Presets Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {[
-                { stage: "warmingUp", label: "Warming Up", duration: 600, desc: "10 Menit" },
-                { stage: "preTest", label: "Pre-Test", duration: 900, desc: "15 Menit" },
-                { stage: "practice", label: "Practice", duration: 3600, desc: "60 Menit" },
-                { stage: "postTest", label: "Post-Test", duration: 2100, desc: "35 Menit" },
-              ].map((p) => (
-                <button
-                  key={p.stage}
-                  type="button"
-                  onClick={() => setTimerPreset(p.stage as any, p.duration)}
-                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
-                    timerStage === p.stage
-                      ? "bg-purple-50 dark:bg-purple-950/60 border-purple-400 dark:border-purple-600 shadow-sm"
-                      : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 hover:bg-slate-100"
-                  }`}
-                >
-                  <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 uppercase font-bold">
-                    Tahap {p.desc}
-                  </div>
-                  <div className="text-sm font-bold text-slate-900 dark:text-white mt-0.5">
-                    {p.label}
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* Massive Digital Timer Display */}
-            <div className="py-12 rounded-[2rem] bg-gradient-to-b from-purple-900 to-indigo-950 text-white flex flex-col items-center justify-center space-y-6 shadow-xl relative overflow-hidden">
-              <div className="absolute inset-0 bg-[radial-gradient(#C084FC_1px,transparent_1px)] [background-size:20px_20px] opacity-20" />
-              
-              <div className="relative z-10 text-center space-y-1">
-                <span className="text-xs font-mono font-bold uppercase tracking-widest text-purple-300 bg-white/10 px-3 py-1 rounded-full border border-white/15">
-                  {timerStage === "warmingUp" ? "Sesi Warming Up" :
-                   timerStage === "preTest" ? "Sesi Pre-Test" :
-                   timerStage === "practice" ? "Sesi Practice & Bimbingan" : "Sesi Jurnal & Post-Test"}
-                </span>
-                <div className="text-6xl sm:text-7xl lg:text-8xl font-black font-mono tracking-wider text-white drop-shadow-lg">
-                  {formatTimer(timerSeconds)}
-                </div>
-              </div>
-
-              {/* Controls */}
-              <div className="relative z-10 flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => setTimerRunning(!timerRunning)}
-                  className={`px-6 py-3 rounded-2xl font-bold text-sm flex items-center gap-2 shadow-lg transition-all cursor-pointer ${
-                    timerRunning
-                      ? "bg-amber-500 hover:bg-amber-600 text-slate-950"
-                      : "bg-emerald-500 hover:bg-emerald-600 text-white"
-                  }`}
-                >
-                  {timerRunning ? (
-                    <>
-                      <Pause size={18} />
-                      <span>Jeda Timer</span>
-                    </>
-                  ) : (
-                    <>
-                      <Play size={18} />
-                      <span>Mulai Timer</span>
-                    </>
-                  )}
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTimerRunning(false);
-                    const defaultDuration =
-                      timerStage === "warmingUp" ? 600 :
-                      timerStage === "preTest" ? 900 :
-                      timerStage === "practice" ? 3600 : 2100;
-                    setTimerSeconds(defaultDuration);
-                  }}
-                  className="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 text-white font-mono text-xs font-bold flex items-center gap-2 backdrop-blur-md transition-colors cursor-pointer"
-                >
-                  <RotateCcw size={16} />
-                  <span>Reset</span>
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* MODUL & SILABUS TAB */}
         {(activeTab === "modul" || activeTab === "informasi") && (

@@ -10,7 +10,6 @@ import {
   Camera,
   Calendar,
   CalendarDays,
-  Timer,
   Settings,
   LogOut,
   X,
@@ -69,7 +68,6 @@ export function DashboardSidebar({
     { id: "dokumentasi", label: "Dokumentasi", icon: Camera },
     { id: "jadwal_saya", label: "Jadwal Saya", icon: Calendar },
     { id: "jadwal_praktikum", label: "Jadwal Praktikum", icon: CalendarDays },
-    { id: "timer", label: "Timer Sesi", icon: Timer },
   ];
 
   const handleSelectTab = (tabId: string) => {
@@ -98,7 +96,6 @@ export function DashboardSidebar({
     if (id === "dokumentasi" && activeTab === "dokumentasi") return true;
     if (id === "jadwal_saya" && activeTab === "jadwal_saya") return true;
     if (id === "jadwal_praktikum" && (activeTab === "jadwal_praktikum" || activeTab === "jadwal")) return true;
-    if (id === "timer" && activeTab === "timer") return true;
     return activeTab === id;
   };
 

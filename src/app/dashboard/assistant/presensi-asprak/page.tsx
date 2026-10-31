@@ -291,7 +291,7 @@ export default function PresensiAsprakPage() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#F0F2F6] dark:bg-[#070312] text-slate-900 dark:text-neutral-100 transition-colors">
       {/* Floating Rounded Sidebar */}
-      <DashboardSidebar activeTab="absensi" role="ASPRAK" />
+      <DashboardSidebar activeTab="presensi_asprak" role="ASPRAK" />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col h-full overflow-hidden">
