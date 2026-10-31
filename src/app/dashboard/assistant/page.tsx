@@ -2275,13 +2275,19 @@ export default function AssistantDashboard() {
         {activeTab === "akun" && (
           <div className="space-y-6">
             {/* Profile Header Card with Cover Banner & Avatar */}
-            <div className="bg-white dark:bg-[#0e071a] rounded-2xl border border-slate-200/80 dark:border-purple-950/60 shadow-xs overflow-hidden transition-colors">
-              {/* Cover Gradient Banner */}
-              <div className="relative h-28 sm:h-36 bg-gradient-to-r from-[#1E0836] via-[#2E1065] to-[#0F0728] overflow-hidden">
-                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#C084FC_1px,transparent_1px)] [background-size:16px_16px]" />
-                <div className="absolute -bottom-6 -right-6 w-40 h-40 rounded-full bg-purple-600/20 blur-2xl" />
-                <div className="absolute top-3 right-4 flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold text-purple-200 bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15">
+            <div className="bg-white dark:bg-[#0e071a] rounded-[2rem] border border-slate-200/80 dark:border-purple-950/60 shadow-xs overflow-hidden transition-colors">
+              {/* Cover Banner with Official EDM 3 Mascots Panorama */}
+              <div className="relative h-44 sm:h-56 md:h-64 w-full overflow-hidden bg-[#ECE8F8] dark:bg-[#1C0D38]">
+                <Image
+                  src="/images/edm-3maskot-banner.png"
+                  alt="EDM Laboratory 3 Mascots Banner"
+                  fill
+                  priority
+                  className="object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
+                <div className="absolute top-3.5 right-4 flex items-center gap-2 z-10">
+                  <span className="text-[11px] font-mono font-bold text-purple-950 dark:text-purple-200 bg-white/85 dark:bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-purple-200/70 dark:border-purple-800/60 shadow-xs">
                     Lab Terpadu Lt. 3 • EDM Lab
                   </span>
                 </div>
@@ -2289,35 +2295,39 @@ export default function AssistantDashboard() {
 
               {/* Profile Details & Avatar Bar */}
               <div className="px-5 sm:px-8 pb-6 pt-0">
-                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-12 sm:-mt-14 mb-4">
-                  {/* Large Avatar */}
-                  <div className="flex items-end gap-4">
-                    <div className="relative">
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-purple-700 to-indigo-600 p-1 shadow-xl ring-4 ring-white dark:ring-[#0e071a]">
-                        <div className="w-full h-full rounded-xl bg-purple-900/90 flex items-center justify-center text-white text-2xl sm:text-3xl font-black font-mono">
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-5 -mt-12 sm:-mt-14 mb-5 relative z-10">
+                  {/* Large Avatar & Name Information */}
+                  <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-5 min-w-0">
+                    <div className="relative shrink-0">
+                      <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-tr from-purple-700 to-indigo-600 p-1 shadow-xl ring-4 ring-white dark:ring-[#0e071a]">
+                        <div className="w-full h-full rounded-xl bg-purple-950 flex items-center justify-center text-white text-3xl sm:text-4xl font-black font-mono shadow-inner">
                           {sessionUser.slice(0, 2)}
                         </div>
                       </div>
-                      <span className="absolute bottom-1 right-1 w-4 h-4 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0e071a] animate-pulse" title="Sesi Aktif Online" />
+                      <span className="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-500 ring-3 ring-white dark:ring-[#0e071a] animate-pulse" title="Sesi Aktif Online" />
                     </div>
 
-                    <div className="space-y-0.5 pb-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+                    <div className="space-y-1.5 pb-1 min-w-0">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">
                           {currentAssistantProfile.name}
                         </h2>
-                        <span className="font-mono text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 px-2 py-0.5 rounded-md border border-purple-200 dark:border-purple-800">
+                        <span className="font-mono text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-100 dark:bg-purple-950/80 px-2.5 py-0.5 rounded-lg border border-purple-300 dark:border-purple-800">
                           {currentAssistantProfile.code}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono">
-                        NIM: {currentAssistantProfile.nim} • Kelas Asal: {currentAssistantProfile.originClass} • Telkom University
+                      <p className="text-xs text-slate-600 dark:text-neutral-400 font-mono flex items-center gap-1.5 flex-wrap">
+                        <span>NIM: <strong className="text-slate-900 dark:text-neutral-200">{currentAssistantProfile.nim}</strong></span>
+                        <span className="text-slate-300 dark:text-neutral-700">•</span>
+                        <span>Kelas Asal: <strong className="text-slate-900 dark:text-neutral-200">{currentAssistantProfile.originClass}</strong></span>
+                        <span className="text-slate-300 dark:text-neutral-700">•</span>
+                        <span>Telkom University</span>
                       </p>
                       <div className="flex items-center gap-2 pt-0.5 flex-wrap">
-                        <span className="text-[10px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-2.5 py-0.5 rounded-full border border-purple-200/80 dark:border-purple-800/80">
+                        <span className="text-[11px] font-mono font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/60 px-3 py-1 rounded-full border border-purple-200/80 dark:border-purple-800/80">
                           {currentAssistantProfile.position} ({currentAssistantProfile.division})
                         </span>
-                        <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                        <span className="text-[11px] font-mono font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
                           Aktif Mengajar 2026/2027
                         </span>
                       </div>
@@ -2325,11 +2335,11 @@ export default function AssistantDashboard() {
                   </div>
 
                   {/* Profile Action Buttons */}
-                  <div className="flex items-center gap-2 pt-2 sm:pt-0">
+                  <div className="flex items-center gap-2 shrink-0 pt-2 md:pt-0">
                     <button
                       type="button"
                       onClick={() => alert("Profil telah disinkronkan dengan Data Asisten Resmi EDM Laboratory Telkom University.")}
-                      className="px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-xs font-semibold text-slate-700 dark:text-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl border border-slate-300 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-xs font-bold text-slate-700 dark:text-neutral-200 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
                     >
                       <Edit3 size={14} />
                       <span>Data Resmi</span>
@@ -2337,7 +2347,7 @@ export default function AssistantDashboard() {
                     <button
                       type="button"
                       onClick={() => alert(`Format password login akun ${currentAssistantProfile.code}: ${currentAssistantProfile.code.toLowerCase()}${currentAssistantProfile.role === "KOMDIS" ? "komdis123" : "123"}`)}
-                      className="px-3.5 py-1.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                      className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
                     >
                       <Key size={14} />
                       <span>Cek Password</span>
