@@ -125,6 +125,7 @@ export default function AssistantDashboard() {
   const duty = getAssistantDutyStatus(sessionUser);
   const ongoingShift = getCurrentOngoingShift();
   const [selectedShiftForModal, setSelectedShiftForModal] = useState<number | null>(null);
+  const [selectedModalGroup, setSelectedModalGroup] = useState<string | null>(null);
 
   // Absensi sub-tab: 'praktikan' | 'asprak'
   const [absensiSubTab, setAbsensiSubTab] = useState<"praktikan" | "asprak">("praktikan");
@@ -1495,19 +1496,25 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(9)}
+                            onClick={() => {
+                              setSelectedShiftForModal(9);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-rose-200 hover:bg-rose-300 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-700 text-rose-950 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 9</div>
                             <div className="font-bold text-sm text-rose-900 dark:text-rose-200">(SI-50-03)</div>
-                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">7 Grup (HAFK, ALRS, ...)</div>
                           </button>
                         </td>
                         {/* JUMAT: SHIFT 11 */}
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(11)}
+                            onClick={() => {
+                              setSelectedShiftForModal(11);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-sky-200 hover:bg-sky-300 dark:bg-sky-950/80 dark:hover:bg-sky-900/80 border border-sky-300 dark:border-sky-700 text-sky-950 dark:text-sky-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 11</div>
@@ -1519,7 +1526,10 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(13)}
+                            onClick={() => {
+                              setSelectedShiftForModal(13);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-blue-200 hover:bg-blue-300 dark:bg-blue-950/80 dark:hover:bg-blue-900/80 border border-blue-300 dark:border-blue-700 text-blue-950 dark:text-blue-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 13</div>
@@ -1540,12 +1550,15 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(7)}
+                            onClick={() => {
+                              setSelectedShiftForModal(7);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 dark:hover:bg-emerald-900/80 border border-emerald-300 dark:border-emerald-700 text-emerald-950 dark:text-emerald-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 7</div>
                             <div className="font-bold text-sm text-emerald-900 dark:text-emerald-200">(SI-50-13)</div>
-                            <div className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 mt-1">6 Grup (DEVO, GRGS, ...)</div>
                           </button>
                         </td>
                         <td></td>
@@ -1562,7 +1575,10 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(2)}
+                            onClick={() => {
+                              setSelectedShiftForModal(2);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-rose-200 hover:bg-rose-300 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-700 text-rose-950 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 2</div>
@@ -1574,12 +1590,15 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(5)}
+                            onClick={() => {
+                              setSelectedShiftForModal(5);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-teal-100 hover:bg-teal-200 dark:bg-teal-950/80 dark:hover:bg-teal-900/80 border border-teal-300 dark:border-teal-700 text-teal-950 dark:text-teal-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 5</div>
                             <div className="font-bold text-sm text-teal-900 dark:text-teal-200">(SI-50-09)</div>
-                            <div className="text-[10px] font-mono text-teal-700 dark:text-teal-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-teal-700 dark:text-teal-300 mt-1">7 Grup (TICS, SYOW, ...)</div>
                           </button>
                         </td>
                         <td></td>
@@ -1589,7 +1608,10 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(14)}
+                            onClick={() => {
+                              setSelectedShiftForModal(14);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 border border-slate-300 dark:border-neutral-700 text-slate-900 dark:text-white font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 14</div>
@@ -1610,12 +1632,15 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(8)}
+                            onClick={() => {
+                              setSelectedShiftForModal(8);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-orange-200 hover:bg-orange-300 dark:bg-orange-950/80 dark:hover:bg-orange-900/80 border border-orange-300 dark:border-orange-700 text-orange-950 dark:text-orange-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 8</div>
                             <div className="font-bold text-sm text-orange-900 dark:text-orange-200">(SI-50-05)</div>
-                            <div className="text-[10px] font-mono text-orange-700 dark:text-orange-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-orange-700 dark:text-orange-300 mt-1">7 Grup (MJFA, MACY, ...)</div>
                           </button>
                         </td>
                         <td></td>
@@ -1623,7 +1648,10 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(12)}
+                            onClick={() => {
+                              setSelectedShiftForModal(12);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-amber-200 hover:bg-amber-300 dark:bg-amber-950/80 dark:hover:bg-amber-900/80 border border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 12</div>
@@ -1643,7 +1671,10 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(3)}
+                            onClick={() => {
+                              setSelectedShiftForModal(3);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 3</div>
@@ -1655,12 +1686,15 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(6)}
+                            onClick={() => {
+                              setSelectedShiftForModal(6);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 dark:hover:bg-amber-900/80 border border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 6</div>
                             <div className="font-bold text-sm text-amber-900 dark:text-amber-200">(SI-50-10)</div>
-                            <div className="text-[10px] font-mono text-amber-700 dark:text-amber-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-amber-700 dark:text-amber-300 mt-1">7 Grup (IPGA, ADRP, ...)</div>
                           </button>
                         </td>
                         <td></td>
@@ -1737,18 +1771,26 @@ export default function AssistantDashboard() {
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                             {plottingDetail.assistants.map((asst) => {
                               const profile = getAssistantByCode(asst.assistantCode);
+                              const isSelected = selectedModalGroup === asst.group;
                               return (
-                                <div
+                                <button
+                                  type="button"
                                   key={asst.group}
-                                  className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 flex items-center justify-between"
+                                  onClick={() => setSelectedModalGroup(isSelected ? null : asst.group)}
+                                  className={`p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
+                                    isSelected
+                                      ? "bg-purple-100 dark:bg-purple-950/80 border-purple-400 dark:border-purple-600 ring-2 ring-purple-500/30"
+                                      : "bg-slate-50 dark:bg-neutral-900/60 border-slate-200 dark:border-neutral-800 hover:border-purple-300 dark:hover:border-purple-800"
+                                  }`}
                                 >
-                                  <div className="flex items-center gap-2.5">
+                                  <div className="flex items-center gap-2.5 min-w-0">
                                     <div className="w-8 h-8 rounded-lg bg-purple-700 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">
                                       {asst.assistantCode}
                                     </div>
-                                    <div>
-                                      <div className="font-bold text-xs text-slate-900 dark:text-white">
-                                        Grup {asst.group} ({asst.studentCount} praktikan)
+                                    <div className="min-w-0">
+                                      <div className="font-bold text-xs text-slate-900 dark:text-white flex items-center gap-1.5">
+                                        <span>Grup {asst.group}</span>
+                                        <span className="text-[10px] font-normal text-slate-500">({asst.studentCount} praktikan)</span>
                                       </div>
                                       <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 truncate max-w-[140px]">
                                         {profile?.name || asst.assistantCode}
@@ -1756,13 +1798,48 @@ export default function AssistantDashboard() {
                                     </div>
                                   </div>
 
-                                  <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200">
-                                    {profile?.role || "ASPRAK"}
-                                  </span>
-                                </div>
+                                  <div className="flex flex-col items-end gap-1 shrink-0">
+                                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200">
+                                      {profile?.role || "ASPRAK"}
+                                    </span>
+                                    <span className="text-[9px] font-mono text-purple-700 dark:text-purple-300">
+                                      {isSelected ? "Tutup ▲" : "Lihat Praktikan ▼"}
+                                    </span>
+                                  </div>
+                                </button>
                               );
                             })}
                           </div>
+
+                          {/* EXPANDED STUDENT LIST FOR SELECTED GROUP */}
+                          {selectedModalGroup && (
+                            <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/60 space-y-2.5 animate-fade-in">
+                              <div className="flex items-center justify-between text-xs font-bold text-purple-950 dark:text-purple-200 border-b border-purple-200/60 dark:border-purple-900/40 pb-2">
+                                <span>Daftar Praktikan Grup {selectedModalGroup}:</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedModalGroup(null)}
+                                  className="text-[10px] font-mono text-purple-700 dark:text-purple-300 hover:underline cursor-pointer"
+                                >
+                                  Tutup List ✕
+                                </button>
+                              </div>
+                              <div className="max-h-48 overflow-y-auto space-y-1.5 divide-y divide-purple-100 dark:divide-purple-900/30 pr-1">
+                                {plottingDetail.students
+                                  .filter((s) => s.group === selectedModalGroup)
+                                  .map((s, idx) => (
+                                    <div key={s.nim} className="pt-1.5 flex items-center justify-between text-[11px]">
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <span className="font-mono text-slate-400 text-[10px] w-4">{idx + 1}.</span>
+                                        <span className="font-mono font-bold text-slate-900 dark:text-slate-100">{s.nim}</span>
+                                        <span className="text-slate-700 dark:text-slate-300 font-medium truncate max-w-[240px]">{s.name}</span>
+                                      </div>
+                                      <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400 font-semibold shrink-0">{s.className}</span>
+                                    </div>
+                                  ))}
+                              </div>
+                            </div>
+                          )}
 
                           <div className="pt-2 flex justify-end gap-2">
                             <button
