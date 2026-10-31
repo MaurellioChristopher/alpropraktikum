@@ -59,6 +59,7 @@ export function DashboardSidebar({
 
   const navItems = [
     { id: "dashboard", label: "Beranda", icon: Home },
+    { id: "presensi_asprak", label: "Presensi Asprak", icon: Camera },
     { id: "praktikan", label: "Praktikan", icon: CheckSquare },
     { id: "informasi", label: "Informasi Praktikan", icon: Users },
     { id: "komdis", label: "Laporan Kecurangan", icon: Flag },
@@ -69,12 +70,19 @@ export function DashboardSidebar({
   ];
 
   const handleSelectTab = (tabId: string) => {
+    if (tabId === "presensi_asprak") {
+      if (typeof window !== "undefined") {
+        window.location.href = "/dashboard/assistant/presensi-asprak";
+        return;
+      }
+    }
     if (onTabChange) onTabChange(tabId);
     if (onCloseMobile) onCloseMobile();
   };
 
   const isItemActive = (id: string) => {
     if (id === "dashboard" && (activeTab === "dashboard" || activeTab === "beranda")) return true;
+    if (id === "presensi_asprak" && activeTab === "presensi_asprak") return true;
     if (id === "praktikan" && (activeTab === "praktikan" || activeTab === "absensi" || activeTab === "penilaian")) return true;
     if (id === "informasi" && (activeTab === "informasi" || activeTab === "modul")) return true;
     if (id === "komdis" && activeTab === "komdis") return true;

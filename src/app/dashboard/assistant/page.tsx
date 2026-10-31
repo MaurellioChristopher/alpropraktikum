@@ -7,6 +7,14 @@ import { DashboardHeader } from "@/components/aureo/dashboard-header";
 import { SI50_CLASSES, SIClass } from "@/lib/si-classes";
 import { MOODLE_STUDENTS_BY_CLASS, LMS_ALPRO_METADATA } from "@/data/moodle-alpro-students";
 import { ALPRO_ASSISTANTS, ALPRO_DIVISIONS, getAssistantByCode, AssistantProfile } from "@/data/assistants-roster";
+import {
+  ALPRO_15_SHIFTS,
+  ShiftSchedule,
+  getCurrentOngoingShift,
+  getAssistantDutyStatus,
+  getAssistantShifts,
+  ALL_SHIFT_PLOTTINGS,
+} from "@/data/alpro-schedule-plotting";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
 import {
@@ -114,6 +122,9 @@ export default function AssistantDashboard() {
   }, []);
 
   const currentAssistantProfile = getAssistantByCode(sessionUser) || ALPRO_ASSISTANTS[4];
+  const duty = getAssistantDutyStatus(sessionUser);
+  const ongoingShift = getCurrentOngoingShift();
+  const [selectedShiftForModal, setSelectedShiftForModal] = useState<number | null>(null);
 
   // Absensi sub-tab: 'praktikan' | 'asprak'
   const [absensiSubTab, setAbsensiSubTab] = useState<"praktikan" | "asprak">("praktikan");
@@ -374,10 +385,27 @@ export default function AssistantDashboard() {
                   </span>
                 </h1>
                 <div>
-                  <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800 text-xs font-mono font-semibold text-slate-700 dark:text-neutral-200 shadow-2xs">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Jadwal modul selesai
-                  </span>
+                  {duty.isCurrentlyOnDuty ? (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500 text-white text-xs font-mono font-bold shadow-md animate-pulse">
+                      <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                      ON DUTY: Shift {duty.activeShiftDetails?.shift.shiftNumber} ({duty.activeShiftDetails?.shift.className} • Grup {duty.activeShiftDetails?.group})
+                    </span>
+                  ) : ongoingShift.activeShift ? (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 dark:bg-purple-950/80 border border-purple-300 dark:border-purple-800 text-xs font-mono font-bold text-purple-900 dark:text-purple-200 shadow-2xs">
+                      <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping" />
+                      Shift Berjalan di Lab: Shift {ongoingShift.activeShift.shiftNumber} ({ongoingShift.activeShift.className} • {ongoingShift.activeShift.timeDisplay} WIB)
+                    </span>
+                  ) : duty.nextUpcomingShift ? (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800 text-xs font-mono font-semibold text-slate-700 dark:text-neutral-200 shadow-2xs">
+                      <span className="w-2 h-2 rounded-full bg-amber-500" />
+                      Shift Saya: Shift {duty.nextUpcomingShift.shift.shiftNumber} ({duty.nextUpcomingShift.shift.className} • {duty.nextUpcomingShift.shift.day} {duty.nextUpcomingShift.shift.timeDisplay} WIB)
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-purple-950/80 border border-purple-200 dark:border-purple-800 text-xs font-mono font-semibold text-slate-700 dark:text-neutral-200 shadow-2xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      Jadwal modul selesai
+                    </span>
+                  )}
                 </div>
               </div>
 
@@ -396,20 +424,56 @@ export default function AssistantDashboard() {
                 <div className="w-32 sm:w-40 h-4 bg-purple-900/20 dark:bg-purple-950/50 rounded-full blur-md -mt-2" />
               </div>
 
-              {/* Right: Floating Glass Card (MINGGU INI • MODUL 4) */}
-              <div className="relative z-10 w-full lg:w-80 rounded-2xl bg-white/90 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/40 shadow-sm space-y-4">
-                <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 dark:text-neutral-400 font-bold">
-                  MINGGU INI • MODUL 4
+              {/* Right: Floating Glass Card (STATUS SHIFT & TUGAS JAGA) */}
+              <div className="relative z-10 w-full lg:w-80 rounded-2xl bg-white/90 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/40 shadow-sm space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 dark:text-purple-300 font-bold">
+                    {duty.isCurrentlyOnDuty ? "● SHIFT SAYA AKTIF" : "TUGAS JAGA ASISTEN"}
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    MODUL 4
+                  </span>
                 </div>
 
                 <div className="space-y-1">
                   <div className="text-[11px] text-slate-500 dark:text-neutral-400 font-medium">
-                    Praktikum berikutnya
+                    {duty.isCurrentlyOnDuty
+                      ? "Shift sedang berjalan di lab:"
+                      : duty.nextUpcomingShift
+                      ? "Shift saya berikutnya:"
+                      : "Praktikum berikutnya:"}
                   </div>
-                  <div className="text-sm font-bold text-slate-900 dark:text-white">
-                    Jadwal modul selesai
+                  <div className="text-sm font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                    <span>
+                      {duty.isCurrentlyOnDuty
+                        ? `Shift ${duty.activeShiftDetails?.shift.shiftNumber} (${duty.activeShiftDetails?.shift.className})`
+                        : duty.nextUpcomingShift
+                        ? `Shift ${duty.nextUpcomingShift.shift.shiftNumber} (${duty.nextUpcomingShift.shift.className})`
+                        : "Jadwal modul selesai"}
+                    </span>
+                    {(duty.isCurrentlyOnDuty || duty.nextUpcomingShift) && (
+                      <span className="text-[10px] font-mono bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 px-2 py-0.5 rounded font-bold">
+                        Grup {duty.isCurrentlyOnDuty ? duty.activeShiftDetails?.group : duty.nextUpcomingShift?.group}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                    {duty.isCurrentlyOnDuty
+                      ? `${duty.activeShiftDetails?.shift.timeDisplay} WIB • ${duty.activeShiftDetails?.studentCount} praktikan`
+                      : duty.nextUpcomingShift
+                      ? `${duty.nextUpcomingShift.shift.day}, ${duty.nextUpcomingShift.shift.timeDisplay} WIB • ${duty.nextUpcomingShift.studentCount} praktikan`
+                      : "Semua kelas telah selesai"}
                   </div>
                 </div>
+
+                {/* Direct Presensi Camera Asprak Button */}
+                <Link
+                  href="/dashboard/assistant/presensi-asprak"
+                  className="w-full py-2 px-3 rounded-xl bg-purple-700 hover:bg-purple-800 text-white font-mono text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition-colors"
+                >
+                  <Camera size={13} />
+                  <span>Presensi Kamera Asprak ↗</span>
+                </Link>
 
                 <div className="space-y-1.5 pt-1 border-t border-slate-100 dark:border-neutral-800">
                   <div className="flex items-center justify-between text-xs font-mono">
@@ -564,39 +628,47 @@ export default function AssistantDashboard() {
                 </div>
 
                 <div className="space-y-2.5">
-                  {[
-                    { code: "SI5002", name: "SI-48-02", group: "Grup A", count: 38, shift: "Senin, 07:30 - 09:30 WIB" },
-                    { code: "SI5004", name: "SI-48-04", group: "Grup B", count: 38, shift: "Selasa, 13:30 - 15:30 WIB" },
-                    { code: "SI5010", name: "SI-48-10", group: "Grup C", count: 38, shift: "Kamis, 09:30 - 11:30 WIB" },
-                  ].map((p) => (
+                  {duty.allMyShifts.map((myShift) => (
                     <div
-                      key={p.code}
+                      key={`my-shift-${myShift.shift.shiftNumber}`}
                       className="p-4 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200/70 dark:border-neutral-800 flex items-center justify-between gap-4 hover:border-purple-300 dark:hover:border-purple-700 transition-all"
                     >
-                      <div className="flex items-center gap-3.5">
+                      <div className="flex items-center gap-3.5 min-w-0">
                         <div className="w-10 h-10 rounded-xl bg-purple-100 dark:bg-purple-950/70 border border-purple-200 dark:border-purple-900 text-purple-700 dark:text-purple-300 flex items-center justify-center font-mono font-bold text-xs shrink-0">
-                          &lt;/&gt;
+                          S{myShift.shift.shiftNumber}
                         </div>
-                        <div>
-                          <div className="font-bold text-sm text-slate-900 dark:text-white">
-                            {p.name}
+                        <div className="min-w-0">
+                          <div className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
+                            <span>{myShift.shift.className}</span>
+                            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200">
+                              Grup {myShift.group}
+                            </span>
                           </div>
                           <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                            {p.group} • {p.count} praktikan • {p.shift}
+                            {myShift.studentCount} praktikan • {myShift.shift.day}, {myShift.shift.timeDisplay} WIB
                           </div>
                         </div>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSelectedClassCode(p.code);
-                          setActiveTab("absensi");
-                        }}
-                        className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold font-mono transition-colors cursor-pointer shadow-xs"
-                      >
-                        Buka
-                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Link
+                          href="/dashboard/assistant/presensi-asprak"
+                          className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold font-mono transition-colors shadow-xs"
+                          title="Presensi kamera untuk shift ini"
+                        >
+                          Presensi
+                        </Link>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedClassCode(myShift.shift.classCode);
+                            setActiveTab("absensi");
+                          }}
+                          className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-bold font-mono transition-colors cursor-pointer shadow-xs"
+                        >
+                          Buka
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -1210,7 +1282,7 @@ export default function AssistantDashboard() {
         )}
 
         {/* 5. PERTUKARAN JADWAL TAB (SHIFT SWAP) */}
-        {(activeTab === "jadwal" || activeTab === "jadwal_saya" || activeTab === "jadwal_praktikum") && (
+        {(activeTab === "jadwal" || activeTab === "jadwal_saya") && (
           <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
@@ -1322,6 +1394,405 @@ export default function AssistantDashboard() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* 6. JADWAL PRAKTIKUM TAB (Full Matrix Timetable 26/27 matching Image 1) */}
+        {activeTab === "jadwal_praktikum" && (
+          <div className="space-y-6">
+            <div className="bg-white dark:bg-[#0e071a] rounded-[2rem] p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+                      Jadwal Praktikum ALPRO 26/27
+                    </h2>
+                    <span className="text-[10px] font-mono font-bold bg-blue-100 dark:bg-blue-900/40 text-blue-900 dark:text-blue-300 px-2.5 py-0.5 rounded-full">
+                      15 Shift • Senin s.d. Sabtu
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                    Matriks plotting jadwal praktikum dan penugasan shift asisten semester ganjil 2026/2027.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/dashboard/assistant/presensi-asprak"
+                    className="px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-mono font-bold flex items-center gap-1.5 shadow-xs transition-all"
+                  >
+                    <Camera size={13} />
+                    <span>Presensi Asprak ↗</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* TIMETABLE MATRIX TABLE */}
+              <div className="border border-slate-300 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+                {/* Main Blue Header Banner matching Image 1 */}
+                <div className="bg-[#1E3A8A] text-white py-3.5 px-6 text-center font-black tracking-widest text-sm uppercase">
+                  JADWAL PRAKTIKUM ALPRO 26/27
+                </div>
+
+                <div className="overflow-x-auto scrollbar-thin">
+                  <table className="w-full border-collapse text-xs text-center min-w-[900px]">
+                    <thead>
+                      <tr className="bg-[#2563EB] text-white font-mono text-xs uppercase font-bold divide-x divide-blue-400/40">
+                        <th className="py-2.5 px-3 w-28">JAM</th>
+                        <th className="py-2.5 px-3">SENIN</th>
+                        <th className="py-2.5 px-3">SELASA</th>
+                        <th className="py-2.5 px-3">RABU</th>
+                        <th className="py-2.5 px-3">KAMIS</th>
+                        <th className="py-2.5 px-3">JUMAT</th>
+                        <th className="py-2.5 px-3">SABTU</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200 dark:divide-neutral-800 font-sans">
+                      {/* Slot 1: 06.30 - 07.30 */}
+                      <tr className="divide-x divide-slate-200 dark:divide-neutral-800 h-10 text-[11px] font-mono text-slate-500 dark:text-neutral-400 bg-slate-50/50 dark:bg-neutral-900/30">
+                        <td className="font-bold bg-slate-100 dark:bg-neutral-900">06.30-07.30</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+
+                      {/* Slot 2: 07.30 - 09.30 (Shift 1, 4, 9, 11, 13) */}
+                      <tr className="divide-x divide-slate-200 dark:divide-neutral-800 h-24">
+                        <td className="font-mono text-[11px] font-bold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900">
+                          07.30-09.30
+                        </td>
+                        {/* SENIN: SHIFT 1 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(1)}
+                            className="w-full h-full p-2.5 rounded-xl bg-blue-100 hover:bg-blue-200 dark:bg-blue-950/80 dark:hover:bg-blue-900/80 border border-blue-300 dark:border-blue-700 text-blue-950 dark:text-blue-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 1</div>
+                            <div className="font-bold text-sm text-blue-900 dark:text-blue-200">(SI-50-12)</div>
+                            <div className="text-[10px] font-mono text-blue-700 dark:text-blue-300 mt-1">7 Grup (ADDH, IPGA, ...)</div>
+                          </button>
+                        </td>
+                        {/* SELASA: SHIFT 4 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(4)}
+                            className="w-full h-full p-2.5 rounded-xl bg-teal-100 hover:bg-teal-200 dark:bg-teal-950/80 dark:hover:bg-teal-900/80 border border-teal-300 dark:border-teal-700 text-teal-950 dark:text-teal-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 4</div>
+                            <div className="font-bold text-sm text-teal-900 dark:text-teal-200">(SI-50-04)</div>
+                            <div className="text-[10px] font-mono text-teal-700 dark:text-teal-300 mt-1">7 Grup (MUDI, MACY, ...)</div>
+                          </button>
+                        </td>
+                        {/* RABU: EMPTY */}
+                        <td></td>
+                        {/* KAMIS: SHIFT 9 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(9)}
+                            className="w-full h-full p-2.5 rounded-xl bg-rose-200 hover:bg-rose-300 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-700 text-rose-950 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 9</div>
+                            <div className="font-bold text-sm text-rose-900 dark:text-rose-200">(SI-50-03)</div>
+                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        {/* JUMAT: SHIFT 11 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(11)}
+                            className="w-full h-full p-2.5 rounded-xl bg-sky-200 hover:bg-sky-300 dark:bg-sky-950/80 dark:hover:bg-sky-900/80 border border-sky-300 dark:border-sky-700 text-sky-950 dark:text-sky-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 11</div>
+                            <div className="font-bold text-sm text-sky-900 dark:text-sky-200">(SI-50-01)</div>
+                            <div className="text-[10px] font-mono text-sky-700 dark:text-sky-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        {/* SABTU: SHIFT 13 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(13)}
+                            className="w-full h-full p-2.5 rounded-xl bg-blue-200 hover:bg-blue-300 dark:bg-blue-950/80 dark:hover:bg-blue-900/80 border border-blue-300 dark:border-blue-700 text-blue-950 dark:text-blue-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 13</div>
+                            <div className="font-bold text-sm text-blue-900 dark:text-blue-200">(SI-50-INT)</div>
+                            <div className="text-[10px] font-mono text-blue-700 dark:text-blue-300 mt-1">Internasional</div>
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Slot 3: 09.30 - 11.30 (Shift 7 Rabu) */}
+                      <tr className="divide-x divide-slate-200 dark:divide-neutral-800 h-24">
+                        <td className="font-mono text-[11px] font-bold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900">
+                          09.30-11.30
+                        </td>
+                        <td></td>
+                        <td></td>
+                        {/* RABU: SHIFT 7 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(7)}
+                            className="w-full h-full p-2.5 rounded-xl bg-emerald-100 hover:bg-emerald-200 dark:bg-emerald-950/80 dark:hover:bg-emerald-900/80 border border-emerald-300 dark:border-emerald-700 text-emerald-950 dark:text-emerald-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 7</div>
+                            <div className="font-bold text-sm text-emerald-900 dark:text-emerald-200">(SI-50-13)</div>
+                            <div className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+
+                      {/* Slot 4: 10.30 - 12.30 (Shift 2, 5, 14) */}
+                      <tr className="divide-x divide-slate-200 dark:divide-neutral-800 h-24">
+                        <td className="font-mono text-[11px] font-bold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900">
+                          10.30-12.30
+                        </td>
+                        {/* SENIN: SHIFT 2 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(2)}
+                            className="w-full h-full p-2.5 rounded-xl bg-rose-200 hover:bg-rose-300 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-700 text-rose-950 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 2</div>
+                            <div className="font-bold text-sm text-rose-900 dark:text-rose-200">(SI-50-02)</div>
+                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">7 Grup (GRGS, DEVO, ...)</div>
+                          </button>
+                        </td>
+                        {/* SELASA: SHIFT 5 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(5)}
+                            className="w-full h-full p-2.5 rounded-xl bg-teal-100 hover:bg-teal-200 dark:bg-teal-950/80 dark:hover:bg-teal-900/80 border border-teal-300 dark:border-teal-700 text-teal-950 dark:text-teal-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 5</div>
+                            <div className="font-bold text-sm text-teal-900 dark:text-teal-200">(SI-50-09)</div>
+                            <div className="text-[10px] font-mono text-teal-700 dark:text-teal-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        {/* SABTU: SHIFT 14 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(14)}
+                            className="w-full h-full p-2.5 rounded-xl bg-slate-200 hover:bg-slate-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 border border-slate-300 dark:border-neutral-700 text-slate-900 dark:text-white font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 14</div>
+                            <div className="font-bold text-sm text-slate-800 dark:text-neutral-200">(SI-50-07)</div>
+                            <div className="text-[10px] font-mono text-slate-600 dark:text-neutral-400 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                      </tr>
+
+                      {/* Slot 5: 13.30 - 15.30 (Shift 8 Rabu, Shift 12 Jumat) */}
+                      <tr className="divide-x divide-slate-200 dark:divide-neutral-800 h-24">
+                        <td className="font-mono text-[11px] font-bold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900">
+                          13.30-15.30
+                        </td>
+                        <td></td>
+                        <td></td>
+                        {/* RABU: SHIFT 8 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(8)}
+                            className="w-full h-full p-2.5 rounded-xl bg-orange-200 hover:bg-orange-300 dark:bg-orange-950/80 dark:hover:bg-orange-900/80 border border-orange-300 dark:border-orange-700 text-orange-950 dark:text-orange-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 8</div>
+                            <div className="font-bold text-sm text-orange-900 dark:text-orange-200">(SI-50-05)</div>
+                            <div className="text-[10px] font-mono text-orange-700 dark:text-orange-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        <td></td>
+                        {/* JUMAT: SHIFT 12 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(12)}
+                            className="w-full h-full p-2.5 rounded-xl bg-amber-200 hover:bg-amber-300 dark:bg-amber-950/80 dark:hover:bg-amber-900/80 border border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 12</div>
+                            <div className="font-bold text-sm text-amber-900 dark:text-amber-200">(SI-50-08)</div>
+                            <div className="text-[10px] font-mono text-amber-700 dark:text-amber-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        <td></td>
+                      </tr>
+
+                      {/* Slot 6: 14.30 - 16.30 (Shift 3, 6, 10, 15) */}
+                      <tr className="divide-x divide-slate-200 dark:divide-neutral-800 h-24">
+                        <td className="font-mono text-[11px] font-bold text-slate-600 dark:text-neutral-400 bg-slate-100 dark:bg-neutral-900">
+                          14.30-16.30
+                        </td>
+                        {/* SENIN: SHIFT 3 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(3)}
+                            className="w-full h-full p-2.5 rounded-xl bg-rose-100 hover:bg-rose-200 dark:bg-rose-950/80 dark:hover:bg-rose-900/80 border border-rose-300 dark:border-rose-700 text-rose-900 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 3</div>
+                            <div className="font-bold text-sm text-rose-900 dark:text-rose-200">(SI-50-11)</div>
+                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">7 Grup (TICS, LAUF, ...)</div>
+                          </button>
+                        </td>
+                        {/* SELASA: SHIFT 6 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(6)}
+                            className="w-full h-full p-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/80 dark:hover:bg-amber-900/80 border border-amber-300 dark:border-amber-700 text-amber-950 dark:text-amber-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 6</div>
+                            <div className="font-bold text-sm text-amber-900 dark:text-amber-200">(SI-50-10)</div>
+                            <div className="text-[10px] font-mono text-amber-700 dark:text-amber-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        <td></td>
+                        {/* KAMIS: SHIFT 10 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(10)}
+                            className="w-full h-full p-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/80 dark:hover:bg-purple-900/80 border border-purple-300 dark:border-purple-700 text-purple-950 dark:text-purple-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 10</div>
+                            <div className="font-bold text-sm text-purple-900 dark:text-purple-200">(SI-50-06)</div>
+                            <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                        <td></td>
+                        {/* SABTU: SHIFT 15 */}
+                        <td className="p-1.5 align-top">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedShiftForModal(15)}
+                            className="w-full h-full p-2.5 rounded-xl bg-rose-300/80 hover:bg-rose-300 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-400 dark:border-rose-600 text-rose-950 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
+                          >
+                            <div className="font-black text-xs">SHIFT 15</div>
+                            <div className="font-bold text-sm text-rose-900 dark:text-rose-200">(SI-50-14)</div>
+                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">Plotting Menyusul</div>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* MODAL POPUP: DETAIL PLOTTING SHIFT */}
+              {selectedShiftForModal && (() => {
+                const shiftDetail = ALPRO_15_SHIFTS.find((s) => s.shiftNumber === selectedShiftForModal);
+                const plottingDetail = ALL_SHIFT_PLOTTINGS[selectedShiftForModal];
+
+                return (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+                    <div className="bg-white dark:bg-[#0e071a] rounded-[2rem] border border-slate-200 dark:border-purple-950 max-w-2xl w-full p-6 sm:p-7 space-y-5 shadow-2xl animate-fade-in max-h-[85vh] overflow-y-auto">
+                      <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+                        <div>
+                          <div className="text-[11px] font-mono font-bold text-purple-700 dark:text-purple-300 uppercase">
+                            DETAIL PLOTTING RESMI
+                          </div>
+                          <h3 className="text-xl font-black text-slate-900 dark:text-white">
+                            SHIFT {shiftDetail?.shiftNumber}: {shiftDetail?.className}
+                          </h3>
+                          <div className="text-xs font-mono text-slate-500 dark:text-neutral-400 mt-0.5">
+                            {shiftDetail?.day}, {shiftDetail?.timeDisplay} WIB • {shiftDetail?.room}
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setSelectedShiftForModal(null)}
+                          className="w-8 h-8 rounded-full bg-slate-100 dark:bg-neutral-800 hover:bg-slate-200 text-slate-700 dark:text-white flex items-center justify-center font-bold text-sm cursor-pointer"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {plottingDetail && plottingDetail.isFinalized ? (
+                        <div className="space-y-4">
+                          <div className="text-xs font-bold text-slate-900 dark:text-white flex items-center justify-between">
+                            <span>Daftar Asisten &amp; Grup Mahasiswa:</span>
+                            <span className="text-[11px] font-mono text-emerald-600 font-semibold">
+                              ✓ Terverifikasi SK Plotting
+                            </span>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {plottingDetail.assistants.map((asst) => {
+                              const profile = getAssistantByCode(asst.assistantCode);
+                              return (
+                                <div
+                                  key={asst.group}
+                                  className="p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 flex items-center justify-between"
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <div className="w-8 h-8 rounded-lg bg-purple-700 text-white font-mono font-bold text-xs flex items-center justify-center shrink-0">
+                                      {asst.assistantCode}
+                                    </div>
+                                    <div>
+                                      <div className="font-bold text-xs text-slate-900 dark:text-white">
+                                        Grup {asst.group} ({asst.studentCount} praktikan)
+                                      </div>
+                                      <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 truncate max-w-[140px]">
+                                        {profile?.name || asst.assistantCode}
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200">
+                                    {profile?.role || "ASPRAK"}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          <div className="pt-2 flex justify-end gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (shiftDetail) setSelectedClassCode(shiftDetail.classCode);
+                                setActiveTab("absensi");
+                                setSelectedShiftForModal(null);
+                              }}
+                              className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-mono font-bold rounded-xl transition-colors cursor-pointer"
+                            >
+                              Buka Absensi Kelas Ini →
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="p-8 text-center space-y-2 bg-slate-50 dark:bg-neutral-900/50 rounded-2xl border border-dashed border-slate-300 dark:border-neutral-700">
+                          <Info size={28} className="text-amber-500 mx-auto" />
+                          <div className="text-sm font-bold text-slate-900 dark:text-white">
+                            Data Plotting Grup Menyusul
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-neutral-400 max-w-md mx-auto">
+                            Data asisten penanggung jawab per grup praktikan untuk Shift {selectedShiftForModal} ({shiftDetail?.className}) sedang diproses oleh Koordinator Praktikum &amp; BPH.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
