@@ -100,14 +100,14 @@ export function DashboardSidebar({
   };
 
   const sidebarBody = (
-    <div className="flex flex-col justify-between h-full p-4 sm:p-5 text-white">
+    <div className="flex flex-col justify-between h-full p-4 sm:p-5 text-slate-900 dark:text-white">
       {/* Top Header Logo */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between pb-3 border-b border-white/15">
+        <div className="flex items-center justify-between pb-3 border-b border-purple-200/70 dark:border-white/10">
           <div className="flex items-center gap-2.5">
-            <div className="relative w-9 h-9 rounded-2xl bg-white/15 backdrop-blur-md flex items-center justify-center p-1.5 shadow-inner shrink-0 overflow-hidden">
+            <div className="relative w-9 h-9 rounded-2xl bg-white dark:bg-purple-950/80 flex items-center justify-center p-1.5 shadow-xs border border-purple-200/80 dark:border-purple-800/60 shrink-0 overflow-hidden">
               <Image
-                src="/images/edm-emblem-white.png"
+                src="/images/edm-emblem-crimson.png"
                 alt="EDM Laboratory Logo"
                 fill
                 sizes="36px"
@@ -117,10 +117,10 @@ export function DashboardSidebar({
             </div>
             {!collapsed && (
               <div>
-                <div className="font-bold text-sm tracking-tight leading-none text-white">
+                <div className="font-bold text-sm tracking-tight leading-none text-slate-900 dark:text-white">
                   ALPRO EDM
                 </div>
-                <div className="text-[10px] font-mono text-purple-200 mt-0.5">
+                <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 font-bold mt-0.5">
                   Easy Tools
                 </div>
               </div>
@@ -130,7 +130,7 @@ export function DashboardSidebar({
           <button
             type="button"
             onClick={() => setCollapsed(!collapsed)}
-            className="hidden lg:flex w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 items-center justify-center text-white transition-colors cursor-pointer"
+            className="hidden lg:flex w-7 h-7 rounded-full bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 items-center justify-center text-slate-700 dark:text-neutral-200 shadow-2xs border border-purple-200/60 dark:border-transparent transition-colors cursor-pointer"
             title={collapsed ? "Perluas Sidebar" : "Perkecil Sidebar"}
           >
             {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
@@ -150,11 +150,11 @@ export function DashboardSidebar({
                 onClick={() => handleSelectTab(item.id)}
                 className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-2xl text-xs font-semibold transition-all cursor-pointer ${
                   active
-                    ? "bg-white text-[#3E2D6F] shadow-md font-bold scale-[1.02]"
-                    : "text-white/85 hover:text-white hover:bg-white/10"
+                    ? "bg-white dark:bg-[#28184C] text-purple-900 dark:text-white shadow-[0_4px_16px_rgba(76,59,130,0.10)] font-bold scale-[1.02] border border-purple-100 dark:border-purple-800/50"
+                    : "text-slate-700 dark:text-neutral-300 hover:text-purple-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 font-medium"
                 }`}
               >
-                <Icon size={18} className={active ? "text-[#4C3B82]" : "text-white/90"} />
+                <Icon size={18} className={active ? "text-purple-700 dark:text-purple-300" : "text-slate-500 dark:text-neutral-400"} />
                 {!collapsed && <span>{item.label}</span>}
               </button>
             );
@@ -163,33 +163,33 @@ export function DashboardSidebar({
       </div>
 
       {/* Bottom Area: Settings & Profile Pill & Logout */}
-      <div className="pt-4 border-t border-white/15 space-y-3">
+      <div className="pt-4 border-t border-purple-200/70 dark:border-white/10 space-y-3">
         {/* Settings button */}
         <button
           type="button"
           onClick={() => handleSelectTab("akun")}
           className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-medium transition-colors cursor-pointer ${
             activeTab === "akun"
-              ? "bg-white text-[#3E2D6F] font-bold shadow-xs"
-              : "text-white/80 hover:text-white hover:bg-white/10"
+              ? "bg-white dark:bg-[#28184C] text-purple-900 dark:text-white font-bold shadow-xs border border-purple-100 dark:border-purple-800/50"
+              : "text-slate-700 dark:text-neutral-300 hover:text-purple-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10"
           }`}
         >
-          <Settings size={17} className={activeTab === "akun" ? "text-[#4C3B82]" : "text-white/90"} />
+          <Settings size={17} className={activeTab === "akun" ? "text-purple-700 dark:text-purple-300" : "text-slate-500 dark:text-neutral-400"} />
           {!collapsed && <span>Pengaturan</span>}
         </button>
 
-        {/* User Profile Pill matching reference */}
-        <div className="p-2 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 flex items-center justify-between gap-2">
+        {/* User Profile Pill */}
+        <div className="p-2 rounded-2xl bg-white/80 dark:bg-black/30 backdrop-blur-md border border-purple-200/80 dark:border-purple-900/40 flex items-center justify-between gap-2 shadow-2xs">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-900 font-mono font-bold text-xs flex items-center justify-center shrink-0 shadow-xs">
               {currentProfile.code.slice(0, 2)}
             </div>
             {!collapsed && (
               <div className="min-w-0 text-left">
-                <div className="text-xs font-bold text-white truncate">
+                <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
                   {currentProfile.name.split(" ")[0]}
                 </div>
-                <div className="text-[10px] font-mono text-purple-200 truncate">
+                <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 font-bold truncate">
                   {currentProfile.code} • {currentProfile.position}
                 </div>
               </div>
@@ -201,7 +201,7 @@ export function DashboardSidebar({
         <form action={logoutAction} className="w-full">
           <button
             type="submit"
-            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-mono text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+            className="w-full flex items-center gap-2.5 px-3.5 py-2 text-xs font-mono text-slate-600 dark:text-neutral-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50/70 dark:hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer"
           >
             <LogOut size={15} />
             {!collapsed && <span>Keluar</span>}
@@ -213,11 +213,11 @@ export function DashboardSidebar({
 
   return (
     <>
-      {/* DESKTOP FLOATING SIDEBAR (lg+) */}
+      {/* DESKTOP FLOATING SIDEBAR (lg+) with exact pastel lilac gradient matching swatch */}
       <aside
         className={`hidden lg:flex shrink-0 ${
           collapsed ? "w-20" : "w-64"
-        } bg-gradient-to-b from-[#4C3B82] via-[#3E2D6F] to-[#2B1B52] dark:from-[#261543] dark:via-[#1B0D33] dark:to-[#100620] rounded-[2.2rem] shadow-[0_20px_50px_rgba(40,16,80,0.15)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] sticky top-6 h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-300/20 dark:border-purple-800/30`}
+        } bg-gradient-to-b from-[#E0E6FE] via-[#E4E7FF] to-[#EBE9FE] dark:from-[#1A122E] dark:via-[#140C26] dark:to-[#0D061A] rounded-[2.2rem] shadow-[0_15px_40px_rgba(76,59,130,0.08)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.7)] sticky top-6 h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-200/80 dark:border-purple-900/50`}
       >
         {sidebarBody}
       </aside>
@@ -229,12 +229,12 @@ export function DashboardSidebar({
             className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-72 max-w-[85vw] h-full bg-gradient-to-b from-[#4C3B82] via-[#3E2D6F] to-[#2B1B52] text-white shadow-2xl z-10 flex flex-col">
+          <div className="relative w-72 max-w-[85vw] h-full bg-gradient-to-b from-[#E0E6FE] via-[#E4E7FF] to-[#EBE9FE] dark:from-[#1A122E] dark:via-[#140C26] dark:to-[#0D061A] text-slate-900 dark:text-white shadow-2xl z-10 flex flex-col border-r border-purple-200/80 dark:border-purple-900/50">
             <div className="absolute top-4 right-4 z-20">
               <button
                 type="button"
                 onClick={onCloseMobile}
-                className="p-1 rounded-full bg-white/20 text-white"
+                className="p-1 rounded-full bg-white/70 hover:bg-white text-slate-700 shadow-2xs"
               >
                 <X size={18} />
               </button>
