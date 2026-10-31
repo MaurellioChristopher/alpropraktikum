@@ -578,10 +578,10 @@ export default function AssistantDashboard() {
                 {/* Card 1: Praktikan */}
                 <div
                   onClick={() => switchTab("absensi")}
-                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#EFF5FF] via-[#E8F1FE] to-[#DFECFE] dark:from-[#0F1836] dark:via-[#0B122B] dark:to-[#070C1E] border border-blue-200/80 dark:border-blue-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px] relative overflow-hidden"
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#EFF5FF] via-[#E8F1FE] to-[#DFECFE] dark:from-[#0F1836] dark:via-[#0B122B] dark:to-[#070C1E] border border-blue-200/80 dark:border-blue-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[280px] sm:min-h-[300px] relative overflow-hidden"
                 >
                   {/* Top Illustration Area (Vector Art: Clipboard, checkmarks, pencil, A badge) */}
-                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                  <div className="relative flex-1 min-h-[185px] sm:min-h-[205px] w-full flex items-center justify-center -mb-8 sm:-mb-10 pt-2 z-0 group-hover:scale-105 transition-transform duration-300">
                     <PraktikanCardIllustration />
                   </div>
 
@@ -606,10 +606,10 @@ export default function AssistantDashboard() {
                 {/* Card 2: Dokumentasi */}
                 <div
                   onClick={() => switchTab("dokumentasi")}
-                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#EEFAF3] via-[#E5F7EC] to-[#DCF3E5] dark:from-[#082216] dark:via-[#051A10] dark:to-[#03120B] border border-emerald-200/80 dark:border-emerald-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px] relative overflow-hidden"
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#EEFAF3] via-[#E5F7EC] to-[#DCF3E5] dark:from-[#082216] dark:via-[#051A10] dark:to-[#03120B] border border-emerald-200/80 dark:border-emerald-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[280px] sm:min-h-[300px] relative overflow-hidden"
                 >
                   {/* Top Illustration Area (Vector Art: Photo frames & sleek camera with blue lens) */}
-                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                  <div className="relative flex-1 min-h-[185px] sm:min-h-[205px] w-full flex items-center justify-center -mb-8 sm:-mb-10 pt-2 z-0 group-hover:scale-105 transition-transform duration-300">
                     <DokumentasiCardIllustration />
                   </div>
 
@@ -634,10 +634,10 @@ export default function AssistantDashboard() {
                 {/* Card 3: Jadwal Saya */}
                 <div
                   onClick={() => switchTab("jadwal")}
-                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#FFF3E8] via-[#FFEBD7] to-[#FFE2C5] dark:from-[#291708] dark:via-[#1F1105] dark:to-[#140A02] border border-amber-200/80 dark:border-amber-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[240px] relative overflow-hidden"
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#FFF3E8] via-[#FFEBD7] to-[#FFE2C5] dark:from-[#291708] dark:via-[#1F1105] dark:to-[#140A02] border border-amber-200/80 dark:border-amber-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[280px] sm:min-h-[300px] relative overflow-hidden"
                 >
                   {/* Top Illustration Area (Vector Art: Desk calendar with orange bar & analog clock) */}
-                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                  <div className="relative flex-1 min-h-[185px] sm:min-h-[205px] w-full flex items-center justify-center -mb-8 sm:-mb-10 pt-2 z-0 group-hover:scale-105 transition-transform duration-300">
                     <JadwalCardIllustration />
                   </div>
 
@@ -661,10 +661,10 @@ export default function AssistantDashboard() {
 
                 {/* Card 4: PPT Modul 1 */}
                 <div
-                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#F3EEFF] via-[#EAE2FD] to-[#DFD4FC] dark:from-[#1D1036] dark:via-[#150A29] dark:to-[#0D051C] border border-purple-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[240px] relative overflow-hidden group"
+                  className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#F3EEFF] via-[#EAE2FD] to-[#DFD4FC] dark:from-[#1D1036] dark:via-[#150A29] dark:to-[#0D051C] border border-purple-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between min-h-[280px] sm:min-h-[300px] relative overflow-hidden group"
                 >
                   {/* Top Illustration Area (Vector Art: Yellow folder with fanning slides) */}
-                  <div className="relative h-32 w-full flex items-center justify-center pt-1 group-hover:scale-105 transition-transform duration-300">
+                  <div className="relative flex-1 min-h-[185px] sm:min-h-[205px] w-full flex items-center justify-center -mb-8 sm:-mb-10 pt-2 z-0 group-hover:scale-105 transition-transform duration-300">
                     <SlideModulCardIllustration />
                   </div>
 
