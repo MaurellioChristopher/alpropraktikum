@@ -3068,148 +3068,168 @@ export default function AssistantDashboard() {
               </div>
             </div>
 
-            {/* FULL 32-ASSISTANT DIRECTORY TABLE & DIVISION FILTER */}
-            <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                      Direktori Tim Asisten & Divisi Laboratorium EDM
-                    </h3>
-                    <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 px-2.5 py-0.5 rounded-full">
-                      32 Asisten Resmi
-                    </span>
+            {/* FULL 32-ASSISTANT DIRECTORY TABLE (Admin Only Access) */}
+            {currentRole === "SUPER_ADMIN" || currentRole === "ADMIN" || currentRole === "KOMDIS" || currentRole === "SEKBEN" ? (
+              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                        Direktori Tim Asisten & Divisi Laboratorium EDM
+                      </h3>
+                      <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300 px-2.5 py-0.5 rounded-full">
+                        32 Asisten Resmi
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                      Daftar lengkap seluruh asisten praktikum Algoritma & Pemrograman beserta divisi, kontak WhatsApp, dan ID Line.
+                    </p>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
-                    Daftar lengkap seluruh asisten praktikum Algoritma & Pemrograman beserta divisi, kontak WhatsApp, dan ID Line.
+
+                  {/* Search input */}
+                  <div className="relative min-w-[240px]">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari Asisten (Nama/Kode/NIM)..."
+                      value={rosterSearch}
+                      onChange={(e) => setRosterSearch(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-mono focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Division Filter Badges */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                  {[
+                    { id: "ALL", label: "Semua (32)" },
+                    { id: "Koordinator", label: "Koordinator (1)" },
+                    { id: "Sekretaris & Bendahara", label: "BPH/Sekben (3)" },
+                    { id: "Compliance & Integrity", label: "CnI / Komdis (7)" },
+                    { id: "Creative & Multimedia", label: "CnM (7)" },
+                    { id: "Tech & Systems", label: "TnC (8)" },
+                    { id: "Module Development", label: "MD (6)" },
+                  ].map((f) => (
+                    <button
+                      key={f.id}
+                      type="button"
+                      onClick={() => setRosterDivisionFilter(f.id)}
+                      className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
+                        rosterDivisionFilter === f.id
+                          ? "bg-purple-700 text-white shadow-xs"
+                          : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
+                      }`}
+                    >
+                      {f.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Roster Table */}
+                <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[500px]">
+                  <table className="w-full text-left text-xs whitespace-nowrap min-w-[950px]">
+                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-3">Kode</th>
+                        <th className="px-4 py-3">Nama Lengkap</th>
+                        <th className="px-4 py-3">NIM</th>
+                        <th className="px-4 py-3">Kelas Asal</th>
+                        <th className="px-4 py-3">Jabatan & Divisi</th>
+                        <th className="px-4 py-3">ID LINE</th>
+                        <th className="px-4 py-3">No. HP / WhatsApp</th>
+                        <th className="px-4 py-3">Email Student</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                      {ALPRO_ASSISTANTS
+                        .filter((a) => {
+                          const matchDiv = rosterDivisionFilter === "ALL" || a.division === rosterDivisionFilter;
+                          const matchSearch =
+                            !rosterSearch ||
+                            a.name.toLowerCase().includes(rosterSearch.toLowerCase()) ||
+                            a.code.toLowerCase().includes(rosterSearch.toLowerCase()) ||
+                            a.nim.includes(rosterSearch) ||
+                            a.lineId.toLowerCase().includes(rosterSearch.toLowerCase());
+                          return matchDiv && matchSearch;
+                        })
+                        .map((asst) => {
+                          const isCurrent = asst.code === sessionUser;
+                          return (
+                            <tr
+                              key={asst.code}
+                              className={`transition-colors ${
+                                isCurrent
+                                  ? "bg-purple-50/80 dark:bg-purple-950/40 font-semibold"
+                                  : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
+                              }`}
+                            >
+                              <td className="px-4 py-3">
+                                <span className="inline-flex items-center gap-1 font-mono font-bold text-xs px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+                                  {asst.code}
+                                  {isCurrent && <span className="text-[10px] text-emerald-600 dark:text-emerald-400">●</span>}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                                {asst.name}
+                              </td>
+                              <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
+                                {asst.nim}
+                              </td>
+                              <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
+                                {asst.originClass}
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className={`inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                                  asst.division === "Koordinator"
+                                    ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300"
+                                    : asst.division === "Sekretaris & Bendahara"
+                                    ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
+                                    : asst.division === "Compliance & Integrity"
+                                    ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
+                                    : asst.division === "Creative & Multimedia"
+                                    ? "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300"
+                                    : asst.division === "Tech & Systems"
+                                    ? "bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300"
+                                    : "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300"
+                                }`}>
+                                  {asst.position}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                                @{asst.lineId}
+                              </td>
+                              <td className="px-4 py-3 font-mono text-slate-700 dark:text-neutral-300">
+                                {asst.phone}
+                              </td>
+                              <td className="px-4 py-3 font-mono text-[11px] text-slate-500 dark:text-neutral-400 truncate max-w-[200px]" title={asst.studentEmail}>
+                                {asst.studentEmail}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-950/60 shadow-xs text-center space-y-4 transition-colors">
+                <div className="w-14 h-14 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-2xs">
+                  <Lock size={24} />
+                </div>
+                <div className="max-w-md mx-auto space-y-1.5">
+                  <h4 className="text-base font-bold text-slate-900 dark:text-white">
+                    Direktori Kontak Tim Asisten Dibatasi
+                  </h4>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono leading-relaxed">
+                    Direktori lengkap kontak pribadi 32 asisten (No. HP/WhatsApp, ID Line, dan Email Student) hanya dapat diakses oleh akun <strong>Administrator &amp; Tim BPH Laboratorium EDM</strong> demi menjaga kerahasiaan dan privasi data asisten.
                   </p>
                 </div>
-
-                {/* Search input */}
-                <div className="relative min-w-[240px]">
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    placeholder="Cari Asisten (Nama/Kode/NIM)..."
-                    value={rosterSearch}
-                    onChange={(e) => setRosterSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-mono focus:outline-none focus:border-purple-500"
-                  />
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 text-xs font-mono font-semibold">
+                  <Shield size={14} className="text-purple-600 dark:text-purple-400" />
+                  Hak Akses Akun: Asisten Praktikum (Asprak Biasa)
                 </div>
               </div>
-
-              {/* Division Filter Badges */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-                {[
-                  { id: "ALL", label: "Semua (32)" },
-                  { id: "Koordinator", label: "Koordinator (1)" },
-                  { id: "Sekretaris & Bendahara", label: "BPH/Sekben (3)" },
-                  { id: "Compliance & Integrity", label: "CnI / Komdis (7)" },
-                  { id: "Creative & Multimedia", label: "CnM (7)" },
-                  { id: "Tech & Systems", label: "TnC (8)" },
-                  { id: "Module Development", label: "MD (6)" },
-                ].map((f) => (
-                  <button
-                    key={f.id}
-                    type="button"
-                    onClick={() => setRosterDivisionFilter(f.id)}
-                    className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
-                      rosterDivisionFilter === f.id
-                        ? "bg-purple-700 text-white shadow-xs"
-                        : "bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 hover:bg-slate-200 dark:hover:bg-neutral-700"
-                    }`}
-                  >
-                    {f.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Roster Table */}
-              <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[500px]">
-                <table className="w-full text-left text-xs whitespace-nowrap min-w-[950px]">
-                  <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
-                    <tr>
-                      <th className="px-4 py-3">Kode</th>
-                      <th className="px-4 py-3">Nama Lengkap</th>
-                      <th className="px-4 py-3">NIM</th>
-                      <th className="px-4 py-3">Kelas Asal</th>
-                      <th className="px-4 py-3">Jabatan & Divisi</th>
-                      <th className="px-4 py-3">ID LINE</th>
-                      <th className="px-4 py-3">No. HP / WhatsApp</th>
-                      <th className="px-4 py-3">Email Student</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
-                    {ALPRO_ASSISTANTS
-                      .filter((a) => {
-                        const matchDiv = rosterDivisionFilter === "ALL" || a.division === rosterDivisionFilter;
-                        const matchSearch =
-                          !rosterSearch ||
-                          a.name.toLowerCase().includes(rosterSearch.toLowerCase()) ||
-                          a.code.toLowerCase().includes(rosterSearch.toLowerCase()) ||
-                          a.nim.includes(rosterSearch) ||
-                          a.lineId.toLowerCase().includes(rosterSearch.toLowerCase());
-                        return matchDiv && matchSearch;
-                      })
-                      .map((asst) => {
-                        const isCurrent = asst.code === sessionUser;
-                        return (
-                          <tr
-                            key={asst.code}
-                            className={`transition-colors ${
-                              isCurrent
-                                ? "bg-purple-50/80 dark:bg-purple-950/40 font-semibold"
-                                : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
-                            }`}
-                          >
-                            <td className="px-4 py-3">
-                              <span className="inline-flex items-center gap-1 font-mono font-bold text-xs px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
-                                {asst.code}
-                                {isCurrent && <span className="text-[10px] text-emerald-600 dark:text-emerald-400">●</span>}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
-                              {asst.name}
-                            </td>
-                            <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
-                              {asst.nim}
-                            </td>
-                            <td className="px-4 py-3 font-mono text-slate-600 dark:text-neutral-400">
-                              {asst.originClass}
-                            </td>
-                            <td className="px-4 py-3">
-                              <span className={`inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
-                                asst.division === "Koordinator"
-                                  ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300"
-                                  : asst.division === "Sekretaris & Bendahara"
-                                  ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
-                                  : asst.division === "Compliance & Integrity"
-                                  ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
-                                  : asst.division === "Creative & Multimedia"
-                                  ? "bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300"
-                                  : asst.division === "Tech & Systems"
-                                  ? "bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300"
-                                  : "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300"
-                              }`}>
-                                {asst.position}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                              @{asst.lineId}
-                            </td>
-                            <td className="px-4 py-3 font-mono text-slate-700 dark:text-neutral-300">
-                              {asst.phone}
-                            </td>
-                            <td className="px-4 py-3 font-mono text-[11px] text-slate-500 dark:text-neutral-400 truncate max-w-[200px]" title={asst.studentEmail}>
-                              {asst.studentEmail}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            )}
           </div>
         )}
       </div>
