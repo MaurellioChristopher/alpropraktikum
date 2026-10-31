@@ -420,28 +420,10 @@ export default function PresensiAsprakPage() {
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
         }
 
-        // Watermark banner
-        ctx.fillStyle = "rgba(14, 7, 26, 0.85)";
-        ctx.fillRect(0, canvas.height - 56, canvas.width, 56);
-
-        ctx.fillStyle = "#C084FC";
-        ctx.font = "bold 14px monospace";
-        ctx.fillText("LAB EDM • ALPRO 26/27 • R1 LANTAI 8 TULT", 16, canvas.height - 32);
-
-        ctx.fillStyle = "#FFFFFF";
-        ctx.font = "12px sans-serif";
-        const asst = getAssistantByCode(selectedAssistantCode);
-        const shiftObj = ALPRO_15_SHIFTS.find((s) => s.shiftNumber === selectedShiftNumber);
-        ctx.fillText(
-          `${asst?.code || selectedAssistantCode} • Shift ${selectedShiftNumber} (${shiftObj?.className || "ALPRO"}) • ${new Date().toLocaleTimeString("id-ID")} WIB • GPS VERIFIED`,
-          16,
-          canvas.height - 12
-        );
-
-        const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
         setCapturedImage(dataUrl);
-        setUploadedFileName("Foto Kamera Langsung.jpg");
-        setUploadedFileSize("Selfie Lab R1");
+        setUploadedFileName("Foto Presensi.jpg");
+        setUploadedFileSize("Kamera Langsung");
         stopCamera();
       }
       setIsCapturing(false);
@@ -757,9 +739,9 @@ export default function PresensiAsprakPage() {
                       </span>
                     </div>
 
-                    {/* VIEW 1: LIVE WEBCAM ACTIVE */}
+                    {/* VIEW 1: LIVE WEBCAM ACTIVE (Clean & Direct Camera, No Templates) */}
                     {isCameraActive ? (
-                      <div className="relative w-full h-72 sm:h-80 bg-slate-950 rounded-2xl overflow-hidden border border-purple-500/40 shadow-lg">
+                      <div className="relative w-full h-80 sm:h-96 bg-black rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-lg">
                         <video
                           ref={setVideoRef}
                           autoPlay
@@ -771,125 +753,68 @@ export default function PresensiAsprakPage() {
                           className="w-full h-full object-cover"
                         />
 
-                        {/* Top Bar Overlay */}
-                        <div className="absolute top-3 inset-x-3 flex items-center justify-between z-20 pointer-events-none">
-                          <div className="flex items-center gap-2 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 text-[11px] font-mono text-white">
-                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
-                            <span className="font-semibold text-rose-400">LIVE</span>
-                            <span className="text-white/60">•</span>
-                            <span className="text-white/90">KAMERA LAB R1</span>
-                          </div>
-
-                          <div className="flex items-center gap-2 pointer-events-auto">
-                            <button
-                              type="button"
-                              onClick={toggleFacingMode}
-                              className="px-2.5 py-1.5 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
-                              title="Balik Kamera Depan / Belakang"
-                            >
-                              <SwitchCamera size={13} className="text-purple-400" />
-                              <span className="hidden sm:inline">
-                                {facingMode === "user" ? "Kamera Depan" : "Kamera Belakang"}
-                              </span>
-                            </button>
-                            <span className="bg-black/70 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/10 text-[11px] font-mono text-purple-300 font-semibold">
-                              [{selectedAssistantCode}]
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Center Framing Guide (Non-overlapping) */}
-                        <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
-                          <div className="w-48 sm:w-56 h-36 sm:h-40 rounded-xl border border-dashed border-white/30 flex items-end justify-center pb-2">
-                            <span className="text-[10px] font-mono text-white/80 bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded-md text-center">
-                              Posisikan wajah &amp; lanyard
-                            </span>
-                          </div>
-                        </div>
-
-                        {/* Bottom Controls Bar */}
-                        <div className="absolute bottom-3 inset-x-3 flex items-center justify-between z-20">
-                          {/* Cancel / Switch to Upload */}
+                        {/* Super Easy & Clean Bottom Shutter Controls */}
+                        <div className="absolute bottom-4 inset-x-0 flex items-center justify-center gap-3 z-20">
+                          {/* Balik kamera depan/belakang */}
                           <button
                             type="button"
-                            onClick={stopCamera}
-                            className="px-3.5 py-2 rounded-xl bg-black/70 hover:bg-black/90 text-white text-xs font-mono border border-white/20 cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
+                            onClick={toggleFacingMode}
+                            className="w-11 h-11 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center cursor-pointer transition-transform active:scale-95 border border-white/20 shadow-md"
+                            title="Balik Kamera Depan / Belakang"
                           >
-                            <Upload size={13} className="text-slate-300" />
-                            <span>Pilih File</span>
+                            <SwitchCamera size={18} />
                           </button>
 
-                          {/* Shutter Button (Centered & Clear) */}
+                          {/* Tombol Ambil Foto Utama - Jelas & Mudah */}
                           <button
                             type="button"
                             onClick={captureSnapshot}
                             disabled={isCapturing}
-                            className="w-14 h-14 rounded-full bg-white hover:bg-purple-50 text-slate-900 border-4 border-purple-500 shadow-2xl flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95"
-                            title="Ambil Foto Presensi Sekarang"
+                            className="px-6 py-3 rounded-full bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow-xl flex items-center gap-2 cursor-pointer transition-transform hover:scale-105 active:scale-95"
                           >
-                            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-700 to-purple-500 flex items-center justify-center text-white">
-                              <Camera size={16} />
-                            </div>
+                            <Camera size={18} />
+                            <span>Ambil Foto</span>
                           </button>
 
-                          {/* Flip Camera Quick Button */}
+                          {/* Opsi pilih file jika ingin upload */}
                           <button
                             type="button"
-                            onClick={toggleFacingMode}
-                            className="px-3 py-2 rounded-xl bg-black/70 hover:bg-black/90 text-white text-xs font-mono border border-white/20 cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
-                            title="Putar Kamera"
+                            onClick={stopCamera}
+                            className="w-11 h-11 rounded-full bg-black/60 hover:bg-black/80 text-white backdrop-blur-md flex items-center justify-center cursor-pointer transition-transform active:scale-95 border border-white/20 shadow-md"
+                            title="Pilih File dari Galeri / Folder"
                           >
-                            <RotateCw size={13} className="text-purple-300" />
-                            <span className="text-[11px]">Putar</span>
+                            <Upload size={17} />
                           </button>
                         </div>
                       </div>
                     ) : capturedImage ? (
-                      /* VIEW 2: PHOTO PREVIEW (UPLOADED OR CAPTURED) */
+                      /* VIEW 2: PHOTO PREVIEW (Clean Photo, No Template Overlays) */
                       <div className="space-y-2">
-                        <div className="relative w-full h-56 sm:h-64 bg-slate-950 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs group">
+                        <div className="relative w-full h-64 sm:h-72 bg-slate-950 rounded-2xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs">
                           <img
                             src={capturedImage}
                             alt="Bukti Kehadiran Asprak"
                             className="w-full h-full object-cover"
                           />
-
-                          {/* Subtle Verified Watermark Banner */}
-                          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-5 text-white font-mono text-[10px]">
-                            <div className="flex items-center justify-between">
-                              <span className="font-semibold text-white/90">LAB EDM • R1 LT. 8 TULT</span>
-                              <span className="text-emerald-400 font-bold">TERVERIFIKASI</span>
-                            </div>
-                            <div className="text-[10px] text-white/75 mt-0.5 truncate">
-                              [{selectedAssistant.code}] {selectedAssistant.name} • Shift {selectedShiftNumber} ({selectedShift.className})
-                            </div>
-                          </div>
                         </div>
 
-                        {/* Attached File Action Strip */}
-                        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-3 text-xs">
+                        {/* Action Strip: Foto Ulang & Hapus */}
+                        <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-3 text-xs">
                           <div className="flex items-center gap-2 min-w-0">
-                            <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
-                            <div className="min-w-0">
-                              <div className="font-medium text-slate-900 dark:text-white truncate text-xs font-mono">
-                                {uploadedFileName || "Foto Presensi Lab.jpg"}
-                              </div>
-                              {uploadedFileSize && (
-                                <div className="text-[10px] text-slate-400 font-mono">
-                                  {uploadedFileSize}
-                                </div>
-                              )}
-                            </div>
+                            <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <span className="font-semibold text-slate-800 dark:text-white truncate">
+                              Foto presensi siap dikirim
+                            </span>
                           </div>
 
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="flex items-center gap-2 shrink-0">
                             <button
                               type="button"
                               onClick={() => startCamera()}
-                              className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/15 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-neutral-200 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
+                              className="px-3 py-1.5 rounded-lg bg-white dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/15 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-neutral-200 text-xs font-semibold transition-colors cursor-pointer flex items-center gap-1.5"
                             >
-                              <Camera size={12} />
-                              <span>Foto Ulang</span>
+                              <Camera size={13} />
+                              <span>Ambil Ulang</span>
                             </button>
 
                             <button
@@ -898,7 +823,7 @@ export default function PresensiAsprakPage() {
                               className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer"
                               title="Hapus foto"
                             >
-                              <Trash2 size={13} />
+                              <Trash2 size={14} />
                             </button>
                           </div>
                         </div>
