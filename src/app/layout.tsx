@@ -28,13 +28,13 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "EDM Laboratory | Praktikum ALPRO",
+  title: "EDM-ALPRO | Enterprise Data Management",
   description: "Portal Resmi Praktikum Algoritma & Pemrograman EDM Laboratory Telkom University",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "ALPRO EDM",
+    title: "EDM-ALPRO",
   },
   icons: {
     icon: "/favicon.ico",

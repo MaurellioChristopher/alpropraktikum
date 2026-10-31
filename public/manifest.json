@@ -1,6 +1,6 @@
 {
-  "name": "ALPRO EDM — Enterprise Data Management",
-  "short_name": "ALPRO EDM",
+  "name": "EDM-ALPRO",
+  "short_name": "EDM-ALPRO",
   "description": "Portal Resmi Praktikum Algoritma & Pemrograman Telkom University",
   "start_url": "/",
   "display": "standalone",
