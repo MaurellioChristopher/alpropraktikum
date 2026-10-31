@@ -369,10 +369,20 @@ export default function AssistantDashboard() {
         {(activeTab === "dashboard" || activeTab === "beranda") && (
           <div className="space-y-6">
 
-            {/* HERO GREETING BANNER WITH EDM CYBER MASCOT */}
-            <div className="relative rounded-[2.2rem] bg-gradient-to-r from-[#DDE7FF] via-[#EAE5FC] to-[#F3EEFF] dark:from-[#1E0D3C] dark:via-[#16092C] dark:to-[#0D041A] border border-purple-200/70 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all">
-              {/* Subtle ambient blur */}
-              <div className="absolute top-0 right-1/3 w-80 h-80 bg-purple-400/20 dark:bg-purple-600/15 rounded-full blur-3xl pointer-events-none" />
+            {/* HERO GREETING BANNER WITH EDM 3 MASKOT BACKGROUND */}
+            <div className="relative rounded-[2.2rem] border border-purple-200/70 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all min-h-[220px]">
+              {/* Background: Official 3 Mascot EDM Panorama */}
+              <div className="absolute inset-0 z-0 pointer-events-none">
+                <Image
+                  src="/images/hero-bg-edm-3maskot.png"
+                  alt="Hero Background EDM 3 Maskot"
+                  fill
+                  priority
+                  className="object-cover object-center"
+                />
+                {/* Subtle dark mode filter to keep text contrast perfect */}
+                <div className="absolute inset-0 bg-transparent dark:bg-[#0e071a]/75" />
+              </div>
 
               {/* Left Greeting Text */}
               <div className="space-y-3.5 max-w-md relative z-10">
@@ -392,7 +402,7 @@ export default function AssistantDashboard() {
                       ON DUTY: Shift {duty.activeShiftDetails?.shift.shiftNumber} ({duty.activeShiftDetails?.shift.className} • Grup {duty.activeShiftDetails?.group})
                     </span>
                   ) : ongoingShift.activeShift ? (
-                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100 dark:bg-purple-950/80 border border-purple-300 dark:border-purple-800 text-xs font-mono font-bold text-purple-900 dark:text-purple-200 shadow-2xs">
+                    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-purple-100/90 dark:bg-purple-950/80 border border-purple-300 dark:border-purple-800 text-xs font-mono font-bold text-purple-900 dark:text-purple-200 shadow-2xs">
                       <span className="w-2 h-2 rounded-full bg-purple-600 animate-ping" />
                       Shift Berjalan di Lab: Shift {ongoingShift.activeShift.shiftNumber} ({ongoingShift.activeShift.className} • {ongoingShift.activeShift.timeDisplay} WIB)
                     </span>
@@ -410,20 +420,8 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Center: Official EDM Cyber Mascot standing */}
-              <div className="relative z-10 flex flex-col items-center justify-center shrink-0 my-[-10px] lg:my-[-24px]">
-                <div className="relative w-44 sm:w-52 lg:w-60 h-56 sm:h-64 lg:h-72 drop-shadow-2xl">
-                  <Image
-                    src="/images/edm-mascot.png"
-                    alt="EDM Laboratory Cyber Mascot"
-                    fill
-                    priority
-                    sizes="(max-width: 768px) 176px, 240px"
-                    className="object-contain"
-                  />
-                </div>
-                <div className="w-32 sm:w-40 h-4 bg-purple-900/20 dark:bg-purple-950/50 rounded-full blur-md -mt-2" />
-              </div>
+              {/* Center spacer so the 3 mascots on the background panorama shine through */}
+              <div className="hidden lg:block flex-1 min-h-[140px] pointer-events-none" />
 
               {/* Right: Floating Glass Card (STATUS SHIFT & TUGAS JAGA) */}
               <div className="relative z-10 w-full lg:w-80 rounded-2xl bg-white/90 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/40 shadow-sm space-y-3.5">
