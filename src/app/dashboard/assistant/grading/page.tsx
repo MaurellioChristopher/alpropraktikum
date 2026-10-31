@@ -34,6 +34,7 @@ const getStudentsByClassCode = (classCode: string): GradeRow[] => {
 };
 
 export default function GradingDashboard() {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState("SI5001");
   const [classDataStore, setClassDataStore] = useState<Record<string, GradeRow[]>>({
     SI5001: getStudentsByClassCode("SI5001"),
@@ -122,7 +123,11 @@ export default function GradingDashboard() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start pb-12">
-      <DashboardSidebar activeTab="penilaian" />
+      <DashboardSidebar
+        activeTab="penilaian"
+        isMobileOpen={isMobileOpen}
+        onCloseMobile={() => setIsMobileOpen(false)}
+      />
 
       <div className="flex-1 w-full min-w-0 space-y-5">
         {/* Header Bar */}

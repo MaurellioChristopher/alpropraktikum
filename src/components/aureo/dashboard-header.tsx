@@ -74,7 +74,7 @@ export function DashboardHeader({
           <Menu size={18} />
         </button>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs">
+        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs shrink-0">
           <div className="relative w-4 h-4 shrink-0">
             <Image
               src="/images/edm-emblem-crimson.png"
@@ -84,7 +84,7 @@ export function DashboardHeader({
               className="object-contain"
             />
           </div>
-          <span className="text-xs font-bold text-slate-800 dark:text-white">
+          <span className="hidden sm:inline-block text-xs font-bold text-slate-800 dark:text-white">
             Praktikum ALPRO
           </span>
         </div>

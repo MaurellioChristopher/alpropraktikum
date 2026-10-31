@@ -78,6 +78,22 @@ body {
   background-color: #0e091e !important;
 }
 
+/* iOS Safe Area & Mobile Responsive Helpers */
+.safe-pb {
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.safe-pt {
+  padding-top: calc(0.75rem + env(safe-area-inset-top, 0px));
+}
+
+/* Prevent accidental mobile body horizontal overflow */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .dark .bg-slate-50,
 .dark .bg-slate-50\/50,
 .dark .bg-slate-50\/60,

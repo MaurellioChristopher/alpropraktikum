@@ -14,6 +14,7 @@ import {
 } from "@/data/alpro-schedule-plotting";
 import {
   Camera,
+  SwitchCamera,
   RotateCw,
   CheckCircle2,
   AlertCircle,
@@ -25,6 +26,8 @@ import {
   Sparkles,
   ArrowLeft,
   Upload,
+  UploadCloud,
+  Trash2,
   Download,
   Info,
   ChevronDown,
@@ -217,12 +220,16 @@ export default function PresensiAsprakPage() {
   const [status, setStatus] = useState<"Hadir Tepat Waktu" | "Terlambat" | "Shift Swap (Pengganti)">("Hadir Tepat Waktu");
   const [notes, setNotes] = useState<string>("Mengawal praktikan dan mendampingi pelaksanaan modul.");
   const [currentTimeStr, setCurrentTimeStr] = useState<string>("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
-  // Camera & Draft Photo states
-  const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
+  // Camera & Photo Upload states
+  const [isCameraActive, setIsCameraActive] = useState<boolean>(true);
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [capturedImage, setCapturedImage] = useState<string | null>("/images/asprak-draft-1.jpg");
-  const [selectedDraftId, setSelectedDraftId] = useState<string>("draft-1");
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [uploadedFileName, setUploadedFileName] = useState<string>("");
+  const [uploadedFileSize, setUploadedFileSize] = useState<string>("");
+  const [isDragging, setIsDragging] = useState<boolean>(false);
   const [isCapturing, setIsCapturing] = useState<boolean>(false);
   const [isSubmittedSuccess, setIsSubmittedSuccess] = useState<boolean>(false);
 
@@ -322,9 +329,19 @@ export default function PresensiAsprakPage() {
     }
   }, []);
 
+  // Video Ref callback that attaches stream immediately upon DOM mount
+  const setVideoRef = (node: HTMLVideoElement | null) => {
+    videoRef.current = node;
+    if (node && streamRef.current) {
+      node.srcObject = streamRef.current;
+      node.play().catch((err) => console.log("Video play deferred:", err));
+    }
+  };
+
   // Camera start function
-  const startCamera = async () => {
+  const startCamera = async (targetMode?: "user" | "environment") => {
     setCameraError(null);
+    const mode = targetMode || facingMode;
     try {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((track) => track.stop());
@@ -333,24 +350,30 @@ export default function PresensiAsprakPage() {
         video: {
           width: { ideal: 1280 },
           height: { ideal: 720 },
-          facingMode: "user",
+          facingMode: mode,
         },
         audio: false,
       });
       streamRef.current = stream;
+      setIsCameraActive(true);
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play();
+        videoRef.current.play().catch((err) => console.log("Video play deferred:", err));
       }
-      setIsCameraActive(true);
-      setSelectedDraftId("");
     } catch (err: any) {
       console.warn("Camera access failed or denied:", err);
       setCameraError(
-        "Kamera tidak dapat diakses langsung. Anda dapat menggunakan pilihan Draft Foto Lab atau upload foto sebagai gantinya."
+        "Kamera tidak dapat diakses langsung. Pastikan izin kamera telah diberikan di browser atau Anda dapat mengunggah file foto."
       );
       setIsCameraActive(false);
     }
+  };
+
+  // Toggle Front / Back camera on phones
+  const toggleFacingMode = () => {
+    const nextMode = facingMode === "user" ? "environment" : "user";
+    setFacingMode(nextMode);
+    startCamera(nextMode);
   };
 
   // Stop camera function
@@ -362,12 +385,17 @@ export default function PresensiAsprakPage() {
     setIsCameraActive(false);
   };
 
-  // Select Draft Photo with automatic watermark stamp
-  const handleSelectDraftPhoto = (draft: { id: string; url: string }) => {
-    stopCamera();
-    setSelectedDraftId(draft.id);
-    setCapturedImage(draft.url);
-  };
+  // Auto-connect to camera on mount if no photo has been captured yet
+  useEffect(() => {
+    if (!capturedImage) {
+      startCamera("user");
+    }
+    return () => {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
 
   // Capture snapshot from webcam
   const captureSnapshot = () => {
@@ -382,7 +410,15 @@ export default function PresensiAsprakPage() {
 
       const ctx = canvas.getContext("2d");
       if (ctx && video) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        if (facingMode === "user") {
+          ctx.save();
+          ctx.translate(canvas.width, 0);
+          ctx.scale(-1, 1);
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          ctx.restore();
+        } else {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        }
 
         // Watermark banner
         ctx.fillStyle = "rgba(14, 7, 26, 0.85)";
@@ -404,32 +440,69 @@ export default function PresensiAsprakPage() {
 
         const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
         setCapturedImage(dataUrl);
-        setSelectedDraftId("camera-capture");
+        setUploadedFileName("Foto Kamera Langsung.jpg");
+        setUploadedFileSize("Selfie Lab R1");
         stopCamera();
       }
       setIsCapturing(false);
     }, 150);
   };
 
-  // Fallback file upload
+  // Process image file from upload or drop
+  const handleFileProcess = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      alert("Format file tidak didukung. Harap unggah file foto (JPG, PNG, atau WEBP).");
+      return;
+    }
+    const sizeInMB = (file.size / (1024 * 1024)).toFixed(1);
+    setUploadedFileName(file.name);
+    setUploadedFileSize(`${sizeInMB} MB`);
+    const reader = new FileReader();
+    reader.onload = (uploadEvent) => {
+      setCapturedImage(uploadEvent.target?.result as string);
+      stopCamera();
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (uploadEvent) => {
-        setCapturedImage(uploadEvent.target?.result as string);
-        setSelectedDraftId("uploaded-file");
-        stopCamera();
-      };
-      reader.readAsDataURL(file);
+      handleFileProcess(file);
     }
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleFileProcess(file);
+    }
+  };
+
+  const handleRemovePhoto = () => {
+    setCapturedImage(null);
+    setUploadedFileName("");
+    setUploadedFileSize("");
+    stopCamera();
   };
 
   // Submit attendance record
   const handleSubmitAttendance = (e: React.FormEvent) => {
     e.preventDefault();
     if (!capturedImage) {
-      alert("Harap pilih salah satu draft foto atau ambil foto selfie sebelum mengirim!");
+      alert("Harap unggah atau ambil foto bukti kehadiran sebelum mengirim presensi!");
       return;
     }
 
@@ -500,133 +573,112 @@ export default function PresensiAsprakPage() {
   const swapCount = attendanceLogs.filter((a) => a.status === "Shift Swap (Pengganti)").length;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#F0F2F6] dark:bg-[#070312] text-slate-900 dark:text-neutral-100 transition-colors">
+    <div className="flex h-screen w-full overflow-hidden bg-[#F0F2F6] dark:bg-[#070312] text-slate-900 dark:text-neutral-100 transition-colors">
       {/* Floating Rounded Sidebar */}
-      <DashboardSidebar activeTab="presensi_asprak" role="ASPRAK" />
+      <DashboardSidebar
+        activeTab="presensi_asprak"
+        role="ASPRAK"
+        isMobileOpen={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
+      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
         
-        {/* Top Header inside safe padding wrapper so right user pill never gets cut off */}
-        <div className="px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 shrink-0">
-          <DashboardHeader assistantCode={selectedAssistantCode} />
+        {/* Top Header inside safe padding wrapper */}
+        <div className="px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 shrink-0 safe-pt">
+          <DashboardHeader
+            assistantCode={selectedAssistantCode}
+            onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+          />
         </div>
 
         {/* Scrollable Viewport */}
-        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 pb-10 space-y-6">
+        <main className="flex-1 overflow-y-auto px-3 sm:px-6 lg:px-8 pb-12 safe-pb space-y-5">
           
-          {/* Breadcrumb & Navigation */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div className="flex items-center gap-2">
+          {/* Breadcrumb & Real-time Clock */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
+            <div className="flex items-center gap-2 text-xs font-mono">
               <Link
                 href="/dashboard/assistant"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white dark:bg-[#0e071a] border border-slate-200 dark:border-purple-950/60 text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-xs transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white dark:bg-white/5 border border-slate-200/80 dark:border-white/10 font-medium text-slate-600 dark:text-neutral-300 hover:text-purple-600 transition-colors shadow-2xs"
               >
-                <ArrowLeft size={14} />
-                <span>Kembali ke Beranda</span>
+                <ArrowLeft size={13} />
+                <span>Dashboard</span>
               </Link>
-              <span className="text-slate-400 font-mono text-xs">/</span>
-              <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300">
-                Presensi Khusus Asprak
+              <span className="text-slate-300 dark:text-neutral-700">/</span>
+              <span className="text-slate-900 dark:text-white font-medium">
+                Presensi Asprak
               </span>
             </div>
 
-            {/* Real-time Clock Badge */}
-            <div className="flex items-center gap-2 text-xs font-mono text-slate-600 dark:text-neutral-300 bg-white/80 dark:bg-[#0e071a]/80 px-3.5 py-1.5 rounded-xl border border-slate-200/80 dark:border-purple-950/60 shadow-xs">
-              <Clock size={13} className="text-purple-600 dark:text-purple-400 animate-pulse" />
+            <div className="flex items-center gap-2 text-xs font-mono text-slate-500 dark:text-neutral-400 bg-white dark:bg-white/5 px-3 py-1.5 rounded-lg border border-slate-200/80 dark:border-white/10 shadow-2xs">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>{currentTimeStr || "Memuat waktu..."}</span>
             </div>
           </div>
 
-          {/* Hero Banner: Presensi Kehadiran Jaga Asisten */}
-          <div className="relative rounded-[2.2rem] bg-gradient-to-r from-purple-950 via-indigo-950 to-[#120824] p-6 sm:p-8 text-white shadow-xl overflow-hidden border border-purple-800/40">
-            <div className="absolute inset-0 bg-[radial-gradient(#C084FC_1px,transparent_1px)] [background-size:24px_24px] opacity-20 pointer-events-none" />
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-              <div className="space-y-2 max-w-xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[11px] font-mono font-bold text-purple-200">
-                  <ShieldCheck size={14} className="text-emerald-400" />
-                  <span>SISTEM VALIDASI PRESENSI ASPRAK RESMI</span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">
-                  Absensi Kehadiran Jaga Asisten Praktikum
-                </h1>
-                <p className="text-xs sm:text-sm text-purple-100/80 leading-relaxed font-sans">
-                  Pencatatan kehadiran jaga shift laboratorium secara real-time dengan verifikasi draft foto selfie, validasi GPS ruangan R1 TULT Lantai 8, dan rekap terpusat yang dapat diakses seluruh tim asisten.
-                </p>
-              </div>
-
-              {/* Status Box */}
-              <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 space-y-2 shrink-0">
-                <div className="flex items-center gap-2 text-xs font-mono text-purple-200 font-bold">
-                  <MapPin size={14} className="text-rose-400" />
-                  <span>Ruang Laboratorium</span>
-                </div>
-                <div className="text-sm font-bold text-white">
-                  R1 Lantai 8 TULT
-                </div>
-                <div className="text-[11px] font-mono text-emerald-300 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span>GPS / Geofencing Validated</span>
-                </div>
-              </div>
+          {/* Clean Header & Navigation Tabs */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Presensi Asisten Praktikum
+              </h1>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
+                Ruang R1 Lantai 8 TULT • Pencatatan kehadiran jaga shift EDM Laboratory
+              </p>
             </div>
-          </div>
 
-          {/* Navigation Pill Tabs: Formulir Presensi vs Rekap Seluruh Asisten */}
-          <div className="grid grid-cols-2 p-1.5 bg-slate-200/80 dark:bg-[#120824] rounded-2xl border border-slate-300/60 dark:border-purple-900/50 shadow-inner max-w-md">
-            <button
-              type="button"
-              onClick={() => setActiveMainTab("formulir")}
-              className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                activeMainTab === "formulir"
-                  ? "bg-white dark:bg-purple-900 text-purple-950 dark:text-white shadow-xs font-extrabold"
-                  : "text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              <Camera size={15} />
-              <span>Formulir Presensi Saya</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveMainTab("rekap")}
-              className={`py-2.5 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                activeMainTab === "rekap"
-                  ? "bg-white dark:bg-purple-900 text-purple-950 dark:text-white shadow-xs font-extrabold"
-                  : "text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white"
-              }`}
-            >
-              <Users size={15} />
-              <span>Rekap Absensi Semua Asisten ({attendanceLogs.length})</span>
-            </button>
+            {/* Segmented Pill Tabs */}
+            <div className="inline-flex p-1 bg-slate-200/80 dark:bg-white/5 rounded-xl border border-slate-300/60 dark:border-white/10 shrink-0">
+              <button
+                type="button"
+                onClick={() => setActiveMainTab("formulir")}
+                className={`py-1.5 px-3.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                  activeMainTab === "formulir"
+                    ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs font-semibold"
+                    : "text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                <Camera size={14} />
+                <span>Formulir Presensi</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveMainTab("rekap")}
+                className={`py-1.5 px-3.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer ${
+                  activeMainTab === "rekap"
+                    ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs font-semibold"
+                    : "text-slate-600 dark:text-neutral-400 hover:text-slate-900 dark:hover:text-white"
+                }`}
+              >
+                <Users size={14} />
+                <span>Rekap Kehadiran ({attendanceLogs.length})</span>
+              </button>
+            </div>
           </div>
 
           {/* TAB 1: FORMULIR PRESENSI MANDIRI */}
           {activeMainTab === "formulir" && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
               {/* Form Column (Left: 7 Cols) */}
-              <div className="lg:col-span-7 bg-white dark:bg-[#0e071a] rounded-[2rem] p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
-                <div className="border-b border-slate-100 dark:border-neutral-800 pb-4 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                      <Camera size={20} className="text-purple-600 dark:text-purple-400" />
-                      <span>Formulir Presensi Mandiri Asisten</span>
-                    </h2>
-                    <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
-                      Pilih identitas asisten, tentukan shift jaga, dan gunakan draft foto atau kamera langsung di lab.
-                    </p>
-                  </div>
-                  <span className="text-[10px] font-mono px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
-                    Live Verified
-                  </span>
+              <div className="lg:col-span-7 bg-white dark:bg-[#0E071A] rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-white/10 shadow-xs space-y-5 transition-colors">
+                <div className="border-b border-slate-100 dark:border-white/5 pb-3">
+                  <h2 className="text-base font-semibold text-slate-900 dark:text-white">
+                    Formulir Presensi Shift
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
+                    Pilih nama asisten, tentukan shift jaga, dan lampirkan bukti foto lab.
+                  </p>
                 </div>
 
-                <form onSubmit={handleSubmitAttendance} className="space-y-5">
+                <form onSubmit={handleSubmitAttendance} className="space-y-4">
                   {/* 1. Dropdown Nama & Kode Asisten */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 uppercase tracking-wider flex items-center justify-between">
-                      <span>1. Identitas Asisten Praktikum</span>
-                      <span className="text-[10px] text-purple-600 dark:text-purple-400 font-normal">
-                        32 asisten terdaftar
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono font-medium text-slate-700 dark:text-neutral-300 uppercase tracking-wider flex items-center justify-between">
+                      <span>1. Identitas Asisten</span>
+                      <span className="text-[11px] text-slate-400 font-normal">
+                        {selectedAssistant.division}
                       </span>
                     </label>
 
@@ -642,242 +694,280 @@ export default function PresensiAsprakPage() {
                           setSelectedShiftNumber(duty.nextUpcomingShift.shift.shiftNumber);
                         }
                       }}
-                      className="w-full bg-slate-50 dark:bg-neutral-900/70 border border-slate-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 font-sans cursor-pointer transition-all"
+                      className="w-full bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 font-medium cursor-pointer transition-all"
                     >
                       {ALPRO_ASSISTANTS.map((asst) => (
                         <option key={asst.code} value={asst.code}>
-                          [{asst.code}] {asst.name} — {asst.position} ({asst.originClass})
+                          [{asst.code}] {asst.name} — {asst.position}
                         </option>
                       ))}
                     </select>
 
-                    {/* Assistant Profile Chip */}
-                    <div className="p-3.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/60 flex items-center justify-between gap-3 text-xs">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-purple-700 text-white font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
-                          {selectedAssistant.code}
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-900 dark:text-white">
-                            {selectedAssistant.name}
-                          </div>
-                          <div className="text-[11px] font-mono text-purple-700 dark:text-purple-300">
-                            {selectedAssistant.position} • {selectedAssistant.division}
-                          </div>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-200 shrink-0">
+                    <div className="flex items-center justify-between text-xs font-mono text-slate-500 dark:text-neutral-400 pt-0.5 px-0.5">
+                      <span>{selectedAssistant.position} • {selectedAssistant.originClass}</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-white/10 text-slate-700 dark:text-neutral-300 font-medium">
                         {selectedAssistant.role}
                       </span>
                     </div>
                   </div>
 
                   {/* 2. Dropdown Shift Jaga */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 uppercase tracking-wider flex items-center justify-between">
-                      <span>2. Pilih Shift Jaga Praktikum</span>
-                      <span className="text-[10px] text-purple-600 dark:text-purple-400 font-normal">
-                        15 shift jadwal resmi
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-mono font-medium text-slate-700 dark:text-neutral-300 uppercase tracking-wider flex items-center justify-between">
+                      <span>2. Shift Jaga Praktikum</span>
+                      <span className="text-[11px] text-slate-400 font-normal">
+                        Ruang R1 TULT Lt. 8
                       </span>
                     </label>
 
                     <select
                       value={selectedShiftNumber}
                       onChange={(e) => setSelectedShiftNumber(Number(e.target.value))}
-                      className="w-full bg-slate-50 dark:bg-neutral-900/70 border border-slate-200 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm font-semibold text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30 font-sans cursor-pointer transition-all"
+                      className="w-full bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3.5 py-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/20 font-medium cursor-pointer transition-all"
                     >
                       {ALPRO_15_SHIFTS.map((shift) => (
                         <option key={shift.shiftNumber} value={shift.shiftNumber}>
-                          Shift {shift.shiftNumber}: {shift.className} ({shift.day}, {shift.timeDisplay} WIB) — {shift.room}
+                          Shift {shift.shiftNumber}: {shift.className} ({shift.day}, {shift.timeDisplay} WIB)
                         </option>
                       ))}
                     </select>
 
-                    <div className="flex items-center justify-between text-xs font-mono p-3 rounded-xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800">
-                      <span className="text-slate-600 dark:text-neutral-400">
-                        Jadwal: <strong>{selectedShift.day}, {selectedShift.timeDisplay} WIB</strong>
-                      </span>
+                    <div className="flex items-center justify-between text-xs font-mono text-slate-500 dark:text-neutral-400 pt-0.5 px-0.5">
+                      <span>Jadwal: {selectedShift.day}, {selectedShift.timeDisplay} WIB</span>
                       {isShiftCurrentlyActive ? (
-                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                          Sedang Berlangsung Sekarang
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          Sedang Berlangsung
                         </span>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 font-bold">
-                          Terjadwal ({selectedShift.className})
-                        </span>
+                        <span className="text-slate-400 font-normal">Terjadwal</span>
                       )}
                     </div>
                   </div>
 
-                  {/* 3. DRAFT FOTO & BUKTI SELFIE */}
-                  <div className="space-y-3">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <label className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
+                  {/* 3. BUKTI FOTO KEHADIRAN (DRAG & DROP + KAMERA) */}
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-mono font-medium text-slate-700 dark:text-neutral-300 uppercase tracking-wider flex items-center gap-1.5">
                         <ImageIcon size={14} className="text-purple-600 dark:text-purple-400" />
-                        <span>3. Draft Foto Kehadiran &amp; Bukti Lab</span>
+                        <span>3. Bukti Foto Kehadiran</span>
                       </label>
-                      <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                        ✓ Siap Verifikasi
+                      <span className="text-[11px] text-slate-400 font-mono">
+                        {capturedImage ? "✓ Foto Terlampir" : "Upload / Ambil Kamera"}
                       </span>
                     </div>
 
-                    {/* DRAFT PHOTO SELECTOR CARDS */}
-                    <div className="space-y-2">
-                      <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
-                        Pilih opsi bukti foto yang ingin dilampirkan:
-                      </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        {DRAFT_LAB_PHOTOS.map((draft) => (
-                          <button
-                            key={draft.id}
-                            type="button"
-                            onClick={() => handleSelectDraftPhoto(draft)}
-                            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                              selectedDraftId === draft.id
-                                ? "bg-purple-100 dark:bg-purple-950/80 border-purple-600 ring-2 ring-purple-500/20 shadow-xs"
-                                : "bg-slate-50 dark:bg-neutral-900/60 border-slate-200 dark:border-neutral-800 hover:border-purple-300"
-                            }`}
-                          >
-                            <div className="relative w-full h-16 rounded-lg overflow-hidden bg-slate-900 mb-1.5">
-                              <img
-                                src={draft.url}
-                                alt={draft.title}
-                                className="w-full h-full object-cover"
-                              />
-                              {selectedDraftId === draft.id && (
-                                <div className="absolute top-1 right-1 bg-purple-600 text-white p-0.5 rounded-full">
-                                  <Check size={10} />
-                                </div>
-                              )}
-                            </div>
-                            <div className="text-[10px] font-bold text-slate-900 dark:text-white truncate">
-                              {draft.title}
-                            </div>
-                            <div className="text-[9px] text-purple-700 dark:text-purple-300 font-mono">
-                              Draft Lab EDM
-                            </div>
-                          </button>
-                        ))}
+                    {/* VIEW 1: LIVE WEBCAM ACTIVE */}
+                    {isCameraActive ? (
+                      <div className="relative w-full h-72 sm:h-80 bg-slate-950 rounded-2xl overflow-hidden border border-purple-500/40 shadow-lg">
+                        <video
+                          ref={setVideoRef}
+                          autoPlay
+                          playsInline
+                          muted
+                          style={{
+                            transform: facingMode === "user" ? "scaleX(-1)" : "none",
+                          }}
+                          className="w-full h-full object-cover"
+                        />
 
-                        {/* Webcam Option */}
-                        <button
-                          type="button"
-                          onClick={startCamera}
-                          className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col items-center justify-center text-center ${
-                            isCameraActive
-                              ? "bg-purple-100 dark:bg-purple-950/80 border-purple-600 ring-2 ring-purple-500/20"
-                              : "bg-slate-50 dark:bg-neutral-900/60 border-slate-200 dark:border-neutral-800 hover:border-purple-300"
-                          }`}
-                        >
-                          <Camera size={20} className="text-purple-600 dark:text-purple-400 mb-1" />
-                          <span className="text-[10px] font-bold text-slate-900 dark:text-white">
-                            Ambil Kamera
-                          </span>
-                          <span className="text-[9px] text-slate-500 font-mono">Webcam Langsung</span>
-                        </button>
-
-                        {/* File Upload Option */}
-                        <label className="p-2 rounded-xl border border-slate-200 dark:border-neutral-800 bg-slate-50 dark:bg-neutral-900/60 hover:border-purple-300 transition-all cursor-pointer flex flex-col items-center justify-center text-center">
-                          <Upload size={20} className="text-purple-600 dark:text-purple-400 mb-1" />
-                          <span className="text-[10px] font-bold text-slate-900 dark:text-white">
-                            Upload Foto
-                          </span>
-                          <span className="text-[9px] text-slate-500 font-mono">Pilih dari Galeri</span>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                          />
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* PHOTO PREVIEW & VIEWFINDER BOX */}
-                    <div className="relative w-full aspect-video sm:h-72 bg-slate-950 rounded-2xl overflow-hidden border-2 border-dashed border-purple-400/50 dark:border-purple-600/50 flex flex-col items-center justify-center shadow-inner group">
-                      {isCameraActive ? (
-                        // Live Webcam Stream
-                        <div className="relative w-full h-full">
-                          <video
-                            ref={videoRef}
-                            autoPlay
-                            playsInline
-                            muted
-                            className="w-full h-full object-cover mirror"
-                          />
-
-                          <div className="absolute inset-4 pointer-events-none border border-white/25 rounded-xl flex flex-col justify-between p-3">
-                            <div className="flex justify-between items-center text-[10px] font-mono text-purple-300 bg-black/60 backdrop-blur-xs px-2.5 py-1 rounded-md">
-                              <span>REC ● LIVE LAB CAMERA</span>
-                              <span>{selectedAssistantCode}</span>
-                            </div>
-
-                            <div className="text-center text-[11px] font-mono text-white/90 bg-black/60 backdrop-blur-xs py-1 rounded-md">
-                              Arahkan wajah &amp; pastikan berada di area lab R1 TULT
-                            </div>
+                        {/* Top Bar Overlay */}
+                        <div className="absolute top-3 inset-x-3 flex items-center justify-between z-20 pointer-events-none">
+                          <div className="flex items-center gap-2 bg-black/70 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 text-[11px] font-mono text-white">
+                            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping" />
+                            <span className="font-semibold text-rose-400">LIVE</span>
+                            <span className="text-white/60">•</span>
+                            <span className="text-white/90">KAMERA LAB R1</span>
                           </div>
 
-                          {/* Shutter Button */}
-                          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20">
+                          <div className="flex items-center gap-2 pointer-events-auto">
                             <button
                               type="button"
-                              onClick={captureSnapshot}
-                              disabled={isCapturing}
-                              className="w-14 h-14 rounded-full bg-white hover:bg-slate-100 text-purple-900 border-4 border-purple-500 shadow-xl flex items-center justify-center transition-transform hover:scale-105 active:scale-95 cursor-pointer"
-                              title="Ambil Foto Presensi"
+                              onClick={toggleFacingMode}
+                              className="px-2.5 py-1.5 rounded-full bg-black/70 hover:bg-black/90 backdrop-blur-md border border-white/20 text-white text-[11px] font-mono flex items-center gap-1.5 cursor-pointer transition-all active:scale-95"
+                              title="Balik Kamera Depan / Belakang"
                             >
-                              <div className="w-8 h-8 rounded-full bg-purple-700" />
+                              <SwitchCamera size={13} className="text-purple-400" />
+                              <span className="hidden sm:inline">
+                                {facingMode === "user" ? "Kamera Depan" : "Kamera Belakang"}
+                              </span>
                             </button>
+                            <span className="bg-black/70 backdrop-blur-md px-2.5 py-1.5 rounded-full border border-white/10 text-[11px] font-mono text-purple-300 font-semibold">
+                              [{selectedAssistantCode}]
+                            </span>
                           </div>
                         </div>
-                      ) : capturedImage ? (
-                        // Draft or Captured Image View with Watermark
-                        <div className="relative w-full h-full">
+
+                        {/* Center Framing Guide (Non-overlapping) */}
+                        <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-center p-4">
+                          <div className="w-48 sm:w-56 h-36 sm:h-40 rounded-xl border border-dashed border-white/30 flex items-end justify-center pb-2">
+                            <span className="text-[10px] font-mono text-white/80 bg-black/60 backdrop-blur-xs px-2 py-0.5 rounded-md text-center">
+                              Posisikan wajah &amp; lanyard
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Bottom Controls Bar */}
+                        <div className="absolute bottom-3 inset-x-3 flex items-center justify-between z-20">
+                          {/* Cancel / Switch to Upload */}
+                          <button
+                            type="button"
+                            onClick={stopCamera}
+                            className="px-3.5 py-2 rounded-xl bg-black/70 hover:bg-black/90 text-white text-xs font-mono border border-white/20 cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
+                          >
+                            <Upload size={13} className="text-slate-300" />
+                            <span>Pilih File</span>
+                          </button>
+
+                          {/* Shutter Button (Centered & Clear) */}
+                          <button
+                            type="button"
+                            onClick={captureSnapshot}
+                            disabled={isCapturing}
+                            className="w-14 h-14 rounded-full bg-white hover:bg-purple-50 text-slate-900 border-4 border-purple-500 shadow-2xl flex items-center justify-center cursor-pointer transition-all hover:scale-105 active:scale-95"
+                            title="Ambil Foto Presensi Sekarang"
+                          >
+                            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-purple-700 to-purple-500 flex items-center justify-center text-white">
+                              <Camera size={16} />
+                            </div>
+                          </button>
+
+                          {/* Flip Camera Quick Button */}
+                          <button
+                            type="button"
+                            onClick={toggleFacingMode}
+                            className="px-3 py-2 rounded-xl bg-black/70 hover:bg-black/90 text-white text-xs font-mono border border-white/20 cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
+                            title="Putar Kamera"
+                          >
+                            <RotateCw size={13} className="text-purple-300" />
+                            <span className="text-[11px]">Putar</span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : capturedImage ? (
+                      /* VIEW 2: PHOTO PREVIEW (UPLOADED OR CAPTURED) */
+                      <div className="space-y-2">
+                        <div className="relative w-full h-56 sm:h-64 bg-slate-950 rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 shadow-xs group">
                           <img
                             src={capturedImage}
                             alt="Bukti Kehadiran Asprak"
                             className="w-full h-full object-cover"
                           />
 
-                          {/* Top Verified Tag */}
-                          <div className="absolute top-3 left-3 bg-emerald-600/95 backdrop-blur-md text-white text-[10px] font-mono font-bold px-3 py-1 rounded-full shadow-md flex items-center gap-1.5">
-                            <CheckCircle2 size={12} />
-                            <span>DRAFT FOTO TERPILIH</span>
+                          {/* Subtle Verified Watermark Banner */}
+                          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-5 text-white font-mono text-[10px]">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-white/90">LAB EDM • R1 LT. 8 TULT</span>
+                              <span className="text-emerald-400 font-bold">TERVERIFIKASI</span>
+                            </div>
+                            <div className="text-[10px] text-white/75 mt-0.5 truncate">
+                              [{selectedAssistant.code}] {selectedAssistant.name} • Shift {selectedShiftNumber} ({selectedShift.className})
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Attached File Action Strip */}
+                        <div className="p-2.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <CheckCircle2 size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <div className="min-w-0">
+                              <div className="font-medium text-slate-900 dark:text-white truncate text-xs font-mono">
+                                {uploadedFileName || "Foto Presensi Lab.jpg"}
+                              </div>
+                              {uploadedFileSize && (
+                                <div className="text-[10px] text-slate-400 font-mono">
+                                  {uploadedFileSize}
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          {/* Watermark Banner */}
-                          <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-6 text-white font-mono text-[11px]">
-                            <div className="flex items-center justify-between font-bold text-purple-300">
-                              <span>LAB EDM • ALPRO 26/27 • R1 LANTAI 8 TULT</span>
-                              <span className="text-emerald-400">GPS VALID</span>
-                            </div>
-                            <div className="text-[10px] text-white/90 mt-0.5">
-                              {selectedAssistant.code} • Shift {selectedShiftNumber} ({selectedShift.className}) • {selectedAssistant.name}
-                            </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => startCamera()}
+                              className="px-2.5 py-1 rounded-lg bg-white dark:bg-white/10 hover:bg-slate-100 dark:hover:bg-white/15 border border-slate-200 dark:border-white/10 text-slate-700 dark:text-neutral-200 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1"
+                            >
+                              <Camera size={12} />
+                              <span>Foto Ulang</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleRemovePhoto}
+                              className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 transition-colors cursor-pointer"
+                              title="Hapus foto"
+                            >
+                              <Trash2 size={13} />
+                            </button>
                           </div>
                         </div>
-                      ) : (
-                        <div className="p-6 text-center space-y-2">
-                          <ImageIcon size={36} className="text-purple-400 mx-auto" />
-                          <p className="text-sm font-bold text-white">Pilih Draft Foto Lab di Atas</p>
-                          <p className="text-xs text-slate-400">Atau gunakan webcam live untuk mengambil foto selfie kehadiran Anda.</p>
+                      </div>
+                    ) : (
+                      /* VIEW 3: DRAG & DROP PHOTO ZONE + CAMERA TRIGGER */
+                      <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className={`relative rounded-xl border-2 border-dashed p-6 sm:p-7 flex flex-col items-center justify-center text-center transition-all ${
+                          isDragging
+                            ? "border-purple-600 bg-purple-50/60 dark:bg-purple-950/30"
+                            : "border-slate-200 dark:border-white/15 bg-slate-50/60 dark:bg-white/5 hover:border-slate-300 dark:hover:border-white/25"
+                        }`}
+                      >
+                        <div className="w-11 h-11 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200/80 dark:border-purple-900/60 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-2.5 shadow-2xs">
+                          <UploadCloud size={22} />
                         </div>
-                      )}
-                    </div>
+
+                        <p className="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">
+                          Tarik &amp; lepas foto di sini, atau{" "}
+                          <label className="text-purple-600 dark:text-purple-400 hover:underline cursor-pointer">
+                            <span>pilih file</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleFileUpload}
+                              className="hidden"
+                            />
+                          </label>
+                        </p>
+
+                        <p className="text-[11px] text-slate-400 font-mono mt-1">
+                          Mendukung JPG, PNG, atau WEBP (Maksimal 10 MB)
+                        </p>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-2 my-2.5 w-full max-w-xs">
+                          <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
+                          <span className="text-[10px] font-mono text-slate-400 uppercase">atau</span>
+                          <div className="flex-1 h-px bg-slate-200 dark:bg-white/10" />
+                        </div>
+
+                        {/* Webcam Trigger Button */}
+                        <button
+                          type="button"
+                          onClick={() => startCamera()}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white dark:bg-white/10 border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/15 text-xs font-medium text-slate-700 dark:text-neutral-200 shadow-2xs transition-colors cursor-pointer"
+                        >
+                          <Camera size={14} className="text-purple-600 dark:text-purple-400" />
+                          <span>Ambil Foto via Kamera</span>
+                        </button>
+                      </div>
+                    )}
+
                     <canvas ref={canvasRef} className="hidden" />
                   </div>
 
                   {/* 4. Status Kehadiran & Catatan */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 uppercase tracking-wider">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-mono font-medium text-slate-600 dark:text-neutral-400 uppercase tracking-wider">
                         Status Kehadiran
                       </label>
                       <select
                         value={status}
                         onChange={(e: any) => setStatus(e.target.value)}
-                        className="w-full bg-slate-50 dark:bg-neutral-900/70 border border-slate-200 dark:border-neutral-800 rounded-xl px-3 py-2.5 text-xs font-mono font-bold text-slate-900 dark:text-white"
+                        className="w-full bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white"
                       >
                         <option value="Hadir Tepat Waktu">Hadir Tepat Waktu</option>
                         <option value="Terlambat">Terlambat (&lt; 15 menit)</option>
@@ -885,16 +975,16 @@ export default function PresensiAsprakPage() {
                       </select>
                     </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 uppercase tracking-wider">
-                        Keterangan / Aktivitas Jaga
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-mono font-medium text-slate-600 dark:text-neutral-400 uppercase tracking-wider">
+                        Aktivitas Jaga
                       </label>
                       <input
                         type="text"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         placeholder="e.g. Pendampingan Modul BST"
-                        className="w-full bg-slate-50 dark:bg-neutral-900/70 border border-slate-200 dark:border-neutral-800 rounded-xl px-3 py-2.5 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
+                        className="w-full bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-2 text-xs font-mono text-slate-900 dark:text-white focus:outline-none focus:border-purple-500"
                       />
                     </div>
                   </div>
@@ -902,30 +992,30 @@ export default function PresensiAsprakPage() {
                   {/* Submit Action Button */}
                   <button
                     type="submit"
-                    className="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-purple-700 via-indigo-600 to-purple-800 hover:from-purple-800 hover:to-indigo-700 text-white font-mono text-sm font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full mt-2 py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-medium text-xs tracking-wide shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <CheckCircle2 size={18} />
-                    <span>Kirim Presensi Kehadiran Asprak</span>
+                    <CheckCircle2 size={15} />
+                    <span>Kirim Presensi Kehadiran</span>
                   </button>
                 </form>
 
                 {/* Success Alert */}
                 {isSubmittedSuccess && (
-                  <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 flex items-start gap-3 animate-fade-in">
-                    <CheckCircle2 size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 flex items-start gap-2.5">
+                    <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                     <div className="space-y-1 text-xs">
-                      <div className="font-bold text-emerald-900 dark:text-emerald-200">
-                        Presensi Berhasil Dicatat ke Server EDM!
+                      <div className="font-semibold text-emerald-900 dark:text-emerald-200">
+                        Presensi Berhasil Dicatat
                       </div>
-                      <p className="text-emerald-700 dark:text-emerald-300 leading-relaxed font-sans">
-                        Terima kasih, <strong>{selectedAssistant.name}</strong>. Presensi Anda pada <strong>Shift {selectedShiftNumber} ({selectedShift.className})</strong> telah tersimpan dan dapat dilihat oleh seluruh asisten di tab Rekap.
+                      <p className="text-emerald-700 dark:text-emerald-300 leading-relaxed text-[11px]">
+                        Presensi <strong>{selectedAssistant.name}</strong> pada Shift {selectedShiftNumber} ({selectedShift.className}) telah tersimpan.
                       </p>
                       <button
                         type="button"
                         onClick={() => setActiveMainTab("rekap")}
-                        className="text-emerald-800 dark:text-emerald-200 font-mono font-bold underline mt-1 cursor-pointer block"
+                        className="text-emerald-800 dark:text-emerald-200 font-mono font-medium underline cursor-pointer inline-block"
                       >
-                        Buka Rekap Kehadiran Seluruh Asisten →
+                        Buka Rekap Kehadiran →
                       </button>
                     </div>
                   </div>
@@ -933,47 +1023,44 @@ export default function PresensiAsprakPage() {
               </div>
 
               {/* Live Feed Column (Right: 5 Cols) */}
-              <div className="lg:col-span-5 space-y-6">
-                {/* Box 1: Shift Yang Sedang Berlangsung Hari Ini */}
-                <div className="bg-white dark:bg-[#0e071a] rounded-[2rem] p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
-                    <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                      <Clock size={16} className="text-purple-600 dark:text-purple-400" />
-                      <span>Shift Berjalan Hari Ini</span>
+              <div className="lg:col-span-5 space-y-4">
+                {/* Box 1: Shift Berjalan Hari Ini */}
+                <div className="bg-white dark:bg-[#0E071A] rounded-2xl p-5 border border-slate-200/80 dark:border-white/10 shadow-xs space-y-3 transition-colors">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-2.5">
+                    <h3 className="font-semibold text-xs text-slate-900 dark:text-white flex items-center gap-2">
+                      <Clock size={14} className="text-slate-500" />
+                      <span>Shift Hari Ini</span>
                     </h3>
-                    <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2.5 py-0.5 rounded-full">
+                    <span className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
                       {ongoing.currentDayName}
                     </span>
                   </div>
 
                   {ongoing.activeShift ? (
-                    <div className="p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-950/50 dark:to-indigo-950/40 border border-purple-200 dark:border-purple-900/60 space-y-2">
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 space-y-1.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300">
+                        <span className="text-xs font-mono font-semibold text-purple-700 dark:text-purple-300">
                           SHIFT {ongoing.activeShift.shiftNumber}
                         </span>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500 text-white">
+                        <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                           Sedang Berlangsung
                         </span>
                       </div>
-                      <div className="text-base font-black text-slate-900 dark:text-white">
+                      <div className="text-sm font-bold text-slate-900 dark:text-white">
                         {ongoing.activeShift.className}
                       </div>
-                      <div className="text-xs font-mono text-slate-600 dark:text-neutral-300">
-                        Pukul: {ongoing.activeShift.timeDisplay} WIB
-                      </div>
-                      <div className="text-[11px] font-sans text-slate-500 dark:text-neutral-400">
-                        {ongoing.activeShift.room}
+                      <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                        {ongoing.activeShift.timeDisplay} WIB • {ongoing.activeShift.room}
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200 dark:border-neutral-800 text-center space-y-1">
-                      <p className="text-xs font-bold text-slate-700 dark:text-neutral-300">
-                        Tidak ada shift yang sedang berlangsung saat ini.
+                    <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 text-center space-y-1">
+                      <p className="text-xs font-medium text-slate-700 dark:text-neutral-300">
+                        Tidak ada shift aktif saat ini
                       </p>
                       {ongoing.nextShiftToday && (
-                        <p className="text-[11px] font-mono text-purple-600 dark:text-purple-400">
-                          Shift berikutnya: Shift {ongoing.nextShiftToday.shiftNumber} ({ongoing.nextShiftToday.className}) pukul {ongoing.nextShiftToday.timeDisplay} WIB.
+                        <p className="text-[11px] font-mono text-slate-500">
+                          Berikutnya: Shift {ongoing.nextShiftToday.shiftNumber} ({ongoing.nextShiftToday.className}) pukul {ongoing.nextShiftToday.timeDisplay} WIB.
                         </p>
                       )}
                     </div>
@@ -981,35 +1068,35 @@ export default function PresensiAsprakPage() {
                 </div>
 
                 {/* Box 2: Feed Cepat Kehadiran Terbaru */}
-                <div className="bg-white dark:bg-[#0e071a] rounded-[2rem] p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4 transition-colors">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
-                    <h3 className="font-bold text-sm text-slate-900 dark:text-white flex items-center gap-2">
-                      <Users size={16} className="text-purple-600 dark:text-purple-400" />
-                      <span>Kehadiran Asisten Terbaru</span>
+                <div className="bg-white dark:bg-[#0E071A] rounded-2xl p-5 border border-slate-200/80 dark:border-white/10 shadow-xs space-y-3 transition-colors">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-2.5">
+                    <h3 className="font-semibold text-xs text-slate-900 dark:text-white flex items-center gap-2">
+                      <Users size={14} className="text-slate-500" />
+                      <span>Kehadiran Terbaru</span>
                     </h3>
                     <button
                       type="button"
                       onClick={() => setActiveMainTab("rekap")}
-                      className="text-xs font-mono font-bold text-purple-700 dark:text-purple-300 hover:underline cursor-pointer"
+                      className="text-[11px] font-mono text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
                     >
                       Lihat Semua ({attendanceLogs.length}) →
                     </button>
                   </div>
 
-                  <div className="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                  <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
                     {attendanceLogs.slice(0, 5).map((log) => (
                       <div
                         key={log.id}
-                        className="p-3 rounded-2xl bg-slate-50 dark:bg-neutral-900/60 border border-slate-200/70 dark:border-neutral-800 space-y-2 hover:border-purple-300 dark:hover:border-purple-800 transition-all"
+                        className="p-2.5 rounded-xl bg-slate-50/70 dark:bg-white/5 border border-slate-200/70 dark:border-white/5 space-y-1.5 hover:border-slate-300 dark:hover:border-white/15 transition-all"
                       >
-                        <div className="flex items-center justify-between gap-3">
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            {/* Photo Thumbnail - click to open modal */}
+                        <div className="flex items-center justify-between gap-2.5">
+                          <div className="flex items-center gap-2 min-w-0">
+                            {/* Photo Thumbnail */}
                             <button
                               type="button"
                               onClick={() => setActivePhotoModal(log)}
-                              className="relative w-10 h-10 rounded-xl overflow-hidden bg-purple-100 dark:bg-purple-950 shrink-0 border border-purple-200 dark:border-purple-800 cursor-pointer hover:scale-105 transition-transform"
-                              title="Klik untuk perbesar foto bukti"
+                              className="relative w-8 h-8 rounded-lg overflow-hidden bg-slate-800 shrink-0 border border-slate-200 dark:border-white/10 cursor-pointer"
+                              title="Klik untuk perbesar"
                             >
                               <img
                                 src={log.photoUrl}
@@ -1018,29 +1105,29 @@ export default function PresensiAsprakPage() {
                               />
                             </button>
                             <div className="min-w-0">
-                              <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                              <div className="font-semibold text-xs text-slate-900 dark:text-white truncate">
                                 [{log.assistantCode}] {log.assistantName}
                               </div>
-                              <div className="text-[10px] font-mono text-purple-700 dark:text-purple-400">
+                              <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
                                 Shift {log.shiftNumber} • {log.className}
                               </div>
                             </div>
                           </div>
 
-                          <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 shrink-0">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 shrink-0 border border-emerald-200 dark:border-emerald-800/60">
                             {log.status}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-slate-100 dark:border-neutral-800/80 pt-1.5">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 border-t border-slate-100 dark:border-white/5 pt-1">
                           <span>{log.timestamp}</span>
                           <button
                             type="button"
                             onClick={() => setActivePhotoModal(log)}
-                            className="text-purple-600 dark:text-purple-400 hover:underline font-bold flex items-center gap-1 cursor-pointer"
+                            className="text-slate-600 dark:text-neutral-300 hover:text-purple-600 font-medium flex items-center gap-1 cursor-pointer"
                           >
                             <Eye size={11} />
-                            <span>Lihat Bukti</span>
+                            <span>Foto Bukti</span>
                           </button>
                         </div>
                       </div>
@@ -1051,45 +1138,45 @@ export default function PresensiAsprakPage() {
             </div>
           )}
 
-          {/* TAB 2: REKAP ABSENSI SELURUH ASISTEN (BISA DILIHAT OLEH SEMUA ORANG) */}
+          {/* TAB 2: REKAP ABSENSI SELURUH ASISTEN */}
           {activeMainTab === "rekap" && (
-            <div className="space-y-6">
+            <div className="space-y-5">
               {/* Summary Stats Cards */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#0e071a] border border-slate-200/80 dark:border-purple-950/60 shadow-xs">
-                  <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 uppercase font-bold">Total Asisten Absen</div>
-                  <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{totalHadir} Asisten</div>
-                  <div className="text-[10px] text-purple-600 dark:text-purple-400 font-mono mt-0.5">Tersimpan di Sistem Lab</div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="p-4 rounded-xl bg-white dark:bg-[#0E071A] border border-slate-200/80 dark:border-white/10 shadow-2xs">
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 uppercase">Total Kehadiran</div>
+                  <div className="text-xl font-bold text-slate-900 dark:text-white mt-0.5">{totalHadir} Asisten</div>
+                  <div className="text-[10px] text-slate-400 font-mono">Tersimpan di Sistem</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#0e071a] border border-slate-200/80 dark:border-purple-950/60 shadow-xs">
-                  <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 uppercase font-bold">Tepat Waktu</div>
-                  <div className="text-2xl font-black text-emerald-600 dark:text-emerald-400 mt-1">{tepatWaktuCount}</div>
-                  <div className="text-[10px] text-emerald-600 font-mono mt-0.5">Sesuai Jadwal Shift</div>
+                <div className="p-4 rounded-xl bg-white dark:bg-[#0E071A] border border-slate-200/80 dark:border-white/10 shadow-2xs">
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 uppercase">Tepat Waktu</div>
+                  <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">{tepatWaktuCount}</div>
+                  <div className="text-[10px] text-emerald-600/80 font-mono">Sesuai Jadwal</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#0e071a] border border-slate-200/80 dark:border-purple-950/60 shadow-xs">
-                  <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 uppercase font-bold">Terlambat (&lt;15m)</div>
-                  <div className="text-2xl font-black text-amber-600 dark:text-amber-400 mt-1">{terlambatCount}</div>
-                  <div className="text-[10px] text-amber-600 font-mono mt-0.5">Tercatat Disiplin Lab</div>
+                <div className="p-4 rounded-xl bg-white dark:bg-[#0E071A] border border-slate-200/80 dark:border-white/10 shadow-2xs">
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 uppercase">Terlambat (&lt;15m)</div>
+                  <div className="text-xl font-bold text-amber-600 dark:text-amber-400 mt-0.5">{terlambatCount}</div>
+                  <div className="text-[10px] text-amber-600/80 font-mono">Tercatat Sistem</div>
                 </div>
-                <div className="p-4 rounded-2xl bg-white dark:bg-[#0e071a] border border-slate-200/80 dark:border-purple-950/60 shadow-xs">
-                  <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400 uppercase font-bold">Shift Swap</div>
-                  <div className="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">{swapCount}</div>
-                  <div className="text-[10px] text-indigo-600 font-mono mt-0.5">Asisten Pengganti</div>
+                <div className="p-4 rounded-xl bg-white dark:bg-[#0E071A] border border-slate-200/80 dark:border-white/10 shadow-2xs">
+                  <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400 uppercase">Shift Swap</div>
+                  <div className="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-0.5">{swapCount}</div>
+                  <div className="text-[10px] text-indigo-600/80 font-mono">Asisten Pengganti</div>
                 </div>
               </div>
 
               {/* Filter and Search Bar */}
-              <div className="bg-white dark:bg-[#0e071a] rounded-[2rem] p-5 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="bg-white dark:bg-[#0E071A] rounded-2xl p-4 sm:p-5 border border-slate-200/80 dark:border-white/10 shadow-xs space-y-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                   {/* Search Bar */}
                   <div className="relative flex-1">
-                    <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Cari berdasarkan nama, kode asisten, atau kelas..."
-                      className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                      placeholder="Cari nama, kode asisten, atau kelas..."
+                      className="w-full pl-9 pr-4 py-2 rounded-xl bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
                     />
                   </div>
 
@@ -1099,7 +1186,7 @@ export default function PresensiAsprakPage() {
                     <select
                       value={filterShift}
                       onChange={(e) => setFilterShift(e.target.value)}
-                      className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-700 dark:text-neutral-300 cursor-pointer"
                     >
                       <option value="ALL">Semua Shift</option>
                       {ALPRO_15_SHIFTS.map((s) => (
@@ -1113,7 +1200,7 @@ export default function PresensiAsprakPage() {
                     <select
                       value={filterDivision}
                       onChange={(e) => setFilterDivision(e.target.value)}
-                      className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-700 dark:text-neutral-300 cursor-pointer"
                     >
                       <option value="ALL">Semua Divisi</option>
                       <option value="Koordinator">Koordinator</option>
@@ -1128,7 +1215,7 @@ export default function PresensiAsprakPage() {
                     <select
                       value={filterStatus}
                       onChange={(e) => setFilterStatus(e.target.value)}
-                      className="px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-xs font-mono text-slate-700 dark:text-neutral-300 cursor-pointer"
                     >
                       <option value="ALL">Semua Status</option>
                       <option value="Hadir Tepat Waktu">Hadir Tepat Waktu</option>
@@ -1148,49 +1235,48 @@ export default function PresensiAsprakPage() {
                     <p className="text-xs text-slate-400">Silakan ubah filter pencarian atau shift di atas.</p>
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
                     {filteredLogs.map((log) => (
                       <div
                         key={log.id}
-                        className="bg-slate-50/80 dark:bg-neutral-900/60 rounded-2xl p-4 border border-slate-200/80 dark:border-neutral-800 space-y-3 hover:border-purple-400 dark:hover:border-purple-700 transition-all shadow-xs"
+                        className="bg-slate-50/70 dark:bg-white/5 rounded-xl p-3.5 border border-slate-200/70 dark:border-white/10 space-y-2.5 hover:border-slate-300 dark:hover:border-white/20 transition-all shadow-2xs"
                       >
                         {/* Header card */}
-                        <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start justify-between gap-2.5">
                           <div className="flex items-center gap-2.5 min-w-0">
                             {/* Photo Thumbnail */}
                             <button
                               type="button"
                               onClick={() => setActivePhotoModal(log)}
-                              className="relative w-12 h-12 rounded-xl overflow-hidden bg-purple-100 dark:bg-purple-950 shrink-0 border border-purple-200 dark:border-purple-800 cursor-pointer hover:scale-105 transition-transform"
-                              title="Klik untuk melihat foto selfie lengkap"
+                              className="relative w-10 h-10 rounded-lg overflow-hidden bg-slate-800 shrink-0 border border-slate-200 dark:border-white/10 cursor-pointer"
+                              title="Klik untuk perbesar"
                             >
                               <img
                                 src={log.photoUrl}
                                 alt={log.assistantName}
                                 className="w-full h-full object-cover"
                               />
-                              <div className="absolute inset-0 bg-black/20 hover:bg-transparent transition-colors" />
                             </button>
                             <div className="min-w-0">
-                              <div className="font-bold text-xs text-slate-900 dark:text-white truncate">
+                              <div className="font-semibold text-xs text-slate-900 dark:text-white truncate">
                                 [{log.assistantCode}] {log.assistantName}
                               </div>
                               <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 truncate">
                                 {log.assistantRole}
                               </div>
-                              <div className="text-[9px] font-mono text-slate-500 dark:text-neutral-400">
+                              <div className="text-[9px] font-mono text-slate-400">
                                 {log.division}
                               </div>
                             </div>
                           </div>
 
                           <span
-                            className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                            className={`text-[9px] font-mono px-2 py-0.5 rounded shrink-0 ${
                               log.status === "Hadir Tepat Waktu"
-                                ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
+                                ? "bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60"
                                 : log.status === "Terlambat"
-                                ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
-                                : "bg-indigo-100 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300"
+                                ? "bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60"
+                                : "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/60"
                             }`}
                           >
                             {log.status}
@@ -1198,9 +1284,9 @@ export default function PresensiAsprakPage() {
                         </div>
 
                         {/* Shift and time */}
-                        <div className="p-2.5 rounded-xl bg-white dark:bg-black/30 border border-slate-200/60 dark:border-neutral-800 text-[11px] font-mono space-y-1">
+                        <div className="p-2 rounded-lg bg-white dark:bg-white/5 border border-slate-200/60 dark:border-white/5 text-[11px] font-mono space-y-0.5">
                           <div className="flex items-center justify-between text-slate-700 dark:text-neutral-300">
-                            <span className="font-bold text-purple-700 dark:text-purple-400">
+                            <span className="font-semibold text-purple-700 dark:text-purple-300">
                               Shift {log.shiftNumber} ({log.className})
                             </span>
                             <span className="text-slate-400 text-[10px]">R1 TULT Lt 8</span>
@@ -1211,17 +1297,17 @@ export default function PresensiAsprakPage() {
                         </div>
 
                         {/* Notes */}
-                        <p className="text-xs text-slate-600 dark:text-neutral-300 font-sans italic line-clamp-2">
+                        <p className="text-[11px] text-slate-600 dark:text-neutral-300 font-sans italic line-clamp-2">
                           &quot;{log.notes}&quot;
                         </p>
 
                         {/* Footer Info & Action */}
-                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-2 border-t border-slate-200/60 dark:border-neutral-800/80">
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-1.5 border-t border-slate-200/60 dark:border-white/5">
                           <span>{log.timestamp}</span>
                           <button
                             type="button"
                             onClick={() => setActivePhotoModal(log)}
-                            className="px-2.5 py-1 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-800 dark:text-purple-300 font-bold hover:bg-purple-200 transition-colors flex items-center gap-1 cursor-pointer"
+                            className="text-slate-600 dark:text-neutral-300 hover:text-purple-600 font-medium flex items-center gap-1 cursor-pointer"
                           >
                             <Eye size={11} />
                             <span>Foto Bukti</span>
@@ -1238,16 +1324,16 @@ export default function PresensiAsprakPage() {
           {/* FULL PHOTO PROOF MODAL */}
           {activePhotoModal && (
             <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs animate-fade-in">
-              <div className="relative w-full max-w-lg bg-white dark:bg-[#0e071a] rounded-[2rem] overflow-hidden shadow-2xl border border-purple-200 dark:border-purple-900/60 space-y-4">
+              <div className="relative w-full max-w-lg bg-white dark:bg-[#0E071A] rounded-2xl overflow-hidden shadow-xl border border-slate-200/80 dark:border-white/10 space-y-3.5">
                 {/* Modal Header */}
-                <div className="p-5 pb-0 flex items-center justify-between">
+                <div className="p-4 sm:p-5 pb-0 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck size={20} className="text-emerald-500" />
+                    <ShieldCheck size={18} className="text-emerald-500" />
                     <div>
-                      <h4 className="text-sm font-bold text-slate-900 dark:text-white">
-                        Bukti Validasi Presensi Asisten
+                      <h4 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Bukti Validasi Kehadiran
                       </h4>
-                      <p className="text-[10px] font-mono text-purple-600 dark:text-purple-400">
+                      <p className="text-[10px] font-mono text-slate-400">
                         EDM Laboratory Official Proof
                       </p>
                     </div>
@@ -1255,15 +1341,15 @@ export default function PresensiAsprakPage() {
                   <button
                     type="button"
                     onClick={() => setActivePhotoModal(null)}
-                    className="p-1.5 rounded-full bg-slate-100 dark:bg-neutral-800 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
+                    className="p-1 rounded-lg bg-slate-100 dark:bg-white/10 text-slate-500 hover:text-slate-900 dark:hover:text-white cursor-pointer"
                   >
-                    <X size={16} />
+                    <X size={15} />
                   </button>
                 </div>
 
                 {/* Modal Image View */}
-                <div className="px-5">
-                  <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-slate-950 border border-slate-200 dark:border-neutral-800">
+                <div className="px-4 sm:px-5">
+                  <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-200 dark:border-white/10">
                     <img
                       src={activePhotoModal.photoUrl}
                       alt={activePhotoModal.assistantName}
@@ -1271,12 +1357,12 @@ export default function PresensiAsprakPage() {
                     />
 
                     {/* Watermark Details */}
-                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/95 via-black/70 to-transparent p-3 pt-6 text-white font-mono text-[11px]">
-                      <div className="flex items-center justify-between font-bold text-purple-300">
+                    <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-2.5 pt-5 text-white font-mono text-[10px]">
+                      <div className="flex items-center justify-between">
                         <span>LAB EDM • ALPRO 26/27</span>
                         <span className="text-emerald-400">GPS VALID</span>
                       </div>
-                      <div className="text-[10px] text-white/90 mt-0.5">
+                      <div className="text-[10px] text-white/80 mt-0.5 truncate">
                         [{activePhotoModal.assistantCode}] {activePhotoModal.assistantName} • Shift {activePhotoModal.shiftNumber} ({activePhotoModal.className})
                       </div>
                     </div>
@@ -1284,17 +1370,17 @@ export default function PresensiAsprakPage() {
                 </div>
 
                 {/* Assistant Details Strip */}
-                <div className="px-5 pb-5 space-y-3">
-                  <div className="p-3.5 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-900/60 flex items-center justify-between gap-3 text-xs">
+                <div className="px-4 sm:px-5 pb-4 space-y-2.5">
+                  <div className="p-3 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 flex items-center justify-between gap-3 text-xs">
                     <div>
-                      <div className="font-bold text-slate-900 dark:text-white">
+                      <div className="font-semibold text-slate-900 dark:text-white">
                         {activePhotoModal.assistantName} ({activePhotoModal.assistantCode})
                       </div>
-                      <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300">
+                      <div className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
                         {activePhotoModal.assistantRole} • {activePhotoModal.division}
                       </div>
                     </div>
-                    <span className="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                       {activePhotoModal.status}
                     </span>
                   </div>

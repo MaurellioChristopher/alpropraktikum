@@ -7,6 +7,7 @@ import { ALPRO_ASSISTANTS } from "@/data/assistants-roster";
 import Link from "next/link";
 
 export default function SwapEngineDashboard() {
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [swaps, setSwaps] = useState([
     { id: 1, req: "MACY", reqRole: "KOOR CNI", target: "DEVO", targetRole: "KORPRAK", shiftOut: "Modul 4 / SI5001", shiftIn: "Modul 4 / SI5004", status: "PENDING" },
     { id: 2, req: "GRGS", reqRole: "SEKRETARIS", target: "SYOW", targetRole: "BENDAHARA", shiftOut: "Modul 4 / SI5007", shiftIn: "Modul 4 / SI50INT", status: "APPROVED" },
@@ -37,7 +38,11 @@ export default function SwapEngineDashboard() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start">
-      <DashboardSidebar activeTab="perizinan" />
+      <DashboardSidebar
+        activeTab="perizinan"
+        isMobileOpen={isMobileOpen}
+        onCloseMobile={() => setIsMobileOpen(false)}
+      />
 
       <div className="flex-1 w-full min-w-0 space-y-6">
         {/* Header */}

@@ -334,7 +334,7 @@ export default function AssistantDashboard() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 items-start pb-20 sm:pb-8">
+    <div className="flex flex-col lg:flex-row gap-6 items-start pb-28 sm:pb-8">
       {/* LEFT SIDEBAR with role-based feature gating & responsive drawer */}
       <DashboardSidebar
         role={currentRole}
@@ -2704,7 +2704,7 @@ export default function AssistantDashboard() {
       </div>
 
       {/* MOBILE BOTTOM NAVIGATION BAR (Phones: sm:hidden) */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0e071a]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-purple-950/60 px-3 py-2 flex items-center justify-around shadow-lg">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0e071a]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-purple-950/60 px-3 pt-2 pb-2 safe-pb flex items-center justify-around shadow-lg">
         <button
           type="button"
           onClick={() => switchTab("dashboard")}

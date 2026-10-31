@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -16,9 +16,30 @@ const jetbrainsMono = JetBrains_Mono({
 
 import { ThemeProvider } from "@/components/theme-provider";
 
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FFFFFF" },
+    { media: "(prefers-color-scheme: dark)", color: "#070312" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
-  title: "EDM Laboratory | Internal Operations",
-  description: "Mission-Critical Internal Web Portal & Dashboard exclusively for Asisten EDM Laboratory",
+  title: "EDM Laboratory | Praktikum ALPRO",
+  description: "Portal Resmi Praktikum Algoritma & Pemrograman EDM Laboratory Telkom University",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ALPRO EDM",
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
