@@ -455,7 +455,7 @@ export default function AssistantDashboard() {
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.1]">
                   Hai, {currentAssistantProfile.name.split(" ")[0]}!<br />
                   <span className="font-extrabold text-slate-800 dark:text-neutral-100">
-                    Draf aman. Mata juga butuh jeda.
+                    Semangat buat praktikumnya hari ini! Bimbing praktikan dengan maksimal.
                   </span>
                 </h1>
                 <div>
