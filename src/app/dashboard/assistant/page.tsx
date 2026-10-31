@@ -449,18 +449,19 @@ export default function AssistantDashboard() {
         {(activeTab === "dashboard" || activeTab === "beranda") && (
           <div className="space-y-6">
 
-            {/* HERO GREETING BANNER (Faithfully matching Image 1 layout with ALPRO EDM theme & REAL DATA) */}
-            <div className="relative rounded-[2.5rem] bg-gradient-to-r from-[#EDE9FE] via-[#F5F3FF] to-[#FAF5FF] dark:from-[#241348] dark:via-[#1A0C35] dark:to-[#120726] border border-purple-200/80 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all min-h-[250px]">
-              {/* Background Mascot EDM Art */}
-              <div className="absolute right-32 sm:right-48 lg:right-64 bottom-0 w-64 sm:w-80 lg:w-[380px] h-full pointer-events-none z-0 opacity-45 sm:opacity-55 dark:opacity-35">
+            {/* HERO GREETING BANNER WITH OFFICIAL Hero_Background_EDM_3Maskot */}
+            <div className="relative rounded-[2.5rem] border border-purple-200/80 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all min-h-[250px]">
+              {/* Background: Official Hero_Background_EDM_3Maskot.png Panorama */}
+              <div className="absolute inset-0 z-0 pointer-events-none select-none">
                 <Image
-                  src="/images/edm-mascot-hero-art.png"
-                  alt="Maskot EDM Laboratory"
+                  src="/images/hero-bg-edm-3maskot.png"
+                  alt="Hero Background EDM 3 Maskot"
                   fill
-                  sizes="400px"
                   priority
-                  className="object-contain object-bottom"
+                  className="object-cover object-center"
                 />
+                {/* Subtle dark mode filter to keep text contrast perfect */}
+                <div className="absolute inset-0 bg-transparent dark:bg-[#0e071a]/75" />
               </div>
 
               {/* Left Column: Greeting, Real SI'50 Class Chips & Action Button */}
@@ -519,6 +520,9 @@ export default function AssistantDashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Center spacer so the 3 mascots on the background panorama shine through */}
+              <div className="hidden lg:block flex-1 min-h-[140px] pointer-events-none" />
 
               {/* Right: Floating Status Card with Real Duty Telemetry */}
               <div className="relative z-10 w-full lg:w-80 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3.5">
