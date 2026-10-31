@@ -1519,7 +1519,7 @@ export default function AssistantDashboard() {
                           >
                             <div className="font-black text-xs">SHIFT 11</div>
                             <div className="font-bold text-sm text-sky-900 dark:text-sky-200">(SI-50-01)</div>
-                            <div className="text-[10px] font-mono text-sky-700 dark:text-sky-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-sky-700 dark:text-sky-300 mt-1">7 Grup (AITS, ALRS, ...)</div>
                           </button>
                         </td>
                         {/* SABTU: SHIFT 13 */}
@@ -1534,7 +1534,7 @@ export default function AssistantDashboard() {
                           >
                             <div className="font-black text-xs">SHIFT 13</div>
                             <div className="font-bold text-sm text-blue-900 dark:text-blue-200">(SI-50-INT)</div>
-                            <div className="text-[10px] font-mono text-blue-700 dark:text-blue-300 mt-1">Internasional</div>
+                            <div className="text-[10px] font-mono text-blue-700 dark:text-blue-300 mt-1">3 Grup (RAZA, FAAA, ...)</div>
                           </button>
                         </td>
                       </tr>
@@ -1616,7 +1616,7 @@ export default function AssistantDashboard() {
                           >
                             <div className="font-black text-xs">SHIFT 14</div>
                             <div className="font-bold text-sm text-slate-800 dark:text-neutral-200">(SI-50-07)</div>
-                            <div className="text-[10px] font-mono text-slate-600 dark:text-neutral-400 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-slate-600 dark:text-neutral-400 mt-1">7 Grup (IREM, NNUA, ...)</div>
                           </button>
                         </td>
                       </tr>
@@ -1656,7 +1656,7 @@ export default function AssistantDashboard() {
                           >
                             <div className="font-black text-xs">SHIFT 12</div>
                             <div className="font-bold text-sm text-amber-900 dark:text-amber-200">(SI-50-08)</div>
-                            <div className="text-[10px] font-mono text-amber-700 dark:text-amber-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-amber-700 dark:text-amber-300 mt-1">7 Grup (ADRP, INTC, ...)</div>
                           </button>
                         </td>
                         <td></td>
@@ -1702,12 +1702,15 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(10)}
+                            onClick={() => {
+                              setSelectedShiftForModal(10);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-purple-100 hover:bg-purple-200 dark:bg-purple-950/80 dark:hover:bg-purple-900/80 border border-purple-300 dark:border-purple-700 text-purple-950 dark:text-purple-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 10</div>
                             <div className="font-bold text-sm text-purple-900 dark:text-purple-200">(SI-50-06)</div>
-                            <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-purple-700 dark:text-purple-300 mt-1">7 Grup (RAAP, ARSM, ...)</div>
                           </button>
                         </td>
                         <td></td>
@@ -1715,12 +1718,15 @@ export default function AssistantDashboard() {
                         <td className="p-1.5 align-top">
                           <button
                             type="button"
-                            onClick={() => setSelectedShiftForModal(15)}
+                            onClick={() => {
+                              setSelectedShiftForModal(15);
+                              setSelectedModalGroup(null);
+                            }}
                             className="w-full h-full p-2.5 rounded-xl bg-rose-300/80 hover:bg-rose-300 dark:bg-rose-950 dark:hover:bg-rose-900 border border-rose-400 dark:border-rose-600 text-rose-950 dark:text-rose-100 font-sans text-left transition-all cursor-pointer shadow-xs"
                           >
                             <div className="font-black text-xs">SHIFT 15</div>
                             <div className="font-bold text-sm text-rose-900 dark:text-rose-200">(SI-50-14)</div>
-                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">Plotting Menyusul</div>
+                            <div className="text-[10px] font-mono text-rose-700 dark:text-rose-300 mt-1">7 Grup (MACY, MUNR, ...)</div>
                           </button>
                         </td>
                       </tr>

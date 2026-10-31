@@ -869,7 +869,310 @@ export const SHIFT_9_STUDENTS: StudentPlotting[] = [
   { nim: "102022680033", name: "YUL AMROZI", classCode: "SI5003", className: "SI-50-03", assistantCode: "ADRP", group: "G" },
 ];
 
-// Map of finalized plottings for Shift 1 s.d. 9
+export const SHIFT_10_STUDENTS: StudentPlotting[] = [
+  // GRUP A (RAAP)
+  { nim: "102022600008", name: "GABRYELA DEBORA KAROLINA SINAGA", classCode: "SI5006", className: "SI-50-06", assistantCode: "RAAP", group: "A" },
+  { nim: "102022600030", name: "REZA KEMAL PASHA", classCode: "SI5006", className: "SI-50-06", assistantCode: "RAAP", group: "A" },
+  { nim: "102022600039", name: "OLIVIA LARISSA", classCode: "SI5006", className: "SI-50-06", assistantCode: "RAAP", group: "A" },
+  { nim: "102022600053", name: "ICHSANUL MUARIFIN", classCode: "SI5006", className: "SI-50-06", assistantCode: "RAAP", group: "A" },
+  { nim: "102022600071", name: "AHMAD QURTUBIE", classCode: "SI5006", className: "SI-50-06", assistantCode: "RAAP", group: "A" },
+  { nim: "102022600079", name: "ANGGITA SHAFIYYAH PUTRI", classCode: "SI5006", className: "SI-50-06", assistantCode: "RAAP", group: "A" },
+
+  // GRUP B (ARSM)
+  { nim: "102022600097", name: "PANDU CAESARIO", classCode: "SI5006", className: "SI-50-06", assistantCode: "ARSM", group: "B" },
+  { nim: "102022600106", name: "YESIKA EVLIN", classCode: "SI5006", className: "SI-50-06", assistantCode: "ARSM", group: "B" },
+  { nim: "102022600121", name: "PRAMA PASHA NUGRAHA", classCode: "SI5006", className: "SI-50-06", assistantCode: "ARSM", group: "B" },
+  { nim: "102022600136", name: "MUHAMMAD DANIAL NAFIS", classCode: "SI5006", className: "SI-50-06", assistantCode: "ARSM", group: "B" },
+  { nim: "102022600149", name: "VIZZYA MAULIDA AZ ZAHRA", classCode: "SI5006", className: "SI-50-06", assistantCode: "ARSM", group: "B" },
+  { nim: "102022600156", name: "YOHANES JUAN BIMO ELU", classCode: "SI5006", className: "SI-50-06", assistantCode: "ARSM", group: "B" },
+
+  // GRUP C (GRGS)
+  { nim: "102022600175", name: "AFRICO PUTRA PARTOGI", classCode: "SI5006", className: "SI-50-06", assistantCode: "GRGS", group: "C" },
+  { nim: "102022600190", name: "KHARISSA ZHAFIRA", classCode: "SI5006", className: "SI-50-06", assistantCode: "GRGS", group: "C" },
+  { nim: "102022600200", name: "LUTVI AZIEZ MAULANA", classCode: "SI5006", className: "SI-50-06", assistantCode: "GRGS", group: "C" },
+  { nim: "102022600213", name: "CINDY LAKSITA AJIE", classCode: "SI5006", className: "SI-50-06", assistantCode: "GRGS", group: "C" },
+  { nim: "102022600226", name: "DYMAS JAYADININGRAT", classCode: "SI5006", className: "SI-50-06", assistantCode: "GRGS", group: "C" },
+  { nim: "102022600243", name: "ARVEL PRAYOGA PRAJA", classCode: "SI5006", className: "SI-50-06", assistantCode: "GRGS", group: "C" },
+
+  // GRUP D (AZMH)
+  { nim: "102022600260", name: "IQBAL HAKIM ROBANI", classCode: "SI5006", className: "SI-50-06", assistantCode: "AZMH", group: "D" },
+  { nim: "102022600279", name: "RAFFI GUSTI PUTRA", classCode: "SI5006", className: "SI-50-06", assistantCode: "AZMH", group: "D" },
+  { nim: "102022600295", name: "NIZAMUDIN FAQIH", classCode: "SI5006", className: "SI-50-06", assistantCode: "AZMH", group: "D" },
+  { nim: "102022600306", name: "NAYLA SHOFIYAH AZZAHRA", classCode: "SI5006", className: "SI-50-06", assistantCode: "AZMH", group: "D" },
+  { nim: "102022600314", name: "RIDHO HAFIZH", classCode: "SI5006", className: "SI-50-06", assistantCode: "AZMH", group: "D" },
+  { nim: "102022600329", name: "DAFFA ADITYA PUTRA", classCode: "SI5006", className: "SI-50-06", assistantCode: "AZMH", group: "D" },
+
+  // GRUP E (IREM)
+  { nim: "102022600349", name: "RAIHAN ZAYYAN NABIL", classCode: "SI5006", className: "SI-50-06", assistantCode: "IREM", group: "E" },
+  { nim: "102022600351", name: "DAYVA FAIZAH", classCode: "SI5006", className: "SI-50-06", assistantCode: "IREM", group: "E" },
+  { nim: "102022600373", name: "MUHAMMAD WILDAN NURROHMAN", classCode: "SI5006", className: "SI-50-06", assistantCode: "IREM", group: "E" },
+  { nim: "102022600387", name: "ZENONI JINGGA ALUNA TINAYA WIJANARKO", classCode: "SI5006", className: "SI-50-06", assistantCode: "IREM", group: "E" },
+  { nim: "102022600391", name: "M ABIDAR AL GHIFARI", classCode: "SI5006", className: "SI-50-06", assistantCode: "IREM", group: "E" },
+
+  // GRUP F (LAUF)
+  { nim: "102022600410", name: "RAFA ADYA SYAFIQ", classCode: "SI5006", className: "SI-50-06", assistantCode: "LAUF", group: "F" },
+  { nim: "102022600426", name: "BHATARA NITISARA PUTRA", classCode: "SI5006", className: "SI-50-06", assistantCode: "LAUF", group: "F" },
+  { nim: "102022600443", name: "SHERLY FEBRINIA LESTARI", classCode: "SI5006", className: "SI-50-06", assistantCode: "LAUF", group: "F" },
+  { nim: "102022600445", name: "SASANDO Y.NDAUMANU", classCode: "SI5006", className: "SI-50-06", assistantCode: "LAUF", group: "F" },
+  { nim: "102022600458", name: "AHMAD HASBI RASYID", classCode: "SI5006", className: "SI-50-06", assistantCode: "LAUF", group: "F" },
+  { nim: "102022600484", name: "A.MUH KAYVAN OCTO RIFA", classCode: "SI5006", className: "SI-50-06", assistantCode: "LAUF", group: "F" },
+
+  // GRUP G (ADRP)
+  { nim: "102022600500", name: "SHINDY CHRISTIN BARANY", classCode: "SI5006", className: "SI-50-06", assistantCode: "ADRP", group: "G" },
+  { nim: "102022600501", name: "RAIHAN ADITYA TARIDALA", classCode: "SI5006", className: "SI-50-06", assistantCode: "ADRP", group: "G" },
+  { nim: "102022630004", name: "ALFREDO TINAMBUNAN", classCode: "SI5006", className: "SI-50-06", assistantCode: "ADRP", group: "G" },
+  { nim: "102022630019", name: "GHEA AINUL WARDAH", classCode: "SI5006", className: "SI-50-06", assistantCode: "ADRP", group: "G" },
+  { nim: "102022630040", name: "IBRAHIM HUSEIN", classCode: "SI5006", className: "SI-50-06", assistantCode: "ADRP", group: "G" },
+];
+
+export const SHIFT_11_STUDENTS: StudentPlotting[] = [
+  // GRUP A (AITS)
+  { nim: "102022600001", name: "INTAN AFRIANI", classCode: "SI5001", className: "SI-50-01", assistantCode: "AITS", group: "A" },
+  { nim: "102022600020", name: "NABIL HARYANDA KAMAL", classCode: "SI5001", className: "SI-50-01", assistantCode: "AITS", group: "A" },
+  { nim: "102022600026", name: "QARIRA HANIFA", classCode: "SI5001", className: "SI-50-01", assistantCode: "AITS", group: "A" },
+  { nim: "102022600047", name: "M. LUTHFI ADRIKA", classCode: "SI5001", className: "SI-50-01", assistantCode: "AITS", group: "A" },
+  { nim: "102022600062", name: "MELATI LASMARITO", classCode: "SI5001", className: "SI-50-01", assistantCode: "AITS", group: "A" },
+  { nim: "102022600064", name: "MUHAMMAD AL FIKRI Y", classCode: "SI5001", className: "SI-50-01", assistantCode: "AITS", group: "A" },
+
+  // GRUP B (ALRS)
+  { nim: "102022600087", name: "MUHAMAD KEYZAR ABIYASA", classCode: "SI5001", className: "SI-50-01", assistantCode: "ALRS", group: "B" },
+  { nim: "102022600094", name: "REVINA RIZQA FADHILLAH", classCode: "SI5001", className: "SI-50-01", assistantCode: "ALRS", group: "B" },
+  { nim: "102022600116", name: "RAFA ADITYA RUSLI", classCode: "SI5001", className: "SI-50-01", assistantCode: "ALRS", group: "B" },
+  { nim: "102022600130", name: "NABILA INAYATULLAH", classCode: "SI5001", className: "SI-50-01", assistantCode: "ALRS", group: "B" },
+  { nim: "102022600132", name: "AIRLANGGA EVORIUS FARREL", classCode: "SI5001", className: "SI-50-01", assistantCode: "ALRS", group: "B" },
+  { nim: "102022600150", name: "DANENDRA AMMAR LATIF", classCode: "SI5001", className: "SI-50-01", assistantCode: "ALRS", group: "B" },
+
+  // GRUP C (AZMH)
+  { nim: "102022600169", name: "HARITS FARREL HIDAYAT", classCode: "SI5001", className: "SI-50-01", assistantCode: "AZMH", group: "C" },
+  { nim: "102022600179", name: "FARSYA ZHARIFA RIZQA RAMADHANI", classCode: "SI5001", className: "SI-50-01", assistantCode: "AZMH", group: "C" },
+  { nim: "102022600191", name: "GALUH ZUFAR AHMAD", classCode: "SI5001", className: "SI-50-01", assistantCode: "AZMH", group: "C" },
+  { nim: "102022600207", name: "MEISYIA ARNELITA SIBORO", classCode: "SI5001", className: "SI-50-01", assistantCode: "AZMH", group: "C" },
+  { nim: "102022600221", name: "FINNAHARI FATHUL AKBAR", classCode: "SI5001", className: "SI-50-01", assistantCode: "AZMH", group: "C" },
+  { nim: "102022600235", name: "CHINTYA RAMADHANI", classCode: "SI5001", className: "SI-50-01", assistantCode: "AZMH", group: "C" },
+
+  // GRUP D (IREM)
+  { nim: "102022600238", name: "AREAL CAESAR ISLAMI", classCode: "SI5001", className: "SI-50-01", assistantCode: "IREM", group: "D" },
+  { nim: "102022600255", name: "ADITIYA MULYAWARMAN", classCode: "SI5001", className: "SI-50-01", assistantCode: "IREM", group: "D" },
+  { nim: "102022600273", name: "RIZKY ANDHIKA PRAJA", classCode: "SI5001", className: "SI-50-01", assistantCode: "IREM", group: "D" },
+  { nim: "102022600285", name: "RAIQA ALYA RAMADHANI", classCode: "SI5001", className: "SI-50-01", assistantCode: "IREM", group: "D" },
+  { nim: "102022600290", name: "MUHAMMAD KEANU SURYA MULYA", classCode: "SI5001", className: "SI-50-01", assistantCode: "IREM", group: "D" },
+  { nim: "102022600303", name: "ABIEL AL-FAREL SYAH", classCode: "SI5001", className: "SI-50-01", assistantCode: "IREM", group: "D" },
+
+  // GRUP E (ARSM)
+  { nim: "102022600324", name: "SULTHAN RASYID SIDQI", classCode: "SI5001", className: "SI-50-01", assistantCode: "ARSM", group: "E" },
+  { nim: "102022600337", name: "ANGELIA SABANA DZIKRA", classCode: "SI5001", className: "SI-50-01", assistantCode: "ARSM", group: "E" },
+  { nim: "102022600344", name: "MAZKAFIQLLA ZAINRAJA SANTOSA", classCode: "SI5001", className: "SI-50-01", assistantCode: "ARSM", group: "E" },
+  { nim: "102022600366", name: "RADITYA KUSNA WIRASAKA", classCode: "SI5001", className: "SI-50-01", assistantCode: "ARSM", group: "E" },
+  { nim: "102022600405", name: "GALEH RADYA PRATAMA RAMADHAN", classCode: "SI5001", className: "SI-50-01", assistantCode: "ARSM", group: "E" },
+  { nim: "102022600420", name: "MUHAMAD AUZAN HIBATULLAH", classCode: "SI5001", className: "SI-50-01", assistantCode: "ARSM", group: "E" },
+
+  // GRUP F (RAAP)
+  { nim: "102022600427", name: "RAYA AELIA AL'ARAF YUWONO", classCode: "SI5001", className: "SI-50-01", assistantCode: "RAAP", group: "F" },
+  { nim: "102022600438", name: "MADE FEBRIAN JOSHUA NUGRAHA", classCode: "SI5001", className: "SI-50-01", assistantCode: "RAAP", group: "F" },
+  { nim: "102022600452", name: "MUHAMMAD NAWFAL ARFANI PUTRA", classCode: "SI5001", className: "SI-50-01", assistantCode: "RAAP", group: "F" },
+  { nim: "102022600479", name: "VANIA HASSYA KHARISA TOEKIDJO", classCode: "SI5001", className: "SI-50-01", assistantCode: "RAAP", group: "F" },
+  { nim: "102022600481", name: "MOHAMAD ADAFFA LUTHFI MUNAJAT", classCode: "SI5001", className: "SI-50-01", assistantCode: "RAAP", group: "F" },
+  { nim: "102022600494", name: "ANDI MUHAMMAD ZAKY ALFAIN", classCode: "SI5001", className: "SI-50-01", assistantCode: "RAAP", group: "F" },
+
+  // GRUP G (DINF)
+  { nim: "102022600511", name: "MOCH. RAFI CAHYALESMANA", classCode: "SI5001", className: "SI-50-01", assistantCode: "DINF", group: "G" },
+  { nim: "102022630001", name: "FIRAZ ALFATHAN", classCode: "SI5001", className: "SI-50-01", assistantCode: "DINF", group: "G" },
+  { nim: "102022630028", name: "NAYLA EMIRATY", classCode: "SI5001", className: "SI-50-01", assistantCode: "DINF", group: "G" },
+  { nim: "102022630030", name: "MUHAMMAD HAFIZH ADITIYA", classCode: "SI5001", className: "SI-50-01", assistantCode: "DINF", group: "G" },
+  { nim: "102022630038", name: "MUHAMMAD RIZKY PRASETYA", classCode: "SI5001", className: "SI-50-01", assistantCode: "DINF", group: "G" },
+];
+
+export const SHIFT_12_STUDENTS: StudentPlotting[] = [
+  // GRUP A (ADRP)
+  { nim: "102022300383", name: "TSAQIF AMMAR MAKMUN", classCode: "SI5008", className: "SI-47-08", assistantCode: "ADRP", group: "A" },
+  { nim: "102022600010", name: "SYAIFULLAH MIKAIL OBAMA TARIGAN", classCode: "SI5008", className: "SI-50-08", assistantCode: "ADRP", group: "A" },
+  { nim: "102022600011", name: "ASYIFA ZHAFIRAH AKMAL", classCode: "SI5008", className: "SI-50-08", assistantCode: "ADRP", group: "A" },
+  { nim: "102022600033", name: "MOHAMAD KEMAL ARTHUR", classCode: "SI5008", className: "SI-50-08", assistantCode: "ADRP", group: "A" },
+  { nim: "102022600055", name: "ALFI SYAHRIN AL QADRI", classCode: "SI5008", className: "SI-50-08", assistantCode: "ADRP", group: "A" },
+  { nim: "102022600073", name: "MUHAMAD ZAKI ABDILLAH", classCode: "SI5008", className: "SI-50-08", assistantCode: "ADRP", group: "A" },
+
+  // GRUP B (INTC)
+  { nim: "102022600084", name: "NADHIFAN ARISANTI", classCode: "SI5008", className: "SI-50-08", assistantCode: "INTC", group: "B" },
+  { nim: "102022600101", name: "MUHAMAD BARULIAN SYAH", classCode: "SI5008", className: "SI-50-08", assistantCode: "INTC", group: "B" },
+  { nim: "102022600108", name: "CINDY LUXIECIA SYILL", classCode: "SI5008", className: "SI-50-08", assistantCode: "INTC", group: "B" },
+  { nim: "102022600123", name: "BRYANT LEONARD KENNAHBOY BANUREA", classCode: "SI5008", className: "SI-50-08", assistantCode: "INTC", group: "B" },
+  { nim: "102022600139", name: "JERICHO BENHAIM PASKASEAN SIHOMBING", classCode: "SI5008", className: "SI-50-08", assistantCode: "INTC", group: "B" },
+  { nim: "102022600157", name: "SHAILJEEVAN MOHAMMED ALIBRAHIM HAMESHA", classCode: "SI5008", className: "SI-50-08", assistantCode: "INTC", group: "B" },
+
+  // GRUP C (MUHA)
+  { nim: "102022600158", name: "KAYLA FALIHA KHALIS", classCode: "SI5008", className: "SI-50-08", assistantCode: "MUHA", group: "C" },
+  { nim: "102022600178", name: "DAFFA AMRU FADHILA", classCode: "SI5008", className: "SI-50-08", assistantCode: "MUHA", group: "C" },
+  { nim: "102022600194", name: "ZAHRA SALSA FADILLA", classCode: "SI5008", className: "SI-50-08", assistantCode: "MUHA", group: "C" },
+  { nim: "102022600205", name: "FARREL HASSYA NATAMA", classCode: "SI5008", className: "SI-50-08", assistantCode: "MUHA", group: "C" },
+  { nim: "102022600216", name: "FAHIRA SALMA AZAHRA", classCode: "SI5008", className: "SI-50-08", assistantCode: "MUHA", group: "C" },
+
+  // GRUP D (FAAA)
+  { nim: "102022600228", name: "MAULANA AGIS ANTAREZA", classCode: "SI5008", className: "SI-50-08", assistantCode: "FAAA", group: "D" },
+  { nim: "102022600245", name: "YONATHAN MARLEY ELANG TAIRAS", classCode: "SI5008", className: "SI-50-08", assistantCode: "FAAA", group: "D" },
+  { nim: "102022600261", name: "DINA OLIVIA PURNOMO", classCode: "SI5008", className: "SI-50-08", assistantCode: "FAAA", group: "D" },
+  { nim: "102022600265", name: "ABDULLAH AZZAM", classCode: "SI5008", className: "SI-50-08", assistantCode: "FAAA", group: "D" },
+  { nim: "102022600281", name: "MUHAMMAD FARELL JULIANDANI DZAKWAN", classCode: "SI5008", className: "SI-50-08", assistantCode: "FAAA", group: "D" },
+  { nim: "102022600296", name: "JAYDEN DARRYL HARTANTHO", classCode: "SI5008", className: "SI-50-08", assistantCode: "FAAA", group: "D" },
+
+  // GRUP E (MAYR)
+  { nim: "102022600308", name: "NAILA AZAHRA", classCode: "SI5008", className: "SI-50-08", assistantCode: "MAYR", group: "E" },
+  { nim: "102022600316", name: "KAYYAS ILHAN ADIARTO", classCode: "SI5008", className: "SI-50-08", assistantCode: "MAYR", group: "E" },
+  { nim: "102022600333", name: "REINALDY FAIQ MABKHUT", classCode: "SI5008", className: "SI-50-08", assistantCode: "MAYR", group: "E" },
+  { nim: "102022600353", name: "BALTHAZAR AUFA AMANULLAH", classCode: "SI5008", className: "SI-50-08", assistantCode: "MAYR", group: "E" },
+  { nim: "102022600357", name: "PURI PUTRI YULIANA", classCode: "SI5008", className: "SI-50-08", assistantCode: "MAYR", group: "E" },
+
+  // GRUP F (AITS)
+  { nim: "102022600375", name: "BIMA PERKASA MANDIRI", classCode: "SI5008", className: "SI-50-08", assistantCode: "AITS", group: "F" },
+  { nim: "102022600394", name: "FALDIS IKRAM FIRJATULLAH", classCode: "SI5008", className: "SI-50-08", assistantCode: "AITS", group: "F" },
+  { nim: "102022600398", name: "DAVINA PUTRI MALADDINI", classCode: "SI5008", className: "SI-50-08", assistantCode: "AITS", group: "F" },
+  { nim: "102022600412", name: "RAGIL SETYO NUGROHO", classCode: "SI5008", className: "SI-50-08", assistantCode: "AITS", group: "F" },
+  { nim: "102022600429", name: "MUHAMMAD FAIZ ZHAFRAN", classCode: "SI5008", className: "SI-50-08", assistantCode: "AITS", group: "F" },
+  { nim: "102022600446", name: "YOSEF FERNANDO SALVA RODJA", classCode: "SI5008", className: "SI-50-08", assistantCode: "AITS", group: "F" },
+
+  // GRUP G (AZMH)
+  { nim: "102022600460", name: "NEYSZA REGITA PUTRI", classCode: "SI5008", className: "SI-50-08", assistantCode: "AZMH", group: "G" },
+  { nim: "102022600462", name: "ADNAN MAULIDAN SIBAWEH", classCode: "SI5008", className: "SI-50-08", assistantCode: "AZMH", group: "G" },
+  { nim: "102022600471", name: "AMMAR GHOZY MUFLIHIN", classCode: "SI5008", className: "SI-50-08", assistantCode: "AZMH", group: "G" },
+  { nim: "102022600486", name: "TARAWU PAREWALANGI AGELSYAH", classCode: "SI5008", className: "SI-50-08", assistantCode: "AZMH", group: "G" },
+  { nim: "102022600504", name: "DANIEL CRISTY YAWAN", classCode: "SI5008", className: "SI-50-08", assistantCode: "AZMH", group: "G" },
+  { nim: "102022630007", name: "SYAHGITA DENASA ELVO", classCode: "SI5008", className: "SI-50-08", assistantCode: "AZMH", group: "G" },
+];
+
+export const SHIFT_13_STUDENTS: StudentPlotting[] = [
+  // GRUP A (RAZA)
+  { nim: "102022600310", name: "AYESHA MJOURI RAGHEEDA", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAZA", group: "A" },
+  { nim: "102022600372", name: "ABHARINA KHAYLA BATRISYIA", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAZA", group: "A" },
+  { nim: "102022600390", name: "M. WALDI SUPRIADI", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAZA", group: "A" },
+  { nim: "102022600498", name: "EVAN NARARYA HASBA PUTRA", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAZA", group: "A" },
+  { nim: "102022640001", name: "SYARIFAH RAHMA ALIYA", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAZA", group: "A" },
+
+  // GRUP B (FAAA)
+  { nim: "102022640002", name: "BINTANG ELISABETH SARAH NAINGGOLAN", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "FAAA", group: "B" },
+  { nim: "102022640003", name: "ANDI MOHAMMAD GHIFFARI RAMADHAN", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "FAAA", group: "B" },
+  { nim: "102022640004", name: "AUZAN LAKASWARA SIDIK", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "FAAA", group: "B" },
+  { nim: "102022640005", name: "ALDI RAHMATULLOH", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "FAAA", group: "B" },
+  { nim: "102022640006", name: "KADEEJA RANIYA MECCA RASULI", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "FAAA", group: "B" },
+
+  // GRUP C (RAAP)
+  { nim: "102022640007", name: "JOVAN LYONEL REISEL SAMPURNA", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAAP", group: "C" },
+  { nim: "102022640008", name: "ANDI RIVALDI AL AFGHANI", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAAP", group: "C" },
+  { nim: "102022640011", name: "IVODIO ALBERTO SOARES DA COSTA", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAAP", group: "C" },
+  { nim: "102022640012", name: "FARIS MOHAMED DAIFALLA YAGOUB", classCode: "SI50INT", className: "SI-50-INT", assistantCode: "RAAP", group: "C" },
+];
+
+export const SHIFT_14_STUDENTS: StudentPlotting[] = [
+  // GRUP A (IREM)
+  { nim: "102022600007", name: "FATHI RIZKY", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+  { nim: "102022600009", name: "KELLY A. NAINGGOLAN", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+  { nim: "102022600031", name: "MUHAMMAD RAZIQ", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+  { nim: "102022600040", name: "FIRANTHI CLAUDYA AZZAHRA", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+  { nim: "102022600054", name: "DHIDIE FADILLA SYA'BANI", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+  { nim: "102022600072", name: "M ZHAFIR ZAIDAN HAQ AL AMIN", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+  { nim: "102022600080", name: "NUR AISYAH MUFIIDAH SIREGAR", classCode: "SI5007", className: "SI-50-07", assistantCode: "IREM", group: "A" },
+
+  // GRUP B (NNUA)
+  { nim: "102022600100", name: "LUDOVIC DELBERT LAURENT", classCode: "SI5007", className: "SI-50-07", assistantCode: "NNUA", group: "B" },
+  { nim: "102022600107", name: "NADA NABILAH", classCode: "SI5007", className: "SI-50-07", assistantCode: "NNUA", group: "B" },
+  { nim: "102022600122", name: "BAYU AJI PAMUNGKAS", classCode: "SI5007", className: "SI-50-07", assistantCode: "NNUA", group: "B" },
+  { nim: "102022600137", name: "ADHA IBRAHIM SIREGAR", classCode: "SI5007", className: "SI-50-07", assistantCode: "NNUA", group: "B" },
+  { nim: "102022600152", name: "REBECCA KIRANA TORUAN", classCode: "SI5007", className: "SI-50-07", assistantCode: "NNUA", group: "B" },
+
+  // GRUP C (DERA)
+  { nim: "102022600177", name: "MUHAMAD FAHRI", classCode: "SI5007", className: "SI-50-07", assistantCode: "DERA", group: "C" },
+  { nim: "102022600193", name: "ANNISA DWI RAMADHANI", classCode: "SI5007", className: "SI-50-07", assistantCode: "DERA", group: "C" },
+  { nim: "102022600203", name: "M. FAKHRI FAYYAZI", classCode: "SI5007", className: "SI-50-07", assistantCode: "DERA", group: "C" },
+  { nim: "102022600214", name: "MUTIARA ZAIN NAILAH", classCode: "SI5007", className: "SI-50-07", assistantCode: "DERA", group: "C" },
+  { nim: "102022600227", name: "CHANDRA AZZIZ", classCode: "SI5007", className: "SI-50-07", assistantCode: "DERA", group: "C" },
+  { nim: "102022600244", name: "GALIH PRAYOGA", classCode: "SI5007", className: "SI-50-07", assistantCode: "DERA", group: "C" },
+
+  // GRUP D (MUNR)
+  { nim: "102022600254", name: "SHAIRA OKTAVIA PUTRI", classCode: "SI5007", className: "SI-50-07", assistantCode: "MUNR", group: "D" },
+  { nim: "102022600263", name: "KEITARO RAMADHAN CECARIO", classCode: "SI5007", className: "SI-50-07", assistantCode: "MUNR", group: "D" },
+  { nim: "102022600280", name: "SATRIA ADRIAN PUTRA HARRY", classCode: "SI5007", className: "SI-50-07", assistantCode: "MUNR", group: "D" },
+  { nim: "102022600307", name: "RADEN NUR AINI FIRZA RASYIDA PRAWIRA DI NATA", classCode: "SI5007", className: "SI-50-07", assistantCode: "MUNR", group: "D" },
+  { nim: "102022600315", name: "LALU KAINDRA RABBANI HANAFIE", classCode: "SI5007", className: "SI-50-07", assistantCode: "MUNR", group: "D" },
+
+  // GRUP E (RAZA)
+  { nim: "102022600331", name: "HANIF FAWWAZ MUYASSAR", classCode: "SI5007", className: "SI-50-07", assistantCode: "RAZA", group: "E" },
+  { nim: "102022600350", name: "ASKA SETIAWAN YUSUF", classCode: "SI5007", className: "SI-50-07", assistantCode: "RAZA", group: "E" },
+  { nim: "102022600352", name: "AULYA ZAHRA RAMADHANI", classCode: "SI5007", className: "SI-50-07", assistantCode: "RAZA", group: "E" },
+  { nim: "102022600374", name: "MUHAMAD ZHAFRAN NUR RAMADHAN HERFIANSYAH", classCode: "SI5007", className: "SI-50-07", assistantCode: "RAZA", group: "E" },
+  { nim: "102022600392", name: "ZEFA VERLIONENZA SOEMITHA", classCode: "SI5007", className: "SI-50-07", assistantCode: "RAZA", group: "E" },
+
+  // GRUP F (HAFK)
+  { nim: "102022600393", name: "NEISYA SHAFIRA ZAHFARINA", classCode: "SI5007", className: "SI-50-07", assistantCode: "HAFK", group: "F" },
+  { nim: "102022600411", name: "ABIZAR 'ALAMUL HUDA", classCode: "SI5007", className: "SI-50-07", assistantCode: "HAFK", group: "F" },
+  { nim: "102022600428", name: "MUHAMMAD DZILDAN ARRASYA", classCode: "SI5007", className: "SI-50-07", assistantCode: "HAFK", group: "F" },
+  { nim: "102022600453", name: "JEANIFER PEARLYN WIJAYA", classCode: "SI5007", className: "SI-50-07", assistantCode: "HAFK", group: "F" },
+  { nim: "102022600455", name: "MUHAMMAD NABIL SEMAN", classCode: "SI5007", className: "SI-50-07", assistantCode: "HAFK", group: "F" },
+
+  // GRUP G (JBJR)
+  { nim: "102022600459", name: "AHMAD IMAM FAHRI", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+  { nim: "102022600485", name: "ALEXANDRIO DARRELL GUNAWAN", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+  { nim: "102022600502", name: "KYZAN KYRANA ARRUNG", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+  { nim: "102022600503", name: "MUHAMMAD HAFIZ KHAIRUDDIN", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+  { nim: "102022630012", name: "ISLAMMIVAN MUHAMMAD GIOVANNO", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+  { nim: "102022630024", name: "FAKHRI MUMTAZ BASYARI", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+  { nim: "102022630033", name: "MUHAMMAD AL AFGANI", classCode: "SI5007", className: "SI-50-07", assistantCode: "JBJR", group: "G" },
+];
+
+export const SHIFT_15_STUDENTS: StudentPlotting[] = [
+  // GRUP A (MACY)
+  { nim: "102022500243", name: "HELMI FAAZ", classCode: "SI5014", className: "SI-49-02", assistantCode: "MACY", group: "A" },
+  { nim: "102022600018", name: "FARRAS ALVIRUQI", classCode: "SI5014", className: "SI-50-14", assistantCode: "MACY", group: "A" },
+  { nim: "102022600024", name: "REGINA ANGELA PUTRI", classCode: "SI5014", className: "SI-50-14", assistantCode: "MACY", group: "A" },
+  { nim: "102022600045", name: "SYAMIL RUHUL JADID", classCode: "SI5014", className: "SI-50-14", assistantCode: "MACY", group: "A" },
+  { nim: "102022600060", name: "NAUZILA YASHIFA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MACY", group: "A" },
+  { nim: "102022600063", name: "DAFA QIRENSA ABDIRA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MACY", group: "A" },
+
+  // GRUP B (MUNR)
+  { nim: "102022600083", name: "M DEWIL ARGHA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MUNR", group: "B" },
+  { nim: "102022600093", name: "ALIN VHERO ALIFIA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MUNR", group: "B" },
+  { nim: "102022600124", name: "DELPHINE GABRIELLA SIBARANI", classCode: "SI5014", className: "SI-50-14", assistantCode: "MUNR", group: "B" },
+  { nim: "102022600131", name: "ARMIA CHANDRA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MUNR", group: "B" },
+  { nim: "102022600148", name: "RAOUL HAYYAN KHAYRI", classCode: "SI5014", className: "SI-50-14", assistantCode: "MUNR", group: "B" },
+  { nim: "102022600167", name: "MUHAMMAD NABIL AL GHIFARI", classCode: "SI5014", className: "SI-50-14", assistantCode: "MUNR", group: "B" },
+
+  // GRUP C (MAYR)
+  { nim: "102022600176", name: "NADINE AQILA ZAHRA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MAYR", group: "C" },
+  { nim: "102022600189", name: "AMMAR ABDURRAHMAN", classCode: "SI5014", className: "SI-50-14", assistantCode: "MAYR", group: "C" },
+  { nim: "102022600204", name: "TANIA YEHESKIA NABABAN", classCode: "SI5014", className: "SI-50-14", assistantCode: "MAYR", group: "C" },
+  { nim: "102022600220", name: "THORIQ AHMAD HAFIDZ", classCode: "SI5014", className: "SI-50-14", assistantCode: "MAYR", group: "C" },
+  { nim: "102022600234", name: "KAYLA RAIHANNIA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MAYR", group: "C" },
+  { nim: "102022600237", name: "DIMITRIO JESUS D'CESSARIO LIMANTRA", classCode: "SI5014", className: "SI-50-14", assistantCode: "MAYR", group: "C" },
+
+  // GRUP D (NNUA)
+  { nim: "102022600252", name: "JONES DAME SITUMORANG", classCode: "SI5014", className: "SI-50-14", assistantCode: "NNUA", group: "D" },
+  { nim: "102022600271", name: "EXSELL AL IHSAN ALI", classCode: "SI5014", className: "SI-50-14", assistantCode: "NNUA", group: "D" },
+  { nim: "102022600282", name: "AMALIA NURHAYATI", classCode: "SI5014", className: "SI-50-14", assistantCode: "NNUA", group: "D" },
+  { nim: "102022600289", name: "FAKHRIYYAN AZIZ MUZHAFFAR", classCode: "SI5014", className: "SI-50-14", assistantCode: "NNUA", group: "D" },
+  { nim: "102022600302", name: "RIFQI OKLA GINANJAR", classCode: "SI5014", className: "SI-50-14", assistantCode: "NNUA", group: "D" },
+  { nim: "102022600323", name: "KAISAN MUHAMMAD ADITAMA", classCode: "SI5014", className: "SI-50-14", assistantCode: "NNUA", group: "D" },
+
+  // GRUP E (FAAA)
+  { nim: "102022600343", name: "MOHAMAD NUR YASIN", classCode: "SI5014", className: "SI-50-14", assistantCode: "FAAA", group: "E" },
+  { nim: "102022600361", name: "VALENZA APRIANGGA PRAMITA PUTRA", classCode: "SI5014", className: "SI-50-14", assistantCode: "FAAA", group: "E" },
+  { nim: "102022600367", name: "LIVIA RIZQIKA BRILLIANT", classCode: "SI5014", className: "SI-50-14", assistantCode: "FAAA", group: "E" },
+  { nim: "102022600382", name: "ALDYANO ANDHIKA PUTRA PRATAMA", classCode: "SI5014", className: "SI-50-14", assistantCode: "FAAA", group: "E" },
+  { nim: "102022600404", name: "MUHAMMAD IKRAM ZIHNI", classCode: "SI5014", className: "SI-50-14", assistantCode: "FAAA", group: "E" },
+  { nim: "102022600419", name: "ARYA SATYANEGARA", classCode: "SI5014", className: "SI-50-14", assistantCode: "FAAA", group: "E" },
+
+  // GRUP F (DERA)
+  { nim: "102022600425", name: "SAFINA DWI NASRUNITA", classCode: "SI5014", className: "SI-50-14", assistantCode: "DERA", group: "F" },
+  { nim: "102022600437", name: "MADE ANANTHA DIPA SATYAPRAKASH", classCode: "SI5014", className: "SI-50-14", assistantCode: "DERA", group: "F" },
+  { nim: "102022600451", name: "MUHAMMAD WIMPY BIAGGI", classCode: "SI5014", className: "SI-50-14", assistantCode: "DERA", group: "F" },
+  { nim: "102022600466", name: "GLEN VINO", classCode: "SI5014", className: "SI-50-14", assistantCode: "DERA", group: "F" },
+  { nim: "102022600474", name: "ANNISA AZ ZAHRAH", classCode: "SI5014", className: "SI-50-14", assistantCode: "DERA", group: "F" },
+
+  // GRUP G (IPGA)
+  { nim: "102022600480", name: "JULIO YOHANES SUNDAYO", classCode: "SI5014", className: "SI-50-14", assistantCode: "IPGA", group: "G" },
+  { nim: "102022600492", name: "DIAZ LEONARD SIAMPA", classCode: "SI5014", className: "SI-50-14", assistantCode: "IPGA", group: "G" },
+  { nim: "102022600510", name: "DARIUS PRAYOGO KUSUMOWIDADGO", classCode: "SI5014", className: "SI-50-14", assistantCode: "IPGA", group: "G" },
+  { nim: "102022630009", name: "HABIBI AZKA PRATAMA", classCode: "SI5014", className: "SI-50-14", assistantCode: "IPGA", group: "G" },
+  { nim: "102022630026", name: "NAFISA ZAHRA ALIFIA", classCode: "SI5014", className: "SI-50-14", assistantCode: "IPGA", group: "G" },
+];
+
+// Map of finalized plottings for Shift 1 s.d. 15 (100% COMPLETE)
 export const ALL_SHIFT_PLOTTINGS: Record<number, ShiftPlottingSummary> = {
   1: {
     shiftNumber: 1,
@@ -1013,6 +1316,98 @@ export const ALL_SHIFT_PLOTTINGS: Record<number, ShiftPlottingSummary> = {
       { group: "G", assistantCode: "ADRP", studentCount: 7 },
     ],
     students: SHIFT_9_STUDENTS,
+  },
+  10: {
+    shiftNumber: 10,
+    className: "SI-50-06",
+    classCode: "SI5006",
+    isFinalized: true,
+    assistants: [
+      { group: "A", assistantCode: "RAAP", studentCount: 6 },
+      { group: "B", assistantCode: "ARSM", studentCount: 6 },
+      { group: "C", assistantCode: "GRGS", studentCount: 6 },
+      { group: "D", assistantCode: "AZMH", studentCount: 6 },
+      { group: "E", assistantCode: "IREM", studentCount: 5 },
+      { group: "F", assistantCode: "LAUF", studentCount: 6 },
+      { group: "G", assistantCode: "ADRP", studentCount: 5 },
+    ],
+    students: SHIFT_10_STUDENTS,
+  },
+  11: {
+    shiftNumber: 11,
+    className: "SI-50-01",
+    classCode: "SI5001",
+    isFinalized: true,
+    assistants: [
+      { group: "A", assistantCode: "AITS", studentCount: 6 },
+      { group: "B", assistantCode: "ALRS", studentCount: 6 },
+      { group: "C", assistantCode: "AZMH", studentCount: 6 },
+      { group: "D", assistantCode: "IREM", studentCount: 6 },
+      { group: "E", assistantCode: "ARSM", studentCount: 6 },
+      { group: "F", assistantCode: "RAAP", studentCount: 6 },
+      { group: "G", assistantCode: "DINF", studentCount: 5 },
+    ],
+    students: SHIFT_11_STUDENTS,
+  },
+  12: {
+    shiftNumber: 12,
+    className: "SI-50-08",
+    classCode: "SI5008",
+    isFinalized: true,
+    assistants: [
+      { group: "A", assistantCode: "ADRP", studentCount: 6 },
+      { group: "B", assistantCode: "INTC", studentCount: 6 },
+      { group: "C", assistantCode: "MUHA", studentCount: 5 },
+      { group: "D", assistantCode: "FAAA", studentCount: 6 },
+      { group: "E", assistantCode: "MAYR", studentCount: 5 },
+      { group: "F", assistantCode: "AITS", studentCount: 6 },
+      { group: "G", assistantCode: "AZMH", studentCount: 6 },
+    ],
+    students: SHIFT_12_STUDENTS,
+  },
+  13: {
+    shiftNumber: 13,
+    className: "SI-50-INT",
+    classCode: "SI50INT",
+    isFinalized: true,
+    assistants: [
+      { group: "A", assistantCode: "RAZA", studentCount: 5 },
+      { group: "B", assistantCode: "FAAA", studentCount: 5 },
+      { group: "C", assistantCode: "RAAP", studentCount: 4 },
+    ],
+    students: SHIFT_13_STUDENTS,
+  },
+  14: {
+    shiftNumber: 14,
+    className: "SI-50-07",
+    classCode: "SI5007",
+    isFinalized: true,
+    assistants: [
+      { group: "A", assistantCode: "IREM", studentCount: 7 },
+      { group: "B", assistantCode: "NNUA", studentCount: 5 },
+      { group: "C", assistantCode: "DERA", studentCount: 6 },
+      { group: "D", assistantCode: "MUNR", studentCount: 5 },
+      { group: "E", assistantCode: "RAZA", studentCount: 5 },
+      { group: "F", assistantCode: "HAFK", studentCount: 5 },
+      { group: "G", assistantCode: "JBJR", studentCount: 7 },
+    ],
+    students: SHIFT_14_STUDENTS,
+  },
+  15: {
+    shiftNumber: 15,
+    className: "SI-50-14",
+    classCode: "SI5014",
+    isFinalized: true,
+    assistants: [
+      { group: "A", assistantCode: "MACY", studentCount: 6 },
+      { group: "B", assistantCode: "MUNR", studentCount: 6 },
+      { group: "C", assistantCode: "MAYR", studentCount: 6 },
+      { group: "D", assistantCode: "NNUA", studentCount: 6 },
+      { group: "E", assistantCode: "FAAA", studentCount: 6 },
+      { group: "F", assistantCode: "DERA", studentCount: 5 },
+      { group: "G", assistantCode: "IPGA", studentCount: 5 },
+    ],
+    students: SHIFT_15_STUDENTS,
   },
 };
 
