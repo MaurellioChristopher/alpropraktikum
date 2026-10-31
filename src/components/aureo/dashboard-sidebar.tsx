@@ -10,6 +10,7 @@ import {
   Camera,
   Calendar,
   CalendarDays,
+  ArrowLeftRight,
   Settings,
   LogOut,
   X,
@@ -67,6 +68,7 @@ export function DashboardSidebar({
     { id: "komdis", label: "Laporan Kecurangan", icon: Flag },
     { id: "dokumentasi", label: "Dokumentasi", icon: Camera },
     { id: "jadwal_saya", label: "Jadwal Saya", icon: Calendar },
+    { id: "pertukaran_shift", label: "Pertukaran Shift", icon: ArrowLeftRight },
     { id: "jadwal_praktikum", label: "Jadwal Praktikum", icon: CalendarDays },
   ];
 
@@ -95,6 +97,7 @@ export function DashboardSidebar({
     if (id === "komdis" && activeTab === "komdis") return true;
     if (id === "dokumentasi" && activeTab === "dokumentasi") return true;
     if (id === "jadwal_saya" && activeTab === "jadwal_saya") return true;
+    if (id === "pertukaran_shift" && (activeTab === "pertukaran_shift" || activeTab === "swap")) return true;
     if (id === "jadwal_praktikum" && (activeTab === "jadwal_praktikum" || activeTab === "jadwal")) return true;
     return activeTab === id;
   };

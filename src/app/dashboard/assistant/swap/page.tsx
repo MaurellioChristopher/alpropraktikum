@@ -136,7 +136,7 @@ export default function SwapEngineDashboard() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start pb-28 sm:pb-8">
-      <DashboardSidebar activeTab="jadwal_saya" />
+      <DashboardSidebar activeTab="pertukaran_shift" />
 
       <div className="flex-1 w-full min-w-0 space-y-6">
         {/* Header Card */}
