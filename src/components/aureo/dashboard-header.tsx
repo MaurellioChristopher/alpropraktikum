@@ -74,28 +74,22 @@ export function DashboardHeader({
           <Menu size={18} />
         </button>
 
-        <div className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs shrink-0">
-          <div className="relative w-4 h-4 shrink-0">
-            <Image
-              src="/images/edm-emblem-crimson.png"
-              alt="EDM Logo"
-              fill
-              sizes="16px"
-              className="object-contain"
-            />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs shrink-0">
+          <div className="w-5 h-5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400 font-mono font-black text-[11px] shadow-2xs">
+            &lt;&gt;
           </div>
-          <span className="hidden sm:inline-block text-xs font-bold text-slate-800 dark:text-white">
+          <span className="text-xs font-bold text-slate-800 dark:text-white">
             Praktikum ALPRO
           </span>
         </div>
 
-        <span className="hidden sm:inline-block text-xs font-mono text-slate-500 dark:text-neutral-400">
-          2026/2027 • Ganjil
+        <span className="hidden sm:inline-block text-xs font-mono font-medium text-slate-500 dark:text-neutral-400">
+          2026/2027 Ganjil
         </span>
       </div>
 
       {/* Right Action Icons matching Image 1 */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-2.5">
         {/* Refresh button */}
         <button
           type="button"
@@ -106,17 +100,19 @@ export function DashboardHeader({
           <RotateCw size={15} className={isRefreshing ? "animate-spin text-purple-600" : ""} />
         </button>
 
-        {/* Notification Bell */}
+        {/* Notification Bell with red counter badge '4' matching Image 1 */}
         <div className="relative">
           <button
             type="button"
             onClick={() => setNotificationCount(0)}
             className="w-9 h-9 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-xs transition-colors cursor-pointer"
-            title="Pemberitahuan"
+            title="Pemberitahuan Praktikum"
           >
             <Bell size={15} />
             {notificationCount > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-purple-600 ring-2 ring-white dark:ring-[#120824]" />
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs">
+                {notificationCount}
+              </span>
             )}
           </button>
         </div>

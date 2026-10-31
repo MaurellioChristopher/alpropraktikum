@@ -130,68 +130,108 @@ export default function GradingDashboard() {
       />
 
       <div className="flex-1 w-full min-w-0 space-y-5">
-        {/* Header Bar */}
-        <div className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Link href="/dashboard/assistant" className="text-xs font-semibold text-purple-700 hover:underline flex items-center gap-1">
-                <ArrowLeft size={14} /> Kembali ke Dashboard
-              </Link>
+        {/* Title & Sub-tabs matching Image 3 */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Link href="/dashboard/assistant" className="text-xs font-semibold text-purple-700 dark:text-purple-400 hover:underline flex items-center gap-1">
+                  <ArrowLeft size={13} /> Kembali ke Beranda
+                </Link>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                Praktikan<span className="text-orange-500">.</span>
+              </h1>
             </div>
+
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-bold text-slate-900">Grade Spreadsheets</h1>
-              <span className="text-[11px] font-mono font-bold text-purple-800 bg-purple-100 px-2 py-0.5 rounded-md">
-                SI&apos;50
-              </span>
-              <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                LMS CeLOE Telkom
-              </span>
+              <button
+                type="button"
+                onClick={exportCSV}
+                className="flex items-center gap-1.5 px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white rounded-full text-xs font-bold font-mono shadow-xs transition-all cursor-pointer"
+              >
+                <Download size={13} />
+                <span>Export CSV</span>
+              </button>
             </div>
-            <p className="text-xs text-slate-500 font-mono mt-1">
-              Course: {LMS_ALPRO_METADATA.courseFullName} ({LMS_ALPRO_METADATA.courseShortName}) • Kelas {currentClassInfo.name} ({currentClassInfo.totalStudents} Mahasiswa)
-            </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Class Dropdown for 15 classes */}
-            <div className="relative">
+          {/* Sub-tabs matching Image 3 */}
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="px-4 py-2 rounded-full bg-white dark:bg-white/10 text-slate-900 dark:text-white text-xs font-bold shadow-xs border border-slate-200/80 dark:border-white/10 cursor-pointer"
+            >
+              Kelompok saya
+            </button>
+            <button
+              type="button"
+              className="px-4 py-2 rounded-full bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-neutral-400 text-xs font-medium hover:bg-slate-200/70 dark:hover:bg-white/10 transition-colors flex items-center gap-1.5 cursor-pointer"
+            >
+              <span>Praktikan pindahan</span>
+              <span className="px-1.5 py-0.2 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10px] font-bold">
+                3
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Filter Bar matching Image 3 */}
+        <div className="bg-white dark:bg-[#120824] rounded-2xl p-4 border border-slate-200/80 dark:border-purple-900/40 shadow-xs flex flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Modul selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-slate-500 dark:text-neutral-400">Modul</span>
+              <select className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-xs font-bold font-mono text-slate-800 dark:text-white focus:outline-none cursor-pointer">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+              </select>
+            </div>
+
+            {/* Kelas selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-slate-500 dark:text-neutral-400">Kelas</span>
               <select
                 value={selectedClass}
                 onChange={(e) => handleClassChange(e.target.value)}
-                className="bg-slate-50 border border-slate-300 rounded-xl pl-3.5 pr-8 py-2 text-xs font-mono font-bold text-[#250B47] focus:outline-none focus:ring-2 focus:ring-purple-500/30 cursor-pointer appearance-none shadow-xs"
+                className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-xs font-bold font-mono text-slate-800 dark:text-white focus:outline-none cursor-pointer"
               >
                 {SI50_CLASSES.map((cls) => (
                   <option key={cls.code} value={cls.code}>
-                    {cls.code} ({cls.name}) • {cls.totalStudents} Mhs
+                    {cls.code.replace("SI50", "SI-49-")}
                   </option>
                 ))}
               </select>
-              <ChevronDown size={14} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
 
-            <button
-              type="button"
-              onClick={() => setLocked(!locked)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold font-mono uppercase tracking-wider transition-colors cursor-pointer ${
-                locked
-                  ? "bg-rose-100 border border-rose-200 text-rose-800"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-700"
-              }`}
-            >
-              <Lock size={14} />
-              {locked ? "Terkunci" : "Kunci Nilai"}
-            </button>
+            {/* Grup selector */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-slate-500 dark:text-neutral-400">Grup</span>
+              <select className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl px-3 py-1.5 text-xs font-bold font-mono text-slate-800 dark:text-white focus:outline-none cursor-pointer">
+                <option value="A">A - DJDM</option>
+                <option value="B">B - DJDM</option>
+                <option value="C">C - DJDM</option>
+                <option value="H">H - MACY</option>
+              </select>
+            </div>
 
-            <button
-              type="button"
-              onClick={exportCSV}
-              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-800 hover:to-indigo-800 text-white rounded-xl text-xs font-bold font-mono uppercase tracking-wider shadow-sm transition-all cursor-pointer"
-            >
-              <Download size={14} />
-              Export .csv
-            </button>
+            {/* LMS status telemetry */}
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200/80 dark:border-purple-900/40 text-xs font-mono text-purple-700 dark:text-purple-300">
+              <span className="w-2 h-2 rounded-full bg-purple-600 animate-pulse" />
+              <span>LMS Memeriksa... 0/2 komponen</span>
+            </div>
           </div>
+
+          <button
+            type="button"
+            onClick={() => handleClassChange(selectedClass)}
+            className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 flex items-center justify-center text-slate-600 dark:text-neutral-300 transition-colors cursor-pointer"
+            title="Refresh nilai LMS"
+          >
+            <RefreshCw size={14} />
+          </button>
         </div>
 
         {/* 15 CLASS QUICK SWITCHER STRIP */}
@@ -215,127 +255,128 @@ export default function GradingDashboard() {
           ))}
         </div>
 
-        {/* Search & Metadata Filter Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
-          <div className="relative flex-1 max-w-md">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        {/* Group Section Container matching Image 3 */}
+        <div className="bg-white dark:bg-[#120824] rounded-2xl border border-slate-200/80 dark:border-purple-900/40 shadow-xs p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">Grup A</h2>
+            <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-neutral-300 font-mono text-xs font-bold flex items-center justify-center">
+              {filteredGrades.length}
+            </span>
+          </div>
+
+          {/* Search bar matching Image 3 */}
+          <div className="relative">
+            <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
               type="text"
-              placeholder="Cari berdasarkan nama praktikan atau NIM..."
+              placeholder="Cari nama / NIM"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+              className="w-full pl-11 pr-4 py-2 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-full text-xs text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20"
             />
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-mono text-slate-500">
-            <span>Komponen: <strong>5 Indikator</strong></span>
-            <span>•</span>
-            <span>Total: <strong>{filteredGrades.length} Mahasiswa</strong></span>
-          </div>
-        </div>
-
-        {/* Spreadsheet Grid */}
-        <div className="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm whitespace-nowrap">
-              <thead className="bg-[#0e071a] text-[10px] font-mono text-purple-200 uppercase tracking-wider">
-                <tr>
-                  <th className="px-5 py-3.5 font-semibold text-white">NIM (SI&apos;50)</th>
-                  <th className="px-5 py-3.5 font-semibold text-white">Nama Praktikan</th>
-                  <th className="px-3 py-3.5 font-semibold text-right w-24 text-purple-300">Warming Up (10%)</th>
-                  <th className="px-3 py-3.5 font-semibold text-right w-24 text-purple-300">Pre Test (15%)</th>
-                  <th className="px-3 py-3.5 font-semibold text-right w-24 text-purple-300">Practice (30%)</th>
-                  <th className="px-3 py-3.5 font-semibold text-right w-24 text-purple-300">Jurnal (30%)</th>
-                  <th className="px-3 py-3.5 font-semibold text-right w-24 text-purple-300">Post Test (15%)</th>
-                  <th className="px-5 py-3.5 font-semibold text-right text-emerald-400">Nilai Akhir</th>
-                  <th className="px-4 py-3.5 font-semibold text-center w-14">Status</th>
+          {/* Table matching Image 3 */}
+          <div className="overflow-x-auto pt-1">
+            <table className="w-full text-left text-xs whitespace-nowrap">
+              <thead>
+                <tr className="border-b border-slate-100 dark:border-white/10 text-[11px] font-mono text-slate-400">
+                  <th className="pb-3 font-medium">Praktikan</th>
+                  <th className="pb-3 text-center w-20">TP<br /><span className="text-[10px] font-normal">25%</span></th>
+                  <th className="pb-3 text-center w-20">Jurnal<br /><span className="text-[10px] font-normal">40%</span></th>
+                  <th className="pb-3 text-center w-20">Post-test<br /><span className="text-[10px] font-normal">10%</span></th>
+                  <th className="pb-3 text-center w-20">Audit<br /><span className="text-[10px] font-normal">25%</span></th>
+                  <th className="pb-3 text-center w-20">Akhir</th>
+                  <th className="pb-3 text-center w-28">Aksi</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredGrades.map((row, idx) => (
-                  <tr key={row.nim} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="px-5 py-3 font-mono text-xs text-slate-700 font-semibold">{row.nim}</td>
-                    <td className="px-5 py-3 text-xs text-slate-900 font-medium">{row.name}</td>
-                    
-                    {/* Warming Up */}
-                    <td className="px-3 py-2">
-                      <input
-                        type="text"
-                        value={row.warmingUp}
-                        placeholder="-"
-                        onChange={(e) => handleInputChange(idx, "warmingUp", e.target.value)}
-                        disabled={locked}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-right font-mono text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
-                      />
-                    </td>
+              <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                {filteredGrades.map((row, idx) => {
+                  const finalScore = calcFinal(row.warmingUp, row.preTest, row.practice, row.jurnal, row.postTest);
+                  const inisial = row.name.split(" ").map(w => w[0]).slice(0, 2).join("");
 
-                    {/* Pre Test */}
-                    <td className="px-3 py-2">
-                      <input
-                        type="text"
-                        value={row.preTest}
-                        placeholder="-"
-                        onChange={(e) => handleInputChange(idx, "preTest", e.target.value)}
-                        disabled={locked}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-right font-mono text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
-                      />
-                    </td>
+                  return (
+                    <tr key={row.nim} className="hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors">
+                      <td className="py-3.5 pr-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-neutral-300 font-mono font-bold text-[11px] flex items-center justify-center shrink-0">
+                            {inisial}
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-900 dark:text-white text-xs">
+                              {row.name}
+                            </div>
+                            <div className="text-[11px] font-mono text-slate-400 mt-0.5">
+                              {row.nim}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
 
-                    {/* Practice */}
-                    <td className="px-3 py-2">
-                      <input
-                        type="text"
-                        value={row.practice}
-                        placeholder="-"
-                        onChange={(e) => handleInputChange(idx, "practice", e.target.value)}
-                        disabled={locked}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-right font-mono text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
-                      />
-                    </td>
+                      {/* TP */}
+                      <td className="py-3.5 px-2 text-center">
+                        <input
+                          type="text"
+                          value={row.preTest}
+                          placeholder="-"
+                          onChange={(e) => handleInputChange(idx, "preTest", e.target.value)}
+                          className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </td>
 
-                    {/* Jurnal */}
-                    <td className="px-3 py-2">
-                      <input
-                        type="text"
-                        value={row.jurnal}
-                        placeholder="-"
-                        onChange={(e) => handleInputChange(idx, "jurnal", e.target.value)}
-                        disabled={locked}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-right font-mono text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
-                      />
-                    </td>
+                      {/* Jurnal */}
+                      <td className="py-3.5 px-2 text-center">
+                        <input
+                          type="text"
+                          value={row.jurnal}
+                          placeholder="-"
+                          onChange={(e) => handleInputChange(idx, "jurnal", e.target.value)}
+                          className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </td>
 
-                    {/* Post Test */}
-                    <td className="px-3 py-2">
-                      <input
-                        type="text"
-                        value={row.postTest}
-                        placeholder="-"
-                        onChange={(e) => handleInputChange(idx, "postTest", e.target.value)}
-                        disabled={locked}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-1 text-right font-mono text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-500 disabled:opacity-50"
-                      />
-                    </td>
+                      {/* Post-test */}
+                      <td className="py-3.5 px-2 text-center">
+                        <input
+                          type="text"
+                          value={row.postTest}
+                          placeholder="-"
+                          onChange={(e) => handleInputChange(idx, "postTest", e.target.value)}
+                          className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </td>
 
-                    {/* Nilai Akhir */}
-                    <td className="px-5 py-3 text-right font-mono text-xs font-bold text-purple-700">
-                      {calcFinal(row.warmingUp, row.preTest, row.practice, row.jurnal, row.postTest)}
-                    </td>
+                      {/* Audit */}
+                      <td className="py-3.5 px-2 text-center">
+                        <input
+                          type="text"
+                          value={row.practice}
+                          placeholder="-"
+                          onChange={(e) => handleInputChange(idx, "practice", e.target.value)}
+                          className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </td>
 
-                    <td className="px-4 py-3 text-center">
-                      {row.status === "saving" && (
-                        <div className="w-3.5 h-3.5 mx-auto rounded-full border-2 border-slate-300 border-t-purple-600 animate-spin" />
-                      )}
-                      {row.status === "saved" && (
-                        <CheckCircle2 size={15} className="text-emerald-500 mx-auto" />
-                      )}
-                      {row.status === "idle" && (
-                        <div className="w-1.5 h-1.5 mx-auto rounded-full bg-slate-300" />
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                      {/* Akhir */}
+                      <td className="py-3.5 px-2 text-center">
+                        <span className="inline-block px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-mono font-bold text-xs">
+                          {finalScore}
+                        </span>
+                      </td>
+
+                      {/* Aksi matching Image 3 */}
+                      <td className="py-3.5 pl-2 text-center">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Review nilai ${row.name}`)}
+                          className="px-3 py-1 rounded-full border border-slate-200 dark:border-white/10 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-neutral-200 text-[11px] font-medium transition-colors cursor-pointer"
+                        >
+                          Review
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
