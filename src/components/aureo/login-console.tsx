@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { loginAction } from "@/app/(auth)/actions/auth";
 import { useActionState } from "react";
-
 import {
   Eye,
   EyeOff,
@@ -12,9 +10,7 @@ import {
   KeyRound,
   ArrowRight,
   Loader2,
-  CheckCircle2,
   Sparkles,
-  ShieldCheck,
 } from "lucide-react";
 
 export function LoginForm() {
@@ -25,52 +21,43 @@ export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   return (
-    <div className="w-full max-w-[420px] bg-white dark:bg-[#0E071A]/95 backdrop-blur-md rounded-2xl p-5 sm:p-8 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-slate-200/80 dark:border-white/10 transition-colors">
+    <div className="w-full max-w-[420px] bg-white dark:bg-[#120B24] rounded-[2rem] p-7 sm:p-9 shadow-[0_20px_50px_-15px_rgba(30,27,75,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-slate-100 dark:border-white/10 transition-colors">
       
-      {/* Header Inside Card */}
-      <div className="space-y-1.5 mb-6">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-purple-50 dark:bg-purple-950/50 border border-purple-200/60 dark:border-purple-800/40 text-[10px] font-mono font-semibold text-purple-700 dark:text-purple-300">
-          <ShieldCheck size={12} className="text-purple-600 dark:text-purple-400" />
-          <span>PORTAL ASISTEN &amp; PRAKTIKAN</span>
-        </div>
-        <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Masuk ke Portal
-        </h2>
-        <p className="text-xs text-slate-500 dark:text-neutral-400 leading-relaxed">
-          Gunakan NIM Praktikan SI&apos;50 atau Kode Asisten resmi EDM.
-        </p>
-      </div>
+      {/* Title */}
+      <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#1E1B4B] dark:text-white mb-6">
+        Masuk.
+      </h2>
 
       {/* Segmented Pill Tabs */}
-      <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-white/5 rounded-xl mb-6 border border-slate-200/70 dark:border-white/5">
+      <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-white/5 rounded-full mb-6 border border-slate-200/50 dark:border-white/5">
         <button
           type="button"
           onClick={() => setTab("masuk")}
-          className={`py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+          className={`py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
             tab === "masuk"
-              ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs font-semibold"
+              ? "bg-white dark:bg-[#1E1638] text-[#1E1B4B] dark:text-white shadow-xs"
               : "text-slate-500 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-neutral-200"
           }`}
         >
-          Masuk Akun
+          Masuk
         </button>
         <button
           type="button"
           onClick={() => setTab("aktivasi")}
-          className={`py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+          className={`py-2 rounded-full text-xs font-semibold transition-all cursor-pointer ${
             tab === "aktivasi"
-              ? "bg-white dark:bg-white/10 text-slate-900 dark:text-white shadow-2xs font-semibold"
+              ? "bg-white dark:bg-[#1E1638] text-[#1E1B4B] dark:text-white shadow-xs"
               : "text-slate-500 hover:text-slate-800 dark:text-neutral-400 dark:hover:text-neutral-200"
           }`}
         >
-          Aktivasi Akun
+          Aktivasi
         </button>
       </div>
 
       {tab === "aktivasi" ? (
-        <div className="p-4 rounded-xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-900/40 text-xs space-y-3">
+        <div className="p-5 rounded-2xl bg-purple-50/70 dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-900/40 text-xs space-y-3">
           <div className="flex items-center gap-2 text-purple-900 dark:text-purple-200 font-semibold">
-            <Sparkles size={14} className="text-purple-600 dark:text-purple-400" />
+            <Sparkles size={15} className="text-purple-600 dark:text-purple-400" />
             <span>Aktivasi Akun Mahasiswa SI&apos;50</span>
           </div>
           <p className="text-slate-600 dark:text-neutral-300 leading-relaxed text-xs">
@@ -79,22 +66,21 @@ export function LoginForm() {
           <button
             type="button"
             onClick={() => setTab("masuk")}
-            className="w-full py-2 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 rounded-xl font-medium text-xs transition-colors cursor-pointer"
+            className="w-full py-2.5 bg-[#1E1B4B] hover:bg-[#141238] dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 rounded-xl font-medium text-xs transition-colors cursor-pointer"
           >
-            Kembali ke Form Masuk
+            Kembali ke Masuk
           </button>
         </div>
       ) : (
         <form action={formAction} className="space-y-4">
           {/* Identifier Input */}
           <div className="space-y-1.5">
-            <label className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-neutral-400 font-semibold flex items-center justify-between">
-              <span>NIM / Kode Asisten</span>
-              <span className="text-[10px] text-slate-400 font-normal">Contoh: MACY / 102022...</span>
+            <label className="text-xs font-semibold text-slate-700 dark:text-neutral-300 block">
+              NIM
             </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                <User size={15} />
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <User size={16} />
               </div>
               <input
                 id="identifier"
@@ -103,22 +89,20 @@ export function LoginForm() {
                 required
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value.toUpperCase())}
-                placeholder="NIM atau Kode Asisten"
-                className="w-full pl-9 pr-3.5 py-2.5 bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-mono uppercase text-slate-900 dark:text-white placeholder:text-slate-400 placeholder:normal-case focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all font-medium"
+                placeholder="NIM / Kode Asisten"
+                className="w-full pl-10 pr-4 py-3 bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 rounded-2xl text-xs font-mono uppercase text-slate-900 dark:text-white placeholder:text-slate-400 placeholder:normal-case focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all font-medium"
               />
             </div>
           </div>
 
           {/* Password Input */}
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between">
-              <label className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-neutral-400 font-semibold">
-                Password
-              </label>
-            </div>
+            <label className="text-xs font-semibold text-slate-700 dark:text-neutral-300 block">
+              PIN
+            </label>
             <div className="relative">
-              <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
-                <KeyRound size={15} />
+              <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                <KeyRound size={16} />
               </div>
               <input
                 id="password"
@@ -127,15 +111,15 @@ export function LoginForm() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Masukkan kata sandi"
-                className="w-full pl-9 pr-9 py-2.5 bg-slate-50/80 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all font-medium"
+                placeholder="PIN / Kata Sandi"
+                className="w-full pl-10 pr-10 py-3 bg-slate-50/80 dark:bg-white/5 border border-slate-200/80 dark:border-white/10 rounded-2xl text-xs font-mono text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-600 transition-all font-medium"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
               >
-                {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
           </div>
@@ -151,17 +135,17 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full mt-2 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 rounded-xl font-medium text-xs tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-xs"
+            className="w-full mt-2 py-3.5 bg-[#1E1B4B] hover:bg-[#141238] dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 rounded-2xl font-semibold text-xs tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 shadow-md active:scale-[0.99]"
           >
             {isPending ? (
               <>
-                <Loader2 size={14} className="animate-spin" />
+                <Loader2 size={15} className="animate-spin" />
                 <span>Memverifikasi...</span>
               </>
             ) : (
               <>
-                <span>Masuk ke Dashboard</span>
-                <ArrowRight size={14} />
+                <span>Masuk</span>
+                <ArrowRight size={15} />
               </>
             )}
           </button>
