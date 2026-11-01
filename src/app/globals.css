@@ -37,6 +37,16 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Safe area insets for iOS / Android notch & PWA status bars */
+@supports (padding-top: env(safe-area-inset-top)) {
+  :root {
+    --sat: env(safe-area-inset-top);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+    --sar: env(safe-area-inset-right);
+  }
+}
+
 /* Glassmorphism utilities */
 .glass-panel-dark {
   background: rgba(19, 14, 38, 0.88);

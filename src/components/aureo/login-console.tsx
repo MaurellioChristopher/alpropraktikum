@@ -25,7 +25,7 @@ export function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
 
   return (
-    <div className="w-full max-w-[420px] bg-white dark:bg-[#0E071A]/95 backdrop-blur-md rounded-2xl p-7 sm:p-8 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-slate-200/80 dark:border-white/10 transition-colors">
+    <div className="w-full max-w-[420px] bg-white dark:bg-[#0E071A]/95 backdrop-blur-md rounded-2xl p-5 sm:p-8 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5)] border border-slate-200/80 dark:border-white/10 transition-colors">
       
       {/* Header Inside Card */}
       <div className="space-y-1.5 mb-6">
