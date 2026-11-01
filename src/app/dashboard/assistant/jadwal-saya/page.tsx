@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
-import { ALPRO_15_SHIFTS } from "@/data/alpro-schedule-plotting";
+import { ALPRO_15_SHIFTS, getAssistantShifts } from "@/data/alpro-schedule-plotting";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -17,66 +17,57 @@ import {
 
 export default function JadwalSayaPage() {
   const [expandedShiftId, setExpandedShiftId] = useState<number | null>(null);
+  const [sessionUser, setSessionUser] = useState<string>("MACY");
 
-  // Daftar kelas penugasan asisten jaga praktikum ALPRO SI'50
-  const myAssignedShifts = [
-    {
-      shiftNum: 4,
-      classCode: "SI-50-04",
-      day: "Selasa",
-      dayAbbr: "SEL",
-      startTime: "15.30",
-      timeDisplay: "15.30 - 17.30",
+  useEffect(() => {
+    if (typeof document !== "undefined") {
+      const rawCookies = document.cookie ? document.cookie.split("; ") : [];
+      for (const c of rawCookies) {
+        const [k, v] = c.split("=");
+        if (k === "mock_session" && v) {
+          setSessionUser(decodeURIComponent(v));
+          break;
+        }
+      }
+    }
+  }, []);
+
+  const rawPlottingShifts = getAssistantShifts(sessionUser);
+  const myAssignedShifts = rawPlottingShifts.map((item) => {
+    const shift = item.shift;
+    const dayAbbrMap: Record<string, string> = {
+      Senin: "SEN",
+      Selasa: "SEL",
+      Rabu: "RAB",
+      Kamis: "KAM",
+      Jumat: "JUM",
+      Sabtu: "SAB",
+      Minggu: "MIN",
+    };
+    const dayAbbr = dayAbbrMap[shift.day] || shift.day.slice(0, 3).toUpperCase();
+    const startTime = shift.startTime.replace(":", ".");
+    let pillColor = "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800";
+    if (shift.day === "Rabu" || shift.day === "Kamis") {
+      pillColor = "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800";
+    } else if (shift.day === "Jumat" || shift.day === "Sabtu") {
+      pillColor = "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800";
+    }
+
+    return {
+      shiftNum: shift.shiftNumber,
+      classCode: shift.className,
+      day: shift.day,
+      dayAbbr,
+      startTime,
+      timeDisplay: shift.timeDisplay,
       room: "Ruang R1 Lantai 8 TULT",
-      group: "A",
-      studentCount: 8,
-      status: "Selesai",
+      group: item.group,
+      studentCount: item.studentCount,
+      status: "Terjadwal",
       isPindahan: false,
-      pillColor: "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800",
-    },
-    {
-      shiftNum: 5,
-      classCode: "SI-50-09",
-      day: "Kamis",
-      dayAbbr: "KAM",
-      startTime: "06.30",
-      timeDisplay: "06.30 - 08.30",
-      room: "Ruang R1 Lantai 8 TULT",
-      group: "B",
-      studentCount: 7,
-      status: "Selesai",
-      isPindahan: false,
-      pillColor: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
-    },
-    {
-      shiftNum: 6,
-      classCode: "SI-50-10",
-      day: "Kamis",
-      dayAbbr: "KAM",
-      startTime: "09.30",
-      timeDisplay: "09.30 - 11.30",
-      room: "Ruang R1 Lantai 8 TULT",
-      group: "C",
-      studentCount: 8,
-      status: "Selesai",
-      isPindahan: false,
-      pillColor: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
-    },
-    {
-      shiftNum: 11,
-      classCode: "SI-50-04",
-      day: "Sabtu",
-      dayAbbr: "SAB",
-      startTime: "13.30",
-      timeDisplay: "13.30 - 15.30",
-      room: "Ruang R1 Lantai 8 TULT",
-      group: "A",
-      studentCount: 8,
-      status: "Selesai",
-      isPindahan: true,
-      pillColor: "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
-    },
-  ];
+      pillColor,
+    };
+  });
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start pb-28 sm:pb-8">
@@ -135,7 +126,18 @@ export default function JadwalSayaPage() {
 
           {/* List of Class Rows */}
           <div className="space-y-3">
-            {myAssignedShifts.map((item) => {
+            {myAssignedShifts.length === 0 ? (
+              <div className="bg-white dark:bg-[#120824] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-900/40 text-center space-y-2 shadow-xs">
+                <Users size={32} className="text-purple-500 mx-auto" />
+                <p className="text-xs font-bold text-slate-800 dark:text-white">
+                  Belum ada jadwal shift praktikum
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans max-w-sm mx-auto">
+                  Anda belum dialokasikan ke shift praktikum aktif untuk periode ini.
+                </p>
+              </div>
+            ) : (
+              myAssignedShifts.map((item) => {
               const isExpanded = expandedShiftId === item.shiftNum;
               return (
                 <div
@@ -230,7 +232,7 @@ export default function JadwalSayaPage() {
                   )}
                 </div>
               );
-            })}
+            }))}
           </div>
         </div>
       </div>

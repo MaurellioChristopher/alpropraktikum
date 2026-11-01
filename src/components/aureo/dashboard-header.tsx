@@ -62,9 +62,9 @@ export function DashboardHeader({
   };
 
   return (
-    <header className="w-full flex items-center justify-between py-2 sm:py-3 mb-4 select-none">
+    <header className="w-full flex items-center justify-between gap-3 py-2 sm:py-3 mb-4 select-none min-w-0 pr-1">
       {/* Left: Breadcrumb / Subject badge matching Image 1 */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 min-w-0">
         {/* Mobile menu toggle */}
         <button
           type="button"

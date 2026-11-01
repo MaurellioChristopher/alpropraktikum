@@ -274,6 +274,51 @@ export default function AssistantDashboard() {
   const currentAssistantProfile = getAssistantByCode(sessionUser) || ALPRO_ASSISTANTS[4];
   const duty = getAssistantDutyStatus(sessionUser);
   const ongoingShift = getCurrentOngoingShift();
+
+  // Dynamic Jadwal Saya per Asisten
+  const myAssistantShifts = getAssistantShifts(sessionUser).map((item) => {
+    const shift = item.shift;
+    const dayAbbrMap: Record<string, string> = {
+      Senin: "SEN",
+      Selasa: "SEL",
+      Rabu: "RAB",
+      Kamis: "KAM",
+      Jumat: "JUM",
+      Sabtu: "SAB",
+      Minggu: "MIN",
+    };
+    const dayAbbr = dayAbbrMap[shift.day] || shift.day.slice(0, 3).toUpperCase();
+    const startTime = shift.startTime.replace(":", ".");
+    let pillColor = "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800";
+    if (shift.day === "Rabu" || shift.day === "Kamis") {
+      pillColor = "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800";
+    } else if (shift.day === "Jumat" || shift.day === "Sabtu") {
+      pillColor = "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800";
+    }
+
+    return {
+      shiftNum: shift.shiftNumber,
+      classCode: shift.className,
+      rawClassCode: shift.classCode,
+      day: shift.day,
+      dayAbbr,
+      startTime,
+      timeDisplay: shift.timeDisplay,
+      room: shift.room.startsWith("Ruang") ? shift.room : `Ruang ${shift.room}`,
+      group: item.group,
+      studentCount: item.studentCount,
+      status: "Terjadwal",
+      isPindahan: false,
+      pillColor,
+    };
+  });
+
+  // Informasi Praktikan & Laporan Kecurangan States (Clean & Real, No Fake Demo)
+  const [studentInfoRecords, setStudentInfoRecords] = useState<any[]>([]);
+  const [studentInfoSearch, setStudentInfoSearch] = useState("");
+  const [cheatingReports, setCheatingReports] = useState<any[]>([]);
+  const [cheatingSearchQuery, setCheatingSearchQuery] = useState("");
+
   const [selectedShiftForModal, setSelectedShiftForModal] = useState<number | null>(null);
   const [selectedModalGroup, setSelectedModalGroup] = useState<string | null>(null);
 
@@ -748,7 +793,7 @@ export default function AssistantDashboard() {
 
                 {/* Card 3: Jadwal Saya */}
                 <div
-                  onClick={() => switchTab("jadwal_praktikum")}
+                  onClick={() => switchTab("jadwal_saya")}
                   className="rounded-[1.85rem] p-3 sm:p-3.5 bg-gradient-to-b from-[#FFF3E8] via-[#FFEBD7] to-[#FFE2C5] dark:from-[#291708] dark:via-[#1F1105] dark:to-[#140A02] border border-amber-200/80 dark:border-amber-900/40 shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between min-h-[280px] sm:min-h-[300px] relative overflow-hidden"
                 >
                   <div className="relative flex-1 min-h-[185px] sm:min-h-[205px] w-full flex items-center justify-center -mb-8 sm:-mb-10 pt-2 z-0 group-hover:scale-105 transition-transform duration-300">
@@ -1537,7 +1582,7 @@ export default function AssistantDashboard() {
                     Kelas penugasan
                   </h2>
                   <span className="w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-950/80 text-sky-700 dark:text-sky-300 text-xs font-mono font-bold flex items-center justify-center">
-                    4
+                    {myAssistantShifts.length}
                   </span>
                 </div>
                 <div className="text-xs font-mono text-slate-400 dark:text-neutral-500">
@@ -1553,163 +1598,118 @@ export default function AssistantDashboard() {
 
               {/* List of Class Rows (Matching Image 2) */}
               <div className="space-y-3">
-                {[
-                  {
-                    shiftNum: 4,
-                    classCode: "SI-50-04",
-                    day: "Selasa",
-                    dayAbbr: "SEL",
-                    startTime: "15.30",
-                    timeDisplay: "15.30 - 17.30",
-                    room: "Ruang R1 Lantai 8 TULT",
-                    group: "A",
-                    studentCount: 8,
-                    status: "Selesai",
-                    isPindahan: false,
-                    pillColor: "bg-sky-100 text-sky-800 border-sky-200 dark:bg-sky-950/60 dark:text-sky-300 dark:border-sky-800",
-                  },
-                  {
-                    shiftNum: 5,
-                    classCode: "SI-50-09",
-                    day: "Kamis",
-                    dayAbbr: "KAM",
-                    startTime: "06.30",
-                    timeDisplay: "06.30 - 08.30",
-                    room: "Ruang R1 Lantai 8 TULT",
-                    group: "B",
-                    studentCount: 7,
-                    status: "Selesai",
-                    isPindahan: false,
-                    pillColor: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
-                  },
-                  {
-                    shiftNum: 6,
-                    classCode: "SI-50-10",
-                    day: "Kamis",
-                    dayAbbr: "KAM",
-                    startTime: "09.30",
-                    timeDisplay: "09.30 - 11.30",
-                    room: "Ruang R1 Lantai 8 TULT",
-                    group: "C",
-                    studentCount: 8,
-                    status: "Selesai",
-                    isPindahan: false,
-                    pillColor: "bg-amber-100 text-amber-900 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800",
-                  },
-                  {
-                    shiftNum: 11,
-                    classCode: "SI-50-04",
-                    day: "Sabtu",
-                    dayAbbr: "SAB",
-                    startTime: "13.30",
-                    timeDisplay: "13.30 - 15.30",
-                    room: "Ruang R1 Lantai 8 TULT",
-                    group: "A",
-                    studentCount: 8,
-                    status: "Selesai",
-                    isPindahan: true,
-                    pillColor: "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800",
-                  },
-                ].map((item) => {
-                  const isExpanded = expandedShiftId === item.shiftNum;
-                  return (
-                    <div
-                      key={`${item.shiftNum}-${item.classCode}`}
-                      className="rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/30 hover:bg-white dark:hover:bg-neutral-900/80 hover:border-purple-200 dark:hover:border-purple-900/50 transition-all p-4 sm:p-5 space-y-3"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        {/* Left: Pill & Class Details */}
-                        <div className="flex items-center gap-4">
-                          {/* Day & Start Time Pill */}
-                          <div
-                            className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0 border shadow-2xs ${item.pillColor}`}
-                          >
-                            <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
-                              {item.dayAbbr}
-                            </span>
-                            <span className="text-xs font-mono font-black">{item.startTime}</span>
-                          </div>
-
-                          {/* Class Info */}
-                          <div>
-                            <div className="flex items-center gap-2.5">
-                              <span className="font-bold text-base text-slate-900 dark:text-white">
-                                {item.classCode}
+                {myAssistantShifts.length === 0 ? (
+                  <div className="p-8 rounded-2xl bg-slate-50 dark:bg-neutral-900/40 border border-slate-200 dark:border-neutral-800 text-center space-y-2">
+                    <Calendar size={28} className="text-purple-500 mx-auto opacity-70" />
+                    <p className="text-xs font-bold text-slate-800 dark:text-white">
+                      Belum ada kelas penugasan untuk asisten {currentAssistantProfile.code}
+                    </p>
+                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans">
+                      Silakan periksa jadwal keseluruhan di menu Jadwal Praktikum.
+                    </p>
+                  </div>
+                ) : (
+                  myAssistantShifts.map((item) => {
+                    const isExpanded = expandedShiftId === item.shiftNum;
+                    return (
+                      <div
+                        key={`${item.shiftNum}-${item.classCode}-${item.group}`}
+                        className="rounded-2xl border border-slate-100 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/30 hover:bg-white dark:hover:bg-neutral-900/80 hover:border-purple-200 dark:hover:border-purple-900/50 transition-all p-4 sm:p-5 space-y-3"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          {/* Left: Pill & Class Details */}
+                          <div className="flex items-center gap-4">
+                            {/* Day & Start Time Pill */}
+                            <div
+                              className={`w-14 h-14 rounded-2xl flex flex-col items-center justify-center shrink-0 border shadow-2xs ${item.pillColor}`}
+                            >
+                              <span className="text-[10px] font-mono font-bold uppercase tracking-wider">
+                                {item.dayAbbr}
                               </span>
-                              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                {item.status}
-                              </span>
+                              <span className="text-xs font-mono font-black">{item.startTime}</span>
                             </div>
 
-                            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-neutral-400 mt-1 font-mono">
-                              <Clock size={13} className="text-slate-400" />
-                              <span>
-                                {item.day} · SHIFT {item.shiftNum}
-                              </span>
-                              {item.isPindahan && (
-                                <span className="text-[9px] font-mono font-extrabold uppercase bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 px-1.5 py-0.5 rounded tracking-wider">
-                                  PINDAHAN
+                            {/* Class Info */}
+                            <div>
+                              <div className="flex items-center gap-2.5">
+                                <span className="font-bold text-base text-slate-900 dark:text-white">
+                                  {item.classCode}
                                 </span>
-                              )}
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/70 dark:text-emerald-300">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                  {item.status}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-neutral-400 mt-1 font-mono">
+                                <Clock size={13} className="text-slate-400" />
+                                <span>
+                                  {item.day} · SHIFT {item.shiftNum} · Grup {item.group}
+                                </span>
+                                {item.isPindahan && (
+                                  <span className="text-[9px] font-mono font-extrabold uppercase bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-300 px-1.5 py-0.5 rounded tracking-wider">
+                                    PINDAHAN
+                                  </span>
+                                )}
+                              </div>
                             </div>
+                          </div>
+
+                          {/* Right: Buka Button & Accordion Toggle */}
+                          <div className="flex items-center gap-2 self-end sm:self-center">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedClassCode(item.rawClassCode || item.classCode.replace("-", ""));
+                                switchTab("praktikan");
+                              }}
+                              className="bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#7C3AED] dark:hover:bg-[#6D28D9] text-white px-5 py-2 rounded-full font-semibold text-xs transition-colors shadow-2xs cursor-pointer"
+                            >
+                              Buka
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setExpandedShiftId(isExpanded ? null : item.shiftNum)
+                              }
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+                              title="Tampilkan detail sesi"
+                            >
+                              <ChevronDown
+                                size={16}
+                                className={`transition-transform duration-200 ${
+                                  isExpanded ? "rotate-180" : ""
+                                }`}
+                              />
+                            </button>
                           </div>
                         </div>
 
-                        {/* Right: Buka Button & Accordion Toggle */}
-                        <div className="flex items-center gap-2 self-end sm:self-center">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedClassCode(item.classCode);
-                              switchTab("praktikan");
-                            }}
-                            className="bg-[#2563EB] hover:bg-[#1D4ED8] dark:bg-[#7C3AED] dark:hover:bg-[#6D28D9] text-white px-5 py-2 rounded-full font-semibold text-xs transition-colors shadow-2xs cursor-pointer"
-                          >
-                            Buka
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setExpandedShiftId(isExpanded ? null : item.shiftNum)
-                            }
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200/60 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
-                            title="Tampilkan detail sesi"
-                          >
-                            <ChevronDown
-                              size={16}
-                              className={`transition-transform duration-200 ${
-                                isExpanded ? "rotate-180" : ""
-                              }`}
-                            />
-                          </button>
-                        </div>
+                        {/* Accordion Expansion Details */}
+                        {isExpanded && (
+                          <div className="pt-3 border-t border-slate-200/70 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-300 space-y-2">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-[11px]">
+                              <div className="flex items-center gap-1.5">
+                                <MapPin size={13} className="text-[#7C3AED]" />
+                                <span>{item.room}</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Clock size={13} className="text-[#7C3AED]" />
+                                <span>{item.timeDisplay} WIB</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                <Users size={13} className="text-[#7C3AED]" />
+                                <span>
+                                  Grup {item.group} • {item.studentCount} Praktikan
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
-
-                      {/* Accordion Expansion Details */}
-                      {isExpanded && (
-                        <div className="pt-3 border-t border-slate-200/70 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-300 space-y-2">
-                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-[11px]">
-                            <div className="flex items-center gap-1.5">
-                              <MapPin size={13} className="text-[#7C3AED]" />
-                              <span>{item.room}</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Clock size={13} className="text-[#7C3AED]" />
-                              <span>{item.timeDisplay} WIB</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <Users size={13} className="text-[#7C3AED]" />
-                              <span>
-                                Grup {item.group} • {item.studentCount} Praktikan
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
@@ -2595,6 +2595,8 @@ export default function AssistantDashboard() {
                 <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
+                  value={studentInfoSearch}
+                  onChange={(e) => setStudentInfoSearch(e.target.value)}
                   placeholder="Nama / NIM"
                   className="w-full pl-11 pr-10 py-2.5 bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 rounded-full text-xs text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-xs"
                 />
@@ -2611,61 +2613,54 @@ export default function AssistantDashboard() {
             <div className="space-y-3">
               <div className="text-xs font-mono text-slate-400 space-y-0.5">
                 <div className="font-semibold text-slate-600 dark:text-neutral-300">Modul 1</div>
-                <div>6 catatan</div>
+                <div>{studentInfoRecords.length} catatan</div>
               </div>
 
-              <div className="space-y-2.5">
-                {[
-                  {
-                    name: "VINCENTIUS DE PAUL SOLIDEO BAGASKARA",
-                    detail: "102022500119 • SI-50-07 → SI-50-05 • Modul 1",
-                    status: "Pindah Shift",
-                    type: "warning",
-                  },
-                  {
-                    name: "RADITYA SYANDANA PRASETYO",
-                    detail: "102022400367 • SI-50-08 • Modul 1",
-                    status: "Alpa",
-                    type: "danger",
-                  },
-                  {
-                    name: "MUHAMMAD NADHIF WIJAYA PUTRA",
-                    detail: "102022500033 • SI-50-06 → SI-50-05 • Modul 1",
-                    status: "Pindah Shift",
-                    type: "warning",
-                  },
-                  {
-                    name: "TEUKU MUSYAFFA ATHALLAH SADDAM",
-                    detail: "102022500252 • SI-50-07 → SI-50-03 • Modul 1",
-                    status: "Pindah Shift",
-                    type: "warning",
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.name}
-                    className="p-4 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs flex items-center justify-between gap-4 hover:border-purple-300 dark:hover:border-purple-700 transition-all"
-                  >
-                    <div className="min-w-0">
-                      <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white uppercase tracking-tight truncate">
-                        {item.name}
-                      </div>
-                      <div className="text-[11px] font-mono text-slate-400 mt-0.5 truncate">
-                        {item.detail}
-                      </div>
-                    </div>
+              {studentInfoRecords.length === 0 ? (
+                <div className="p-8 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs text-center space-y-2">
+                  <Info size={26} className="text-purple-500 mx-auto opacity-70" />
+                  <p className="text-xs font-bold text-slate-800 dark:text-white">
+                    Belum ada catatan informasi praktikan
+                  </p>
+                  <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans max-w-sm mx-auto">
+                    Seluruh praktikan saat ini tercatat mengikuti jadwal shift reguler tanpa kendala atau perpindahan shift.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  {studentInfoRecords
+                    .filter(
+                      (item) =>
+                        item.name.toLowerCase().includes(studentInfoSearch.toLowerCase()) ||
+                        item.detail.toLowerCase().includes(studentInfoSearch.toLowerCase())
+                    )
+                    .map((item) => (
+                      <div
+                        key={item.name}
+                        className="p-4 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs flex items-center justify-between gap-4 hover:border-purple-300 dark:hover:border-purple-700 transition-all"
+                      >
+                        <div className="min-w-0">
+                          <div className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white uppercase tracking-tight truncate">
+                            {item.name}
+                          </div>
+                          <div className="text-[11px] font-mono text-slate-400 mt-0.5 truncate">
+                            {item.detail}
+                          </div>
+                        </div>
 
-                    <span
-                      className={`px-3 py-1 rounded-full text-[11px] font-bold font-mono shrink-0 ${
-                        item.type === "danger"
-                          ? "bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400"
-                          : "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
-                      }`}
-                    >
-                      {item.status}
-                    </span>
-                  </div>
-                ))}
-              </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-[11px] font-bold font-mono shrink-0 ${
+                            item.type === "danger"
+                              ? "bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400"
+                              : "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300"
+                          }`}
+                        >
+                          {item.status}
+                        </span>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -2690,7 +2685,7 @@ export default function AssistantDashboard() {
                   <Flag size={13} className="text-purple-600" />
                   <span>Semua laporan</span>
                   <span className="w-5 h-5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 font-mono text-[10px] font-bold flex items-center justify-center">
-                    5
+                    {cheatingReports.length}
                   </span>
                 </button>
               </div>
@@ -2701,6 +2696,8 @@ export default function AssistantDashboard() {
                   <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
+                    value={cheatingSearchQuery}
+                    onChange={(e) => setCheatingSearchQuery(e.target.value)}
                     placeholder="Nama, NIM, asisten..."
                     className="w-full pl-11 pr-10 py-2.5 bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 rounded-full text-xs text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-xs"
                   />
@@ -2714,6 +2711,7 @@ export default function AssistantDashboard() {
 
                 <button
                   type="button"
+                  onClick={() => setCheatingSearchQuery("")}
                   className="w-10 h-10 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 shadow-xs cursor-pointer shrink-0"
                 >
                   <RotateCw size={15} />
@@ -2722,84 +2720,57 @@ export default function AssistantDashboard() {
             </div>
 
             {/* Reports Grid matching Image 5 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {[
-                {
-                  name: "THARIQ EL MUTSLA PUTRA FAZA",
-                  nim: "102022500022",
-                  cls: "SI-50-07",
-                  mod: "Modul 1",
-                  viol: "Plagiarisme",
-                  reporter: "HADH",
-                  time: "29/10/2026, 20.49.47",
-                },
-                {
-                  name: "CLAUDIA INTAN AZZAHRA",
-                  nim: "102022500051",
-                  cls: "SI-50-07",
-                  mod: "Modul 1",
-                  viol: "Plagiarisme",
-                  reporter: "HADH",
-                  time: "29/10/2026, 20.49.39",
-                },
-                {
-                  name: "MUHAMMAD FAMORIS",
-                  nim: "102022500091",
-                  cls: "SI-50-07",
-                  mod: "Modul 1",
-                  viol: "Plagiarisme",
-                  reporter: "HADH",
-                  time: "29/10/2026, 20.49.29",
-                },
-                {
-                  name: "MUHAMMAD RAKA TEGAR SETIAWAN",
-                  nim: "102022500010",
-                  cls: "SI-50-07",
-                  mod: "Modul 1",
-                  viol: "Plagiarisme",
-                  reporter: "HADH",
-                  time: "29/10/2026, 20.48.47",
-                },
-                {
-                  name: "ABIZARD AVANTGARDA PRATAMA",
-                  nim: "102022500337",
-                  cls: "SI-50-07",
-                  mod: "Modul 1",
-                  viol: "Plagiarisme",
-                  reporter: "HADH",
-                  time: "29/10/2026, 19.27.50",
-                },
-              ].map((rep) => (
-                <div
-                  key={rep.nim}
-                  className="p-5 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all space-y-3"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-mono text-slate-400 font-semibold uppercase">
-                      Terbuka
-                    </span>
-                  </div>
+            {cheatingReports.length === 0 ? (
+              <div className="bg-white dark:bg-[#120824] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-900/40 text-center space-y-2 shadow-xs">
+                <ShieldCheck size={32} className="text-emerald-500 mx-auto" />
+                <p className="text-xs font-bold text-slate-800 dark:text-white">
+                  Tidak ada laporan kecurangan
+                </p>
+                <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans max-w-sm mx-auto">
+                  Sistem pengawasan praktikum ALPRO bersih. Belum ada catatan indikasi kecurangan atau pelanggaran integritas akademik.
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {cheatingReports
+                  .filter((rep) =>
+                    !cheatingSearchQuery ||
+                    rep.name?.toLowerCase().includes(cheatingSearchQuery.toLowerCase()) ||
+                    rep.nim?.includes(cheatingSearchQuery) ||
+                    rep.reporter?.toLowerCase().includes(cheatingSearchQuery.toLowerCase())
+                  )
+                  .map((rep) => (
+                    <div
+                      key={rep.id || rep.nim}
+                      className="p-5 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all space-y-3"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono text-slate-400 font-semibold uppercase">
+                          {rep.status || "Terbuka"}
+                        </span>
+                      </div>
 
-                  <div className="space-y-1">
-                    <div className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-tight leading-snug">
-                      {rep.name}
-                    </div>
-                    <div className="text-[10px] font-mono text-slate-400">
-                      {rep.nim} · {rep.cls} · {rep.mod}
-                    </div>
-                  </div>
+                      <div className="space-y-1">
+                        <div className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-tight leading-snug">
+                          {rep.name}
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-400">
+                          {rep.nim} · {rep.cls} · {rep.mod}
+                        </div>
+                      </div>
 
-                  <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-1">
-                    <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
-                      {rep.viol}
+                      <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-1">
+                        <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
+                          {rep.viol}
+                        </div>
+                        <div className="text-[10px] font-mono text-slate-400">
+                          {rep.reporter} · {rep.time}
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-[10px] font-mono text-slate-400">
-                      {rep.reporter} · {rep.time}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  ))}
+              </div>
+            )}
           </div>
         )}
 

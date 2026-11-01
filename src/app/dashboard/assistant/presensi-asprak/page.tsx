@@ -555,7 +555,7 @@ export default function PresensiAsprakPage() {
   const swapCount = attendanceLogs.filter((a) => a.status === "Shift Swap (Pengganti)").length;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#F0F2F6] dark:bg-[#070312] text-slate-900 dark:text-neutral-100 transition-colors">
+    <div className="flex flex-col lg:flex-row gap-6 items-start">
       {/* Floating Rounded Sidebar */}
       <DashboardSidebar
         activeTab="presensi_asprak"
@@ -565,18 +565,16 @@ export default function PresensiAsprakPage() {
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col h-full overflow-hidden min-w-0">
+      <div className="flex-1 w-full min-w-0 space-y-5 pb-28 sm:pb-8">
         
-        {/* Top Header inside safe padding wrapper */}
-        <div className="px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 shrink-0 safe-pt">
-          <DashboardHeader
-            assistantCode={selectedAssistantCode}
-            onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
-          />
-        </div>
+        {/* Top Header */}
+        <DashboardHeader
+          assistantCode={selectedAssistantCode}
+          onOpenMobileMenu={() => setIsMobileMenuOpen(true)}
+        />
 
-        {/* Scrollable Viewport */}
-        <main className="flex-1 overflow-y-auto px-3 sm:px-6 lg:px-8 pb-12 safe-pb space-y-5">
+        {/* Viewport */}
+        <main className="space-y-5">
           
           {/* Breadcrumb & Real-time Clock */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pt-1">
@@ -877,6 +875,48 @@ export default function PresensiAsprakPage() {
                           <Camera size={14} className="text-purple-600 dark:text-purple-400" />
                           <span>Ambil Foto via Kamera</span>
                         </button>
+
+                        {/* Pilihan Draft Foto Lab Praktikum */}
+                        <div className="w-full pt-4 mt-3 border-t border-slate-200 dark:border-white/10 text-left">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[11px] font-mono font-semibold text-slate-700 dark:text-neutral-300 uppercase">
+                              Draft Foto Lab Siap Pakai
+                            </span>
+                            <span className="text-[10px] font-mono text-purple-600 dark:text-purple-400">
+                              2 Draft Tersedia
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                            {DRAFT_LAB_PHOTOS.map((draft) => (
+                              <button
+                                key={draft.id}
+                                type="button"
+                                onClick={() => {
+                                  setCapturedImage(draft.url);
+                                  setUploadedFileName(draft.title);
+                                  setUploadedFileSize("750 KB");
+                                }}
+                                className="group p-2 rounded-xl border border-slate-200/90 dark:border-white/10 bg-white dark:bg-white/5 hover:border-purple-500 text-left transition-all cursor-pointer flex items-center gap-2.5 shadow-2xs hover:shadow-xs"
+                              >
+                                <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-slate-200/60 dark:border-white/10">
+                                  <img
+                                    src={draft.url}
+                                    alt={draft.title}
+                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                  />
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="text-[11px] font-bold text-slate-900 dark:text-white truncate">
+                                    {draft.title}
+                                  </div>
+                                  <div className="text-[10px] text-slate-500 dark:text-neutral-400 truncate">
+                                    {draft.subtitle}
+                                  </div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
                     )}
 

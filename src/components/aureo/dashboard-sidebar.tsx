@@ -206,12 +206,12 @@ export function DashboardSidebar({
             {currentProfile.code.slice(0, 2)}
           </div>
           {!collapsed && (
-            <div className="min-w-0 text-left">
-              <div className="text-xs font-bold text-white truncate leading-tight">
-                {currentProfile.name.split(" ")[0]}
+            <div className="min-w-0 text-left flex-1">
+              <div className="text-xs font-bold text-white truncate leading-tight" title={currentProfile.name}>
+                {currentProfile.name}
               </div>
-              <div className="text-[10px] font-mono text-purple-200 font-medium truncate mt-0.5">
-                {currentProfile.code} • {currentProfile.position.split(" ")[0]}
+              <div className="text-[10px] font-mono text-purple-200 font-medium truncate mt-0.5" title={`${currentProfile.code} • ${currentProfile.position}`}>
+                {currentProfile.code} • {currentProfile.position}
               </div>
             </div>
           )}
