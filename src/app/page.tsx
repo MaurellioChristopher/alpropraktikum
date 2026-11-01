@@ -4,107 +4,139 @@ import Image from "next/image";
 import { LoginForm } from "@/components/aureo/login-console";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { motion } from "motion/react";
-import { CheckCircle2, Sparkles } from "lucide-react";
 
 export default function Home() {
   return (
-    <main className="w-screen h-screen flex overflow-hidden bg-[#F3F2FD] dark:bg-[#070312] selection:bg-purple-600 selection:text-white">
+    <main className="w-screen h-screen flex overflow-hidden selection:bg-purple-600 selection:text-white">
 
       {/* ============================================================ */}
-      {/* LEFT PANEL: FULL-HEIGHT PASTEL LILAC BRAND                   */}
+      {/* LEFT PANEL: LAVENDER GRADIENT + MASCOT BACKGROUND            */}
       {/* ============================================================ */}
-      <section className="hidden lg:flex w-1/2 h-full flex-col bg-[#C9C4F5] dark:bg-[#1A1232] relative overflow-hidden p-12 xl:p-16">
+      <section className="hidden lg:flex w-1/2 h-full flex-col relative overflow-hidden"
+        style={{
+          background: "linear-gradient(145deg, #E2DFFF 0%, #C9C4F5 40%, #BDB6F2 70%, #D4AEFF 100%)",
+        }}
+      >
+        {/* ── Decorative sparkle stars (CSS, no image needed) ─────────── */}
+        {[
+          { top: "18%", left: "12%", size: 10, opacity: 0.55 },
+          { top: "35%", left: "52%", size: 8, opacity: 0.4 },
+          { top: "60%", left: "20%", size: 12, opacity: 0.45 },
+          { top: "72%", right: "38%", size: 7, opacity: 0.35 },
+          { top: "28%", right: "22%", size: 9, opacity: 0.5 },
+        ].map((s, i) => (
+          <motion.div
+            key={i}
+            animate={{ opacity: [s.opacity, s.opacity * 0.4, s.opacity] }}
+            transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute pointer-events-none"
+            style={{ top: s.top, left: s.left, right: (s as {right?: string}).right }}
+          >
+            {/* 4-point star SVG */}
+            <svg width={s.size} height={s.size} viewBox="0 0 20 20" fill="none">
+              <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" fill="#8B5CF6" />
+            </svg>
+          </motion.div>
+        ))}
 
-        {/* Ambient glow */}
-        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full bg-white/20 dark:bg-purple-600/10 blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-purple-300/20 dark:bg-purple-900/20 blur-3xl pointer-events-none" />
+        {/* ── Big light circle outline (decorative ring) ───────────────── */}
+        <div
+          className="absolute pointer-events-none rounded-full border border-white/30"
+          style={{ width: "70%", aspectRatio: "1", top: "10%", left: "-15%" }}
+        />
 
-        {/* Top: Brand */}
-        <div className="relative z-10 flex items-center gap-3 shrink-0">
-          <div className="relative w-9 h-9 shrink-0 rounded-xl bg-white/80 dark:bg-white/10 border border-white/60 dark:border-white/10 overflow-hidden shadow-sm">
-            <Image src="/images/edm-emblem-crimson.png" alt="Logo EDM" fill sizes="36px" className="object-contain p-1" priority />
+        {/* ── EDM Logo (top-right, clean watermark style) ─────────────── */}
+        {/* Positioned so it's well above the mascot area */}
+        <div className="absolute top-6 right-6 xl:top-8 xl:right-8 z-10 pointer-events-none select-none">
+          <div className="relative" style={{ width: 140, height: 90 }}>
+            <Image
+              src="/images/edm-ribbon-logo.png"
+              alt="EDM Laboratory"
+              fill
+              sizes="140px"
+              className="object-contain opacity-80"
+              priority
+            />
           </div>
-          <span className="font-extrabold text-lg text-[#1E1B4B] dark:text-white tracking-tight">
-            edm-alpro<span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-600 dark:bg-purple-400 mb-1.5 ml-0.5" />
-          </span>
         </div>
 
-        {/* Middle: Headline + Illustration — takes remaining space */}
-        <div className="relative z-10 flex-1 flex flex-col justify-center min-h-0">
+        {/* ── Cloud puffs at the bottom (CSS blur shapes) ─────────────── */}
+        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: "22%" }}>
+          {/* Left cloud blob */}
+          <div className="absolute bottom-0 left-[-5%] w-[45%] h-full rounded-[50%] bg-white/55 blur-sm" />
+          {/* Center cloud blob */}
+          <div className="absolute bottom-[-4%] left-[15%] w-[55%] h-[85%] rounded-[50%] bg-white/60 blur-sm" />
+          {/* Right cloud blob */}
+          <div className="absolute bottom-[-2%] right-[-8%] w-[40%] h-[80%] rounded-[50%] bg-white/50 blur-sm" />
+        </div>
+
+        {/* ── EDM Mascot (bottom-right, floating above clouds) ─────────── */}
+        {/* Positioned strictly in bottom-right, never touching logo area */}
+        <motion.div
+          animate={{ y: [0, -10, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-0 right-0 z-10 pointer-events-none select-none"
+          style={{ width: "42%", paddingBottom: "2%" }}
+        >
+          <div className="relative w-full" style={{ aspectRatio: "1024/765" }}>
+            <Image
+              src="/images/edm-mascot.png"
+              alt="Maskot EDM"
+              fill
+              sizes="40vw"
+              className="object-contain object-bottom"
+            />
+          </div>
+        </motion.div>
+
+        {/* ── Foreground content: brand + headline ─────────────────────── */}
+        <div className="relative z-20 flex flex-col h-full p-10 xl:p-14">
           
-          {/* Headline */}
-          <h1 className="text-6xl xl:text-8xl font-extrabold text-[#1E1B4B] dark:text-white tracking-tight leading-[1.0] mb-10">
-            ALPRO<br />Practicum
-          </h1>
-
-          {/* Illustration — fits inside remaining space */}
-          <div className="relative flex items-center justify-start w-full" style={{ height: "min(300px, 35vh)" }}>
-
-            {/* Torus ring accent */}
-            <div className="absolute left-24 xl:left-32 top-1/2 -translate-y-1/2 w-48 h-48 xl:w-56 xl:h-56 rounded-full border-[18px] xl:border-[22px] border-purple-400/30 dark:border-purple-500/20 rotate-[-12deg] pointer-events-none" />
-
-            {/* Green check badge */}
-            <motion.div
-              animate={{ y: [0, -8, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute left-0 bottom-0 z-20 bg-white/95 dark:bg-white/10 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-white/90 dark:border-white/15"
-            >
-              <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center">
-                <CheckCircle2 size={19} className="text-white" />
-              </div>
-            </motion.div>
-
-            {/* Purple sparkle badge */}
-            <motion.div
-              animate={{ y: [0, 9, 0] }}
-              transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-              className="absolute right-4 top-0 z-20 bg-white/95 dark:bg-white/10 backdrop-blur-md p-3.5 rounded-2xl shadow-xl border border-white/90 dark:border-white/15"
-            >
-              <div className="w-8 h-8 rounded-xl bg-purple-600 flex items-center justify-center">
-                <Sparkles size={19} className="text-white" />
-              </div>
-            </motion.div>
-
-            {/* Main EDM Logo Pedestal */}
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              className="relative z-10 mx-auto"
-              style={{ width: "min(220px, 28vh)", height: "min(220px, 28vh)" }}
-            >
-              <div className="w-full h-full rounded-3xl bg-white/90 dark:bg-white/10 backdrop-blur-2xl border-2 border-white/95 dark:border-white/20 shadow-[0_24px_60px_rgba(79,70,229,0.22)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.5)] flex items-center justify-center p-7">
-                <div className="relative w-full h-full">
-                  <Image
-                    src="/images/edm-square-logo.png"
-                    alt="EDM Laboratory Logo"
-                    fill
-                    priority
-                    sizes="220px"
-                    className="object-contain drop-shadow-lg"
-                  />
-                </div>
-              </div>
-            </motion.div>
+          {/* Top brand pill */}
+          <div className="flex items-center gap-2.5 shrink-0">
+            <div className="relative w-9 h-9 rounded-xl bg-white/70 backdrop-blur-sm border border-white/80 overflow-hidden shadow-sm shrink-0">
+              <Image
+                src="/images/edm-emblem-crimson.png"
+                alt="Logo EDM"
+                fill
+                sizes="36px"
+                className="object-contain p-1"
+                priority
+              />
+            </div>
+            <span className="font-extrabold text-lg text-[#1E1B4B] tracking-tight">
+              edm-alpro
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-600 mb-1.5 ml-0.5" />
+            </span>
           </div>
-        </div>
 
-        {/* Bottom footnote */}
-        <p className="relative z-10 shrink-0 text-xs font-mono text-[#1E1B4B]/50 dark:text-white/30 mt-6">
-          EDM Laboratory • Telkom University
-        </p>
+          {/* Headline — vertically centered in remaining space */}
+          <div className="flex-1 flex items-center">
+            <h1 className="text-6xl xl:text-8xl font-extrabold text-[#1E1B4B] tracking-tight leading-[1.0]">
+              ALPRO<br />Practicum
+            </h1>
+          </div>
+
+          {/* Bottom footnote */}
+          <p className="text-xs font-mono text-[#1E1B4B]/40 shrink-0">
+            EDM Laboratory • Telkom University
+          </p>
+        </div>
       </section>
 
       {/* ============================================================ */}
-      {/* RIGHT PANEL (also full page on mobile)                       */}
+      {/* RIGHT PANEL: WHITE AUTH PANEL                                */}
       {/* ============================================================ */}
-      <section className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center bg-white dark:bg-[#0A0515] relative p-6 sm:p-10 lg:p-14 xl:p-16 overflow-y-auto">
+      <section className="w-full lg:w-1/2 h-full flex flex-col items-center justify-center bg-white dark:bg-[#0A0515] relative p-6 sm:p-10 lg:p-12 xl:p-16 overflow-y-auto">
 
-        {/* Mobile brand header (visible only < lg) */}
+        {/* Mobile brand header */}
         <div className="lg:hidden w-full flex items-center gap-2.5 mb-8 shrink-0 pt-[max(0.5rem,env(safe-area-inset-top))]">
-          <div className="relative w-8 h-8 rounded-xl bg-[#C9C4F5] border border-purple-200/60 overflow-hidden">
+          <div className="relative w-8 h-8 rounded-xl overflow-hidden bg-purple-100 border border-purple-200/60">
             <Image src="/images/edm-emblem-crimson.png" alt="Logo EDM" fill sizes="32px" className="object-contain p-1" priority />
           </div>
-          <span className="font-extrabold text-base text-[#1E1B4B] dark:text-white tracking-tight">edm-alpro<span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-600 mb-1 ml-0.5" /></span>
+          <span className="font-extrabold text-base text-[#1E1B4B] dark:text-white tracking-tight">
+            edm-alpro<span className="inline-block w-1.5 h-1.5 rounded-full bg-purple-600 mb-1 ml-0.5" />
+          </span>
         </div>
 
         {/* Theme Toggle */}
