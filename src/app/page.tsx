@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { LoginForm } from "@/components/aureo/login-console";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { motion } from "motion/react";
 
 export default function Home() {
   return (
@@ -12,63 +11,17 @@ export default function Home() {
       {/* ============================================================ */}
       {/* LEFT PANEL: LAVENDER GRADIENT + MASCOT BACKGROUND            */}
       {/* ============================================================ */}
-      <section className="hidden lg:flex w-1/2 h-full flex-col relative overflow-hidden"
-        style={{
-          background: "linear-gradient(145deg, #E2DFFF 0%, #C9C4F5 40%, #BDB6F2 70%, #D4AEFF 100%)",
-        }}
-      >
-        {/* ── Decorative sparkle stars (CSS, no image needed) ─────────── */}
-        {[
-          { top: "18%", left: "12%", size: 10, opacity: 0.55 },
-          { top: "35%", left: "52%", size: 8, opacity: 0.4 },
-          { top: "60%", left: "20%", size: 12, opacity: 0.45 },
-          { top: "72%", right: "38%", size: 7, opacity: 0.35 },
-          { top: "28%", right: "22%", size: 9, opacity: 0.5 },
-        ].map((s, i) => (
-          <motion.div
-            key={i}
-            animate={{ opacity: [s.opacity, s.opacity * 0.4, s.opacity] }}
-            transition={{ duration: 2.5 + i * 0.4, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute pointer-events-none"
-            style={{ top: s.top, left: s.left, right: (s as {right?: string}).right }}
-          >
-            {/* 4-point star SVG */}
-            <svg width={s.size} height={s.size} viewBox="0 0 20 20" fill="none">
-              <path d="M10 0 L11.5 8.5 L20 10 L11.5 11.5 L10 20 L8.5 11.5 L0 10 L8.5 8.5 Z" fill="#8B5CF6" />
-            </svg>
-          </motion.div>
-        ))}
+      <section className="hidden lg:flex w-1/2 h-full flex-col relative overflow-hidden">
 
-        {/* ── Big light circle outline (decorative ring) ───────────────── */}
-        <div
-          className="absolute pointer-events-none rounded-full border border-white/30"
-          style={{ width: "70%", aspectRatio: "1", top: "10%", left: "-15%" }}
+        {/* ── Full-panel background image (contains mascot, EDM logo, clouds, stars) ── */}
+        <Image
+          src="/images/login-bg-maskot.png"
+          alt="EDM ALPRO Background"
+          fill
+          priority
+          sizes="50vw"
+          className="object-cover object-center"
         />
-
-        {/* ── EDM Logo (top-right, clean watermark style) ─────────────── */}
-        {/* Positioned so it's well above the mascot area */}
-        <div className="absolute top-6 right-6 xl:top-8 xl:right-8 z-10 pointer-events-none select-none">
-          <div className="relative" style={{ width: 140, height: 90 }}>
-            <Image
-              src="/images/edm-ribbon-logo.png"
-              alt="EDM Laboratory"
-              fill
-              sizes="140px"
-              className="object-contain opacity-80"
-              priority
-            />
-          </div>
-        </div>
-
-        {/* ── Cloud puffs at the bottom (CSS blur shapes) ─────────────── */}
-        <div className="absolute bottom-0 left-0 right-0 pointer-events-none" style={{ height: "22%" }}>
-          {/* Left cloud blob */}
-          <div className="absolute bottom-0 left-[-5%] w-[45%] h-full rounded-[50%] bg-white/55 blur-sm" />
-          {/* Center cloud blob */}
-          <div className="absolute bottom-[-4%] left-[15%] w-[55%] h-[85%] rounded-[50%] bg-white/60 blur-sm" />
-          {/* Right cloud blob */}
-          <div className="absolute bottom-[-2%] right-[-8%] w-[40%] h-[80%] rounded-[50%] bg-white/50 blur-sm" />
-        </div>
 
 
         {/* ── Foreground content: brand + headline ─────────────────────── */}
