@@ -70,24 +70,6 @@ export default function Home() {
           <div className="absolute bottom-[-2%] right-[-8%] w-[40%] h-[80%] rounded-[50%] bg-white/50 blur-sm" />
         </div>
 
-        {/* ── EDM Mascot (bottom-right, floating above clouds) ─────────── */}
-        {/* Positioned strictly in bottom-right, never touching logo area */}
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 right-0 z-10 pointer-events-none select-none"
-          style={{ width: "42%", paddingBottom: "2%" }}
-        >
-          <div className="relative w-full" style={{ aspectRatio: "1024/765" }}>
-            <Image
-              src="/images/edm-mascot.png"
-              alt="Maskot EDM"
-              fill
-              sizes="40vw"
-              className="object-contain object-bottom"
-            />
-          </div>
-        </motion.div>
 
         {/* ── Foreground content: brand + headline ─────────────────────── */}
         <div className="relative z-20 flex flex-col h-full p-10 xl:p-14">
