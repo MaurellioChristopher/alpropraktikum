@@ -240,7 +240,7 @@ export function DashboardSidebar({
       <aside
         className={`hidden lg:flex shrink-0 ${
           collapsed ? "w-20" : "w-60"
-        } bg-gradient-to-b from-[#7C3AED] via-[#6D28D9] to-[#5B21B6] dark:from-[#3B1977] dark:via-[#281156] dark:to-[#170836] rounded-[2.5rem] shadow-[0_20px_50px_rgba(109,40,217,0.25)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] sticky top-6 h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-400/30 dark:border-purple-800/40`}
+        } bg-gradient-to-b from-[#7C3AED] via-[#6D28D9] to-[#5B21B6] dark:from-[#3B1977] dark:via-[#281156] dark:to-[#170836] rounded-[2.5rem] shadow-[0_20px_50px_rgba(109,40,217,0.25)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] sticky top-6 self-start h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-400/30 dark:border-purple-800/40`}
       >
         {sidebarBody}
       </aside>

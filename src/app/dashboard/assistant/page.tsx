@@ -436,8 +436,8 @@ export default function AssistantDashboard() {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 items-start pb-28 sm:pb-8">
-      {/* LEFT SIDEBAR with role-based feature gating & responsive drawer */}
+    <div className="flex flex-col lg:flex-row gap-6 items-start">
+      {/* LEFT SIDEBAR — sticky, never scrolls with content */}
       <DashboardSidebar
         role={currentRole}
         activeTab={activeTab}
@@ -446,8 +446,8 @@ export default function AssistantDashboard() {
         onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
 
-      {/* RIGHT MAIN CONTENT AREA */}
-      <div className="flex-1 w-full min-w-0 space-y-5">
+      {/* RIGHT MAIN CONTENT AREA — only this column scrolls */}
+      <div className="flex-1 w-full min-w-0 space-y-5 pb-28 sm:pb-8">
         
         {/* TOP SUB-HEADER (Matching Image 1) */}
         <DashboardHeader
