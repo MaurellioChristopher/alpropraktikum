@@ -103,11 +103,11 @@ export function DashboardSidebar({
   };
 
   const sidebarBody = (
-    <div className="flex flex-col justify-between h-full p-2.5 sm:p-3 text-white relative overflow-hidden">
+    <div className="flex flex-col justify-between h-full p-3 sm:p-4 pb-8 sm:pb-9 text-white relative overflow-hidden">
       {/* Top Header Logo & Collapse Toggle + Scrollable Navigation Menu List */}
       <div className="flex flex-col min-h-0 flex-1">
-        <div className="flex items-center justify-between relative px-1 pt-1 shrink-0 pb-1.5">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center justify-between relative px-1 pt-0.5 shrink-0 pb-3">
+          <div className="flex items-center gap-3">
             {/* White rounded square logo container with official EDM logo */}
             <div className="w-10 h-10 rounded-2xl bg-white shadow-md flex items-center justify-center shrink-0 p-1.5 transition-transform hover:scale-105">
               <Image
@@ -122,10 +122,10 @@ export function DashboardSidebar({
 
             {!collapsed && (
               <div className="min-w-0">
-                <div className="font-extrabold text-sm tracking-tight leading-none text-white drop-shadow-xs truncate">
+                <div className="font-extrabold text-[15px] tracking-tight leading-none text-white drop-shadow-xs truncate">
                   EDM-ALPRO
                 </div>
-                <div className="text-[9px] font-mono text-purple-200 font-bold mt-1 tracking-wider uppercase">
+                <div className="text-[9.5px] font-mono text-purple-200 font-bold mt-1 tracking-wider uppercase">
                   Practicum Tools
                 </div>
               </div>
@@ -143,8 +143,8 @@ export function DashboardSidebar({
           </button>
         </div>
 
-        {/* Navigation Menu List: Compact spacing with smooth internal scrollbar-none to fit all laptop screen heights */}
-        <nav className="space-y-1 pt-1 overflow-y-auto scrollbar-none flex-1 min-h-0 pr-0.5">
+        {/* Navigation Menu List: Comfortably spaced and smooth to prevent cramping */}
+        <nav className="space-y-1.5 xl:space-y-2 pt-1 overflow-y-auto scrollbar-none flex-1 min-h-0 pr-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const active = isItemActive(item.id);
@@ -155,11 +155,11 @@ export function DashboardSidebar({
                 type="button"
                 onClick={() => handleSelectTab(item.id)}
                 className={`w-full flex items-center ${
-                  collapsed ? "justify-center px-0" : "px-3"
-                } py-2 xl:py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
+                  collapsed ? "justify-center px-0" : "px-3.5"
+                } py-2.5 rounded-2xl text-xs font-semibold transition-all duration-200 cursor-pointer ${
                   active
                     ? "bg-white text-purple-800 shadow-[0_8px_20px_rgba(0,0,0,0.15)] font-bold scale-[1.02]"
-                    : "text-white/80 hover:text-white hover:bg-white/15"
+                    : "text-white/85 hover:text-white hover:bg-white/15"
                 }`}
                 title={collapsed ? item.label : undefined}
               >
@@ -168,41 +168,43 @@ export function DashboardSidebar({
                   strokeWidth={active ? 2.5 : 2}
                   className={active ? "text-purple-700 shrink-0" : "text-white/90 shrink-0"}
                 />
-                {!collapsed && <span className="ml-2.5 truncate">{item.label}</span>}
+                {!collapsed && <span className="ml-3 truncate">{item.label}</span>}
               </button>
             );
           })}
         </nav>
       </div>
 
-      {/* Bottom Area: Settings & Profile Pill & Logout (Always visible and anchored cleanly) */}
-      <div className="pt-2 border-t border-white/20 space-y-1.5 shrink-0">
+      {/* Bottom Area: Settings & Profile Pill & Logout (Generously spaced and padded above bottom curve) */}
+      <div className="pt-3.5 border-t border-white/20 space-y-2.5 shrink-0">
         {/* Settings button */}
         <button
           type="button"
           onClick={() => handleSelectTab("akun")}
           className={`w-full flex items-center ${
-            collapsed ? "justify-center px-0" : "px-3"
-          } py-2 rounded-2xl text-xs font-medium transition-colors cursor-pointer ${
+            collapsed ? "justify-center px-0" : "px-3.5"
+          } py-2.5 rounded-2xl text-xs font-medium transition-colors cursor-pointer ${
             activeTab === "akun"
               ? "bg-white text-purple-800 font-bold shadow-md"
-              : "text-white/80 hover:text-white hover:bg-white/15"
+              : "text-white/85 hover:text-white hover:bg-white/15"
           }`}
           title={collapsed ? "Pengaturan" : undefined}
         >
           <Settings size={18} className={activeTab === "akun" ? "text-purple-700 shrink-0" : "text-white/90 shrink-0"} />
-          {!collapsed && <span className="ml-2.5">Pengaturan</span>}
+          {!collapsed && <span className="ml-3 font-semibold">Pengaturan</span>}
         </button>
 
         {/* User Profile Avatar */}
         <div
           onClick={() => handleSelectTab("akun")}
           className={`rounded-2xl transition-all cursor-pointer ${
-            collapsed ? "flex justify-center p-1" : "p-1.5 bg-white/15 backdrop-blur-md border border-white/20 flex items-center gap-2"
+            collapsed
+              ? "flex justify-center p-2"
+              : "p-2.5 bg-white/15 hover:bg-white/20 backdrop-blur-md border border-white/20 flex items-center gap-3 shadow-xs"
           }`}
           title={currentProfile.name}
         >
-          <div className="w-8 h-8 rounded-full bg-amber-400 text-slate-900 font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-md ring-2 ring-white/30">
+          <div className="w-9 h-9 rounded-full bg-amber-400 text-slate-900 font-mono font-black text-xs flex items-center justify-center shrink-0 shadow-md ring-2 ring-white/30">
             {currentProfile.code.slice(0, 2)}
           </div>
           {!collapsed && (
@@ -222,12 +224,12 @@ export function DashboardSidebar({
           <button
             type="submit"
             className={`w-full flex items-center ${
-              collapsed ? "justify-center px-0" : "px-3"
-            } py-1.5 text-xs font-mono text-white/75 hover:text-rose-200 hover:bg-rose-500/20 rounded-2xl transition-colors cursor-pointer`}
+              collapsed ? "justify-center px-0" : "px-3.5"
+            } py-2.5 text-xs font-medium text-white/85 hover:text-white hover:bg-rose-500/25 rounded-2xl transition-all cursor-pointer`}
             title={collapsed ? "Keluar" : undefined}
           >
-            <LogOut size={16} className="shrink-0" />
-            {!collapsed && <span className="ml-2.5">Keluar</span>}
+            <LogOut size={16} className="shrink-0 text-rose-300" />
+            {!collapsed && <span className="ml-3 font-semibold">Keluar</span>}
           </button>
         </form>
       </div>
@@ -239,8 +241,8 @@ export function DashboardSidebar({
       {/* DESKTOP FLOATING SIDEBAR (lg+) matching Image 1 shape with vibrant purple/indigo theme */}
       <aside
         className={`hidden lg:flex shrink-0 ${
-          collapsed ? "w-20" : "w-60"
-        } bg-gradient-to-b from-[#7C3AED] via-[#6D28D9] to-[#5B21B6] dark:from-[#3B1977] dark:via-[#281156] dark:to-[#170836] rounded-[2.5rem] shadow-[0_20px_50px_rgba(109,40,217,0.25)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] sticky top-6 self-start h-[calc(100vh-3rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-400/30 dark:border-purple-800/40`}
+          collapsed ? "w-20" : "w-64 xl:w-[268px]"
+        } bg-gradient-to-b from-[#7C3AED] via-[#6D28D9] to-[#5B21B6] dark:from-[#3B1977] dark:via-[#281156] dark:to-[#170836] rounded-[2.5rem] shadow-[0_20px_50px_rgba(109,40,217,0.25)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.8)] sticky top-4 xl:top-5 self-start h-[calc(100vh-2rem)] xl:h-[calc(100vh-2.5rem)] transition-all duration-300 z-30 overflow-hidden border border-purple-400/30 dark:border-purple-800/40`}
       >
         {sidebarBody}
       </aside>
