@@ -711,10 +711,19 @@ export default function AssistantDashboard() {
           <div className="space-y-6">
 
             {/* HERO GREETING BANNER WITH OFFICIAL EDM 3 MASCOTS */}
-            <div className="relative rounded-[2.5rem] border border-purple-200/80 dark:border-purple-900/40 p-5 sm:p-7 lg:p-8 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-5 bg-gradient-to-r from-[#EDE8F8] via-[#E4DBF8] to-[#DDD2F6] dark:from-[#1E0E38] dark:via-[#16082C] dark:to-[#0E041C] transition-all">
+            <div className="relative rounded-[2.5rem] border border-purple-200/80 dark:border-purple-900/40 p-5 sm:p-7 lg:p-8 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-5 min-h-[240px] transition-all">
               
-              {/* Subtle background decorative stars and soft clouds */}
-              <div className="absolute inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20 bg-[radial-gradient(#9333ea_1px,transparent_1px)] [background-size:20px_20px]" />
+              {/* FULL PANORAMIC BACKGROUND — Hero_Background_EDM_3Maskot.png */}
+              <div className="absolute inset-0 z-0 pointer-events-none select-none">
+                <Image
+                  src="/images/hero-bg-edm-3maskot.png"
+                  alt="EDM Hero Background"
+                  fill
+                  priority
+                  className="object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-white/10 dark:bg-[#0e071a]/55" />
+              </div>
 
               {/* Left Column: Greeting, Real SI'50 Class Chips & Action Button */}
               <div className="space-y-3.5 max-w-md relative z-10">
@@ -773,29 +782,8 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Center Column: Dedicated 3 Mascots Illustration - Sits cleanly between text & card without crashing */}
-              <div className="hidden lg:flex items-end justify-center flex-1 h-full min-h-[160px] pointer-events-none select-none px-2 -mb-8 z-10">
-                <Image
-                  src="/images/edm-3maskot-cutout.png"
-                  alt="EDM 3 Mascots"
-                  width={320}
-                  height={170}
-                  priority
-                  className="object-contain object-bottom drop-shadow-md max-h-[175px] w-auto transition-transform hover:scale-105"
-                />
-              </div>
-
-              {/* Mobile Mascot View (Cleanly positioned between text and card) */}
-              <div className="lg:hidden flex justify-center py-1 pointer-events-none select-none z-10">
-                <Image
-                  src="/images/edm-3maskot-cutout.png"
-                  alt="EDM 3 Mascots"
-                  width={240}
-                  height={130}
-                  priority
-                  className="object-contain drop-shadow-sm max-h-32 w-auto"
-                />
-              </div>
+              {/* Spacer — mascots visible through panoramic background image */}
+              <div className="hidden lg:block flex-1 min-h-[160px] pointer-events-none select-none" />
 
               {/* Right: Floating Status Card with Real Duty Telemetry */}
               <div className="relative z-10 w-full lg:w-72 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-4 sm:p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3 lg:self-center shrink-0">
