@@ -708,8 +708,12 @@ export default function AssistantDashboard() {
     const prac = parseFloat(row.practice) || 0;
     const jur = parseFloat(row.jurnal) || 0;
     const post = parseFloat(row.postTest) || 0;
-    // Warming Up (10%), Pre Test (15%), Practice (30%), Jurnal (30%), Post Test (15%)
-    return ((wu * 0.10) + (pre * 0.15) + (prac * 0.30) + (jur * 0.30) + (post * 0.15)).toFixed(2);
+
+    // Aturan Resmi EDM: Jika nilai Pre-Test <= 50, maka nilai Warming Up/TP menjadi 0
+    const effectiveWU = pre <= 50 ? 0 : wu;
+
+    // Bobot Resmi: Warming Up/TP (5%), Pre-Test (20%), Practice (15%), Jurnal (20%), Post-Test (40%)
+    return ((effectiveWU * 0.05) + (pre * 0.20) + (prac * 0.15) + (jur * 0.20) + (post * 0.40)).toFixed(2);
   };
 
   const handleExportCSV = () => {
@@ -718,24 +722,29 @@ export default function AssistantDashboard() {
       "NIM",
       "Nama Mahasiswa",
       "Kelas",
-      "Warming Up (10%)",
-      "Pre Test (15%)",
-      "Practice (30%)",
-      "Jurnal (30%)",
-      "Post Test (15%)",
+      "Warming Up/TP (5%)",
+      "Pre-Test (20%)",
+      "Practice (15%)",
+      "Jurnal (20%)",
+      "Post-Test (40%)",
       "Nilai Akhir",
     ];
-    const rows = list.map((r) => [
-      `"${r.nim}"`,
-      `"${r.name}"`,
-      `"${selectedClassCode}"`,
-      r.warmingUp || "0",
-      r.preTest || "0",
-      r.practice || "0",
-      r.jurnal || "0",
-      r.postTest || "0",
-      calcFinalScore(r),
-    ]);
+    const rows = list.map((r) => {
+      const preVal = parseFloat(r.preTest) || 0;
+      const wuVal = parseFloat(r.warmingUp) || 0;
+      const effectiveWU = preVal <= 50 ? 0 : wuVal;
+      return [
+        `"${r.nim}"`,
+        `"${r.name}"`,
+        `"${selectedClassCode}"`,
+        effectiveWU,
+        r.preTest || "0",
+        r.practice || "0",
+        r.jurnal || "0",
+        r.postTest || "0",
+        calcFinalScore(r),
+      ];
+    });
     const csvContent =
       "data:text/csv;charset=utf-8," +
       [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
@@ -1637,7 +1646,7 @@ export default function AssistantDashboard() {
                     )}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
-                    5 Komponen Resmi: Warming Up (10%), Pre Test (15%), Practice (30%), Jurnal (30%), Post Test (15%).
+                    Bobot Resmi EDM: Warming Up/TP (5%), Pre-Test (20%), Practice (15%), Jurnal (20%), Post-Test (40%). Ketentuan: Jika Pre-Test ≤ 50, maka nilai Warming Up = 0.
                   </p>
                 </div>
 
@@ -1736,16 +1745,16 @@ export default function AssistantDashboard() {
 
               {/* Spreadsheet Table with 5 Components */}
               <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[520px]">
-                <table className="w-full text-left text-xs whitespace-nowrap min-w-[850px]">
+                <table className="w-full text-left text-xs whitespace-nowrap min-w-[880px]">
                   <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
                     <tr>
                       <th className="px-5 py-3.5">NIM</th>
                       <th className="px-5 py-3.5">Nama Mahasiswa</th>
-                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Warming Up (10%)</th>
-                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Pre Test (15%)</th>
-                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Practice (30%)</th>
-                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Jurnal (30%)</th>
-                      <th className="px-2 py-3.5 text-right w-20 text-purple-200">Post Test (15%)</th>
+                      <th className="px-2 py-3.5 text-right w-24 text-purple-200">Warming Up/TP (5%)</th>
+                      <th className="px-2 py-3.5 text-right w-24 text-purple-200">Pre-Test (20%)</th>
+                      <th className="px-2 py-3.5 text-right w-24 text-purple-200">Practice (15%)</th>
+                      <th className="px-2 py-3.5 text-right w-24 text-purple-200">Jurnal (20%)</th>
+                      <th className="px-2 py-3.5 text-right w-24 text-purple-200">Post-Test (40%)</th>
                       <th className="px-5 py-3.5 text-right text-purple-300">Nilai Akhir</th>
                     </tr>
                   </thead>
@@ -1759,6 +1768,10 @@ export default function AssistantDashboard() {
                     ) : (
                       filteredRows.map((row) => {
                         const originalIdx = currentGrades.findIndex((g) => g.nim === row.nim);
+                        const vPre = parseFloat(row.preTest) || 0;
+                        const vWU = parseFloat(row.warmingUp) || 0;
+                        const isWuVoid = vPre <= 50 && vWU > 0;
+
                         return (
                           <tr key={row.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
                             <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{row.nim}</td>
@@ -1770,8 +1783,18 @@ export default function AssistantDashboard() {
                                 disabled={gradeLocked}
                                 onChange={(e) => handleGradeChange(originalIdx, "warmingUp", e.target.value)}
                                 placeholder="0"
-                                className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 rounded px-2 py-1 text-right font-mono text-xs text-slate-900 dark:text-white focus:border-purple-500"
+                                className={`w-full bg-slate-50 dark:bg-neutral-900 border rounded px-2 py-1 text-right font-mono text-xs focus:border-purple-500 ${
+                                  isWuVoid
+                                    ? "border-amber-400 dark:border-amber-600/80 line-through text-slate-400 dark:text-neutral-500 bg-amber-50/50 dark:bg-amber-950/20"
+                                    : "border-slate-200 dark:border-neutral-700 text-slate-900 dark:text-white"
+                                }`}
+                                title={isWuVoid ? "Nilai Warming Up dihitung 0 karena nilai Pre-Test ≤ 50" : undefined}
                               />
+                              {isWuVoid && (
+                                <span className="block text-[9px] font-mono text-amber-600 dark:text-amber-400 font-bold text-right mt-0.5 leading-none">
+                                  Hangus (Pre ≤ 50)
+                                </span>
+                              )}
                             </td>
                             <td className="px-2 py-2">
                               <input

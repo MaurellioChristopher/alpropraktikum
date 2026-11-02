@@ -94,8 +94,11 @@ export default function GradingDashboard() {
     const vJur = parseFloat(jur) || 0;
     const vPost = parseFloat(post) || 0;
     
-    // Weight: Warming Up (10%), Pre Test (15%), Practice (30%), Jurnal (30%), Post Test (15%)
-    return ((vWU * 0.10) + (vPre * 0.15) + (vPrac * 0.30) + (vJur * 0.30) + (vPost * 0.15)).toFixed(2);
+    // Aturan Resmi EDM: Jika nilai Pre-Test <= 50, maka nilai Warming Up/TP menjadi 0
+    const effectiveWU = vPre <= 50 ? 0 : vWU;
+
+    // Bobot Resmi: Warming Up/TP (5%), Pre-Test (20%), Practice (15%), Jurnal (20%), Post-Test (40%)
+    return ((effectiveWU * 0.05) + (vPre * 0.20) + (vPrac * 0.15) + (vJur * 0.20) + (vPost * 0.40)).toFixed(2);
   };
 
   const handleInputChange = (idx: number, field: keyof GradeRow, value: string) => {
@@ -124,18 +127,33 @@ export default function GradingDashboard() {
   };
 
   const exportCSV = () => {
-    const headers = ["NIM", "Nama Mahasiswa", "Kelas", "Warming Up (10%)", "Pre Test (15%)", "Practice (30%)", "Jurnal (30%)", "Post Test (15%)", "Nilai Akhir"];
-    const rows = currentGrades.map(r => [
-      `"${r.nim}"`,
-      `"${r.name}"`,
-      `"${selectedClass}"`,
-      r.warmingUp || "0",
-      r.preTest || "0",
-      r.practice || "0",
-      r.jurnal || "0",
-      r.postTest || "0",
-      calcFinal(r.warmingUp, r.preTest, r.practice, r.jurnal, r.postTest)
-    ]);
+    const headers = [
+      "NIM",
+      "Nama Mahasiswa",
+      "Kelas",
+      "Warming Up/TP (5%)",
+      "Pre-Test (20%)",
+      "Practice (15%)",
+      "Jurnal (20%)",
+      "Post-Test (40%)",
+      "Nilai Akhir"
+    ];
+    const rows = currentGrades.map(r => {
+      const vPre = parseFloat(r.preTest) || 0;
+      const vWU = parseFloat(r.warmingUp) || 0;
+      const effectiveWU = vPre <= 50 ? 0 : vWU;
+      return [
+        `"${r.nim}"`,
+        `"${r.name}"`,
+        `"${selectedClass}"`,
+        effectiveWU,
+        r.preTest || "0",
+        r.practice || "0",
+        r.jurnal || "0",
+        r.postTest || "0",
+        calcFinal(r.warmingUp, r.preTest, r.practice, r.jurnal, r.postTest)
+      ];
+    });
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
@@ -175,6 +193,9 @@ export default function GradingDashboard() {
               <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                 Praktikan<span className="text-orange-500">.</span>
               </h1>
+              <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                Bobot Resmi EDM: Warming Up/TP (5%), Pre-Test (20%), Practice (15%), Jurnal (20%), Post-Test (40%) • Ketentuan: Jika Pre-Test ≤ 50, maka nilai Warming Up = 0.
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -322,22 +343,26 @@ export default function GradingDashboard() {
 
           {/* Table matching Image 3 */}
           <div className="overflow-x-auto pt-1">
-            <table className="w-full text-left text-xs whitespace-nowrap">
+            <table className="w-full text-left text-xs whitespace-nowrap min-w-[760px]">
               <thead>
                 <tr className="border-b border-slate-100 dark:border-white/10 text-[11px] font-mono text-slate-400">
                   <th className="pb-3 font-medium">Praktikan</th>
-                  <th className="pb-3 text-center w-20">TP<br /><span className="text-[10px] font-normal">25%</span></th>
-                  <th className="pb-3 text-center w-20">Jurnal<br /><span className="text-[10px] font-normal">40%</span></th>
-                  <th className="pb-3 text-center w-20">Post-test<br /><span className="text-[10px] font-normal">10%</span></th>
-                  <th className="pb-3 text-center w-20">Audit<br /><span className="text-[10px] font-normal">25%</span></th>
+                  <th className="pb-3 text-center w-24">Warming Up<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">5%</span></th>
+                  <th className="pb-3 text-center w-20">Pre-Test<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">20%</span></th>
+                  <th className="pb-3 text-center w-20">Practice<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">15%</span></th>
+                  <th className="pb-3 text-center w-20">Jurnal<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">20%</span></th>
+                  <th className="pb-3 text-center w-20">Post-Test<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">40%</span></th>
                   <th className="pb-3 text-center w-20">Akhir</th>
-                  <th className="pb-3 text-center w-28">Aksi</th>
+                  <th className="pb-3 text-center w-24">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {filteredGrades.map((row, idx) => {
                   const finalScore = calcFinal(row.warmingUp, row.preTest, row.practice, row.jurnal, row.postTest);
                   const inisial = row.name.split(" ").map(w => w[0]).slice(0, 2).join("");
+                  const vPre = parseFloat(row.preTest) || 0;
+                  const vWU = parseFloat(row.warmingUp) || 0;
+                  const isWuVoid = vPre <= 50 && vWU > 0;
 
                   return (
                     <tr key={row.nim} className="hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors">
@@ -357,13 +382,45 @@ export default function GradingDashboard() {
                         </div>
                       </td>
 
-                      {/* TP */}
+                      {/* Warming Up / TP */}
+                      <td className="py-3.5 px-2 text-center">
+                        <input
+                          type="text"
+                          value={row.warmingUp}
+                          placeholder="-"
+                          onChange={(e) => handleInputChange(idx, "warmingUp", e.target.value)}
+                          className={`w-14 py-1.5 bg-slate-50 dark:bg-white/5 border rounded-xl text-center font-mono text-xs font-semibold focus:outline-none focus:ring-1 focus:ring-purple-500 ${
+                            isWuVoid
+                              ? "border-amber-400 dark:border-amber-600/80 line-through text-slate-400 dark:text-neutral-500 bg-amber-50/50 dark:bg-amber-950/20"
+                              : "border-slate-200 dark:border-white/10 text-slate-800 dark:text-white"
+                          }`}
+                          title={isWuVoid ? "Nilai Warming Up dihitung 0 karena nilai Pre-Test ≤ 50" : undefined}
+                        />
+                        {isWuVoid && (
+                          <span className="block text-[9px] font-mono text-amber-600 dark:text-amber-400 font-bold mt-0.5">
+                            Hangus
+                          </span>
+                        )}
+                      </td>
+
+                      {/* Pre-Test */}
                       <td className="py-3.5 px-2 text-center">
                         <input
                           type="text"
                           value={row.preTest}
                           placeholder="-"
                           onChange={(e) => handleInputChange(idx, "preTest", e.target.value)}
+                          className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        />
+                      </td>
+
+                      {/* Practice */}
+                      <td className="py-3.5 px-2 text-center">
+                        <input
+                          type="text"
+                          value={row.practice}
+                          placeholder="-"
+                          onChange={(e) => handleInputChange(idx, "practice", e.target.value)}
                           className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                       </td>
@@ -386,17 +443,6 @@ export default function GradingDashboard() {
                           value={row.postTest}
                           placeholder="-"
                           onChange={(e) => handleInputChange(idx, "postTest", e.target.value)}
-                          className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
-                        />
-                      </td>
-
-                      {/* Audit */}
-                      <td className="py-3.5 px-2 text-center">
-                        <input
-                          type="text"
-                          value={row.practice}
-                          placeholder="-"
-                          onChange={(e) => handleInputChange(idx, "practice", e.target.value)}
                           className="w-14 py-1.5 bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-center font-mono text-xs font-semibold text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"
                         />
                       </td>
