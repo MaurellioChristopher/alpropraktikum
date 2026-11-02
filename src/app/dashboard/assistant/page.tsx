@@ -353,11 +353,11 @@ export default function AssistantDashboard() {
     sanction: "Peringatan 1 (SP1)",
   });
 
-  // Admin Besar Password & Account Management States
+  // Super Admin Password & Account Management States
   const [showAllPasswords, setShowAllPasswords] = useState(false);
   const [visiblePasswordCodes, setVisiblePasswordCodes] = useState<Record<string, boolean>>({});
   const [passwordSearchQuery, setPasswordSearchQuery] = useState("");
-  const [passwordRoleFilter, setPasswordRoleFilter] = useState<"ALL" | "ADMIN_BESAR" | "ADMIN" | "ASPRAK">("ALL");
+  const [passwordRoleFilter, setPasswordRoleFilter] = useState<"ALL" | "SUPER_ADMIN" | "ADMIN" | "ASPRAK">("ALL");
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [showMyPassword, setShowMyPassword] = useState(false);
 
@@ -543,22 +543,30 @@ export default function AssistantDashboard() {
   const isUserKomdis =
     currentAssistantProfile.division === "Compliance & Integrity" ||
     currentAssistantProfile.code === "MACY" ||
+    currentAssistantProfile.code === "DEVO" ||
     isComplianceAndIntegrity(sessionUser);
 
   const isUserAdmin =
     currentRole === "SUPER_ADMIN" ||
     currentRole === "ADMIN" ||
+    getAssistantAccessLevel(sessionUser) === "SUPER_ADMIN" ||
     getAssistantAccessLevel(sessionUser) === "ADMIN_BESAR" ||
     getAssistantAccessLevel(sessionUser) === "ADMIN";
 
   const canReportCheating = isUserKomdis || isUserAdmin;
 
-  // 2. Hak Akses Admin Besar: Melihat akun dan password seluruh asisten
+  // 2. Hak Akses Super Admin: Melihat akun dan password seluruh asisten (MACY & DEVO)
   // Admin biasa (ADMIN) tidak bisa melihat!
-  const isAdminBesar =
-    (sessionUser === "MACY" || currentRole === "SUPER_ADMIN") &&
+  const isSuperAdmin =
+    (sessionUser === "MACY" ||
+      sessionUser === "DEVO" ||
+      currentRole === "SUPER_ADMIN" ||
+      getAssistantAccessLevel(sessionUser) === "SUPER_ADMIN" ||
+      getAssistantAccessLevel(sessionUser) === "ADMIN_BESAR") &&
     currentRole !== "ADMIN" &&
     currentRole !== "ASPRAK";
+
+  const isAdminBesar = isSuperAdmin;
 
   const handleCopyPassword = (code: string, pass: string) => {
     if (typeof navigator !== "undefined" && navigator.clipboard) {
@@ -3727,7 +3735,7 @@ export default function AssistantDashboard() {
 
                   <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
                     {currentRole === "SUPER_ADMIN"
-                      ? "Super Admin (MACY): Otoritas tertinggi sistem, kendali penuh seluruh modul, inventaris, perizinan, dan penugasan laboratorium."
+                      ? "Super Admin (MACY & DEVO): Otoritas tertinggi sistem, kendali penuh seluruh modul, inventaris, perizinan, dan penugasan laboratorium."
                       : currentRole === "ADMIN"
                       ? "Administrator (Executive Board & Compliance and Integrity): Akses penuh inventaris, rekap kehadiran, pembukuan kas, serta tata tertib komdis."
                       : "Asisten Praktikum (Asprak Biasa): Pengampu shift materi praktikum, bimbingan modul, penilaian, dan live rating."}
@@ -3799,10 +3807,10 @@ export default function AssistantDashboard() {
               </div>
             </div>
 
-            {/* 1. PENGATURAN ADMIN BESAR: MASTER KREDENSIAL & PASSWORD ASISTEN (Khusus Admin Besar / MACY) */}
-            {isAdminBesar && (
+            {/* 1. PENGATURAN SUPER ADMIN: MASTER KREDENSIAL & PASSWORD ASISTEN (Khusus Super Admin: MACY & DEVO) */}
+            {isSuperAdmin && (
               <div className="rounded-3xl border-2 border-amber-300/80 dark:border-amber-600/40 bg-gradient-to-b from-amber-50/60 via-white to-purple-50/40 dark:from-[#1b102e] dark:via-[#0e071a] dark:to-[#16082c] p-6 sm:p-8 shadow-md space-y-6 transition-colors">
-                {/* Header Admin Besar */}
+                {/* Header Super Admin */}
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-amber-200/80 dark:border-amber-900/40 pb-5">
                   <div className="flex items-center gap-3.5">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-900 flex items-center justify-center font-black shadow-md ring-4 ring-amber-100 dark:ring-amber-950/60 shrink-0">
@@ -3811,14 +3819,14 @@ export default function AssistantDashboard() {
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
-                          Pengaturan Admin Besar • Master Kredensial Asisten
+                          Pengaturan Super Admin • Master Kredensial Asisten
                         </h3>
                         <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-xs">
-                          SUPER_ADMIN (MACY)
+                          SUPER_ADMIN (MACY &amp; DEVO)
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-neutral-300 font-mono mt-0.5">
-                        Hak akses eksklusif Admin Besar. Melihat, memantau, dan mengelola kata sandi login seluruh 32 asisten praktikum.
+                        Hak akses eksklusif Super Admin. Melihat, memantau, dan mengelola kata sandi login seluruh 32 asisten praktikum.
                       </p>
                     </div>
                   </div>
@@ -3840,27 +3848,27 @@ export default function AssistantDashboard() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="p-3.5 rounded-2xl bg-amber-100/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-1">
                     <div className="flex items-center justify-between text-[10px] font-mono font-bold text-amber-900 dark:text-amber-300">
-                      <span>1. ADMIN BESAR (MACY)</span>
-                      <span className="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-[9px]">1 Akun</span>
+                      <span>1. SUPER ADMIN (MACY &amp; DEVO)</span>
+                      <span className="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-[9px]">2 Akun</span>
                     </div>
-                    <div className="font-mono font-extrabold text-sm text-slate-900 dark:text-white">
-                      MACY194545
+                    <div className="font-mono font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+                      MACY194545 • DEVOADMINR1
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-sans">
-                      Super Admin Otoritas Penuh
+                      Super Admin Otoritas Penuh (Devin &amp; Maurellio)
                     </div>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-purple-100/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 space-y-1">
                     <div className="flex items-center justify-between text-[10px] font-mono font-bold text-purple-900 dark:text-purple-300">
                       <span>2. ADMIN (EXEC &amp; CNI)</span>
-                      <span className="px-1.5 py-0.2 rounded bg-purple-200 dark:bg-purple-900 text-[9px]">10 Akun</span>
+                      <span className="px-1.5 py-0.2 rounded bg-purple-200 dark:bg-purple-900 text-[9px]">9 Akun</span>
                     </div>
                     <div className="font-mono font-extrabold text-sm text-slate-900 dark:text-white">
                       [KODE]ADMINR1
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-sans">
-                      Koordinator, Sekben, Komdis (CnI)
+                      Sekretaris, Bendahara, Komdis (CnI)
                     </div>
                   </div>
 
@@ -3884,8 +3892,8 @@ export default function AssistantDashboard() {
                   <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                     {[
                       { id: "ALL", label: "Semua (32)" },
-                      { id: "ADMIN_BESAR", label: "Admin Besar (1)" },
-                      { id: "ADMIN", label: "Administrator (10)" },
+                      { id: "SUPER_ADMIN", label: "Super Admin (2)" },
+                      { id: "ADMIN", label: "Administrator (9)" },
                       { id: "ASPRAK", label: "Asprak Biasa (21)" },
                     ].map((f) => (
                       <button
@@ -3936,7 +3944,7 @@ export default function AssistantDashboard() {
                           const level = getAssistantAccessLevel(a.code);
                           const matchRole =
                             passwordRoleFilter === "ALL" ||
-                            (passwordRoleFilter === "ADMIN_BESAR" && level === "ADMIN_BESAR") ||
+                            (passwordRoleFilter === "SUPER_ADMIN" && (level === "SUPER_ADMIN" || level === "ADMIN_BESAR")) ||
                             (passwordRoleFilter === "ADMIN" && level === "ADMIN") ||
                             (passwordRoleFilter === "ASPRAK" && level === "ASPRAK");
 
@@ -3962,7 +3970,7 @@ export default function AssistantDashboard() {
                               key={asst.code}
                               className={`transition-colors ${
                                 isCurrent
-                                  ? "bg-amber-50/70 dark:bg-amber-950/20 font-semibold"
+                                    ? "bg-amber-50/70 dark:bg-amber-950/20 font-semibold"
                                   : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
                               }`}
                             >
@@ -3993,13 +4001,13 @@ export default function AssistantDashboard() {
                               </td>
                               <td className="px-4 py-3 text-center">
                                 <span className={`inline-block text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full ${
-                                  level === "ADMIN_BESAR"
+                                  level === "SUPER_ADMIN" || level === "ADMIN_BESAR"
                                     ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-2xs"
                                     : level === "ADMIN"
                                     ? "bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
                                     : "bg-slate-100 text-slate-600 dark:bg-neutral-800 dark:text-neutral-300"
                                 }`}>
-                                  {level === "ADMIN_BESAR" ? "ADMIN BESAR" : level}
+                                  {level === "SUPER_ADMIN" || level === "ADMIN_BESAR" ? "SUPER ADMIN" : level}
                                 </span>
                               </td>
                               <td className="px-4 py-3">
@@ -4059,8 +4067,8 @@ export default function AssistantDashboard() {
             {/* FULL 32-ASSISTANT DIRECTORY TABLE (Admin Only Access) */}
             {currentRole === "SUPER_ADMIN" || currentRole === "ADMIN" || currentRole === "KOMDIS" || currentRole === "SEKBEN" ? (
               <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
-                {/* Security Banner Khusus Jika Login sebagai Admin Biasa (Bukan Admin Besar) */}
-                {!isAdminBesar && (
+                {/* Security Banner Khusus Jika Login sebagai Admin Biasa (Bukan Super Admin) */}
+                {!isSuperAdmin && (
                   <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
@@ -4068,10 +4076,10 @@ export default function AssistantDashboard() {
                       </div>
                       <div>
                         <h4 className="text-xs font-bold text-slate-900 dark:text-white">
-                          Pengaturan Sandi: Khusus Admin Besar (MACY)
+                          Pengaturan Sandi: Khusus Super Admin (MACY &amp; DEVO)
                         </h4>
                         <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
-                          Akun Admin biasa hanya dapat mengelola direktori kontak operasional. Visibilitas seluruh kata sandi akun asisten dilindungi dan hanya dapat diakses melalui Pengaturan Admin Besar (MACY).
+                          Akun Admin biasa hanya dapat mengelola direktori kontak operasional. Visibilitas seluruh kata sandi akun asisten dilindungi dan hanya dapat diakses melalui Pengaturan Super Admin (MACY &amp; DEVO).
                         </p>
                       </div>
                     </div>

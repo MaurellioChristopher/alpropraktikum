@@ -5,7 +5,7 @@
  */
 
 export type AssistantRole = "ASPRAK" | "KOMDIS" | "SEKBEN" | "ADMIN" | "SUPER_ADMIN";
-export type AccessLevel = "ADMIN_BESAR" | "ADMIN" | "ASPRAK";
+export type AccessLevel = "SUPER_ADMIN" | "ADMIN" | "ASPRAK" | "ADMIN_BESAR";
 
 export interface AssistantProfile {
   nim: string;
@@ -31,9 +31,9 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "devin191006@gmail.com",
     code: "DEVO",
     lineId: "devinoctavian",
-    position: "Koordinator (Executive Board)",
+    position: "Koordinator Praktikum (Super Admin)",
     division: "Koordinator",
-    role: "ADMIN",
+    role: "SUPER_ADMIN",
   },
   {
     nim: "102022400331",
@@ -83,7 +83,7 @@ export const ALPRO_ASSISTANTS: AssistantProfile[] = [
     personalEmail: "route.to.maurel@gmail.com",
     code: "MACY",
     lineId: "reach.rel",
-    position: "Koor CnI (Admin Besar)",
+    position: "Koor CnI (Super Admin)",
     division: "Compliance & Integrity",
     role: "SUPER_ADMIN",
   },
@@ -523,16 +523,25 @@ export function isComplianceAndIntegrity(codeOrNim: string): boolean {
 
 /**
  * Level Hak Akses Resmi:
- * - "ADMIN_BESAR" : MACY (Super Admin dengan otoritas tertinggi)
+ * - "SUPER_ADMIN" : MACY & DEVO (Super Admin dengan otoritas tertinggi)
  * - "ADMIN"       : Anggota Executive Board & Compliance and Integrity
  * - "ASPRAK"      : Asisten Praktikum Biasa (CnM, TnC, MD)
  */
 export function getAssistantAccessLevel(codeOrNim: string): AccessLevel {
   const normalized = codeOrNim.trim().toUpperCase();
-  if (normalized === "MACY" || normalized === "102022430009") return "ADMIN_BESAR";
+  if (
+    normalized === "MACY" ||
+    normalized === "102022430009" ||
+    normalized === "DEVO" ||
+    normalized === "102022430024"
+  ) {
+    return "SUPER_ADMIN";
+  }
   const asst = getAssistantByCode(normalized) || getAssistantByNim(normalized);
   if (!asst) return "ASPRAK";
-  if (asst.code === "MACY") return "ADMIN_BESAR";
+  if (asst.code === "MACY" || asst.code === "DEVO" || asst.role === "SUPER_ADMIN") {
+    return "SUPER_ADMIN";
+  }
   if (isExecutiveBoard(asst.code) || isComplianceAndIntegrity(asst.code)) {
     return "ADMIN";
   }
@@ -541,9 +550,10 @@ export function getAssistantAccessLevel(codeOrNim: string): AccessLevel {
 
 /**
  * Aturan Sandi Sesuai Ketentuan Resmi:
- * 1. MACY (Admin Besar)                              : MACY194545
- * 2. ADMIN (Executive Board & Compliance and Integrity): ${KODEASISTEN}ADMINR1
- * 3. AKUN BIASA (CnM, TnC, MD)                       : ${KODEASISTEN}ALPRO123
+ * 1. MACY (Super Admin)                                : MACY194545
+ * 2. DEVO (Super Admin)                                : DEVOADMINR1
+ * 3. ADMIN (Executive Board & Compliance and Integrity): ${KODEASISTEN}ADMINR1
+ * 4. AKUN BIASA (CnM, TnC, MD)                         : ${KODEASISTEN}ALPRO123
  */
 export function getExpectedPassword(codeOrNim: string): string {
   const normalized = codeOrNim.trim().toUpperCase();
@@ -553,8 +563,11 @@ export function getExpectedPassword(codeOrNim: string): string {
   if (code === "MACY") {
     return "MACY194545";
   }
+  if (code === "DEVO") {
+    return "DEVOADMINR1";
+  }
   const level = getAssistantAccessLevel(code);
-  if (level === "ADMIN" || level === "ADMIN_BESAR") {
+  if (level === "ADMIN" || level === "SUPER_ADMIN" || level === "ADMIN_BESAR") {
     return `${code}ADMINR1`;
   }
   return `${code}ALPRO123`;

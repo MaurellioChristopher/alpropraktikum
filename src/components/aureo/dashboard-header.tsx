@@ -49,7 +49,7 @@ export function DashboardHeader({
   const currentAsst = getAssistantByCode(activeCode || assistantCode) || {
     name: "Maurellio Christopher Yonathan",
     code: "MACY",
-    position: "Koor CnI (Admin Besar)",
+    position: "Koor CnI (Super Admin)",
     division: "Compliance & Integrity",
     role: "SUPER_ADMIN",
   };

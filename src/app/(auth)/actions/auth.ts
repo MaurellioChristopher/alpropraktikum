@@ -34,7 +34,15 @@ export async function loginAction(prevState: any, formData: FormData) {
   const expectedPassword = getExpectedPassword(assistantCode);
 
   // Verifikasi kecocokan sandi (case-insensitive untuk kenyamanan pengguna)
-  const isPasswordValid = password.toUpperCase() === expectedPassword.toUpperCase();
+  let isPasswordValid = password.toUpperCase() === expectedPassword.toUpperCase();
+  if (!isPasswordValid && assistantCode === "DEVO") {
+    // Mendukung DEVOADMINR1 maupun DEVO194545 untuk kemudahan akses Super Admin DEVO
+    isPasswordValid =
+      password.toUpperCase() === "DEVOADMINR1" || password.toUpperCase() === "DEVO194545";
+  }
+  if (!isPasswordValid && assistantCode === "MACY") {
+    isPasswordValid = password.toUpperCase() === "MACY194545";
+  }
 
   if (!isPasswordValid) {
     return {
@@ -43,11 +51,11 @@ export async function loginAction(prevState: any, formData: FormData) {
   }
 
   // 2. Simpan Sesi & Hak Akses Berdasarkan Departemen Resmi
-  // - "SUPER_ADMIN" : Khusus MACY (Admin Besar)
+  // - "SUPER_ADMIN" : Khusus MACY & DEVO (Super Admin)
   // - "ADMIN"       : Executive Board & Compliance and Integrity
   // - "ASPRAK"      : Akun Biasa (Creative & Multimedia, Tech & Systems, Module Development)
   const sessionRole =
-    accessLevel === "ADMIN_BESAR"
+    accessLevel === "SUPER_ADMIN" || accessLevel === "ADMIN_BESAR"
       ? "SUPER_ADMIN"
       : accessLevel === "ADMIN"
       ? "ADMIN"

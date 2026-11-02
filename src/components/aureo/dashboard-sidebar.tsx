@@ -55,7 +55,7 @@ export function DashboardSidebar({
   const currentProfile = getAssistantByCode(sessionUser) || {
     name: "Maurellio Christopher Yonathan",
     code: "MACY",
-    position: "Koor CnI (Admin Besar)",
+    position: "Koor CnI (Super Admin)",
     division: "Compliance & Integrity",
     role: "SUPER_ADMIN" as const,
   };
