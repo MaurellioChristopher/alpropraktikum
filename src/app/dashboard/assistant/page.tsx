@@ -12,6 +12,8 @@ import {
   getAssistantByCode,
   getAssistantAccessLevel,
   getExpectedPassword,
+  isComplianceAndIntegrity,
+  isExecutiveBoard,
   AssistantProfile,
 } from "@/data/assistants-roster";
 import {
@@ -80,6 +82,9 @@ import {
   RotateCw,
   Image as ImageIcon,
   Trash2,
+  Eye,
+  EyeOff,
+  Copy,
 } from "lucide-react";
 import {
   PraktikanCardIllustration,
@@ -216,6 +221,13 @@ export default function AssistantDashboard() {
     }
 
     if (typeof window !== "undefined") {
+      try {
+        const savedReports = localStorage.getItem("alpro_cheating_reports");
+        if (savedReports) {
+          setCheatingReports(JSON.parse(savedReports));
+        }
+      } catch (e) {}
+
       const handlePop = () => {
         const params = new URLSearchParams(window.location.search);
         const t = params.get("tab") || "dashboard";
@@ -330,6 +342,24 @@ export default function AssistantDashboard() {
   const [studentInfoSearch, setStudentInfoSearch] = useState("");
   const [cheatingReports, setCheatingReports] = useState<any[]>([]);
   const [cheatingSearchQuery, setCheatingSearchQuery] = useState("");
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [reportForm, setReportForm] = useState({
+    nim: "",
+    name: "",
+    classCode: "SI5004",
+    module: "Modul 1",
+    violationType: "Plagiarisme Kode Program",
+    description: "",
+    sanction: "Peringatan 1 (SP1)",
+  });
+
+  // Admin Besar Password & Account Management States
+  const [showAllPasswords, setShowAllPasswords] = useState(false);
+  const [visiblePasswordCodes, setVisiblePasswordCodes] = useState<Record<string, boolean>>({});
+  const [passwordSearchQuery, setPasswordSearchQuery] = useState("");
+  const [passwordRoleFilter, setPasswordRoleFilter] = useState<"ALL" | "ADMIN_BESAR" | "ADMIN" | "ASPRAK">("ALL");
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const [showMyPassword, setShowMyPassword] = useState(false);
 
   const [selectedShiftForModal, setSelectedShiftForModal] = useState<number | null>(null);
   const [selectedModalGroup, setSelectedModalGroup] = useState<string | null>(null);
@@ -507,6 +537,100 @@ export default function AssistantDashboard() {
   const [swapNote, setSwapNote] = useState("");
   const [expandedShiftId, setExpandedShiftId] = useState<number | null>(null);
   const [showAllStudentsInShift, setShowAllStudentsInShift] = useState<Record<number, boolean>>({});
+
+  // Hak Akses Wewenang:
+  // 1. Yang berwenang lapor kecurangan: Admin dan Komdis
+  const isUserKomdis =
+    currentAssistantProfile.division === "Compliance & Integrity" ||
+    currentAssistantProfile.code === "MACY" ||
+    isComplianceAndIntegrity(sessionUser);
+
+  const isUserAdmin =
+    currentRole === "SUPER_ADMIN" ||
+    currentRole === "ADMIN" ||
+    getAssistantAccessLevel(sessionUser) === "ADMIN_BESAR" ||
+    getAssistantAccessLevel(sessionUser) === "ADMIN";
+
+  const canReportCheating = isUserKomdis || isUserAdmin;
+
+  // 2. Hak Akses Admin Besar: Melihat akun dan password seluruh asisten
+  // Admin biasa (ADMIN) tidak bisa melihat!
+  const isAdminBesar =
+    (sessionUser === "MACY" || currentRole === "SUPER_ADMIN") &&
+    currentRole !== "ADMIN" &&
+    currentRole !== "ASPRAK";
+
+  const handleCopyPassword = (code: string, pass: string) => {
+    if (typeof navigator !== "undefined" && navigator.clipboard) {
+      navigator.clipboard.writeText(pass);
+      setCopiedCode(code);
+      setTimeout(() => setCopiedCode(null), 2000);
+    }
+  };
+
+  const togglePasswordVisibility = (code: string) => {
+    setVisiblePasswordCodes((prev) => ({
+      ...prev,
+      [code]: !prev[code],
+    }));
+  };
+
+  const handleSubmitCheatingReport = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reportForm.name.trim() || !reportForm.description.trim()) {
+      alert("Harap lengkapi nama mahasiswa dan deskripsi indikasi pelanggaran.");
+      return;
+    }
+    const newReport = {
+      id: `CR-${Date.now()}`,
+      nim: reportForm.nim.trim() || "-",
+      name: reportForm.name.trim().toUpperCase(),
+      cls: reportForm.classCode,
+      mod: reportForm.module,
+      viol: reportForm.violationType,
+      desc: reportForm.description.trim(),
+      sanction: reportForm.sanction,
+      status: "Investigasi Komdis",
+      reporter: `[${currentAssistantProfile.code}] ${currentAssistantProfile.name}`,
+      time:
+        new Date().toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        }) + " WIB",
+    };
+
+    const updated = [newReport, ...cheatingReports];
+    setCheatingReports(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("alpro_cheating_reports", JSON.stringify(updated));
+      } catch (err) {}
+    }
+    setIsReportModalOpen(false);
+    setReportForm({
+      nim: "",
+      name: "",
+      classCode: "SI5004",
+      module: "Modul 1",
+      violationType: "Plagiarisme Kode Program",
+      description: "",
+      sanction: "Peringatan 1 (SP1)",
+    });
+  };
+
+  const handleDeleteCheatingReport = (id: string) => {
+    if (!confirm("Hapus catatan laporan kecurangan ini?")) return;
+    const updated = cheatingReports.filter((r) => r.id !== id);
+    setCheatingReports(updated);
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("alpro_cheating_reports", JSON.stringify(updated));
+      } catch (err) {}
+    }
+  };
 
   const getShiftDetails = (shiftNum: number) => {
     const s = ALPRO_15_SHIFTS.find((shift) => shift.shiftNumber === shiftNum);
@@ -3206,17 +3330,49 @@ export default function AssistantDashboard() {
           </div>
         )}
 
-        {/* 6. LAPORAN KECURANGAN TAB matching Image 5 */}
+        {/* 6. LAPORAN KECURANGAN TAB */}
         {activeTab === "komdis" && (
           <div className="space-y-6">
-            {/* Header matching Image 5 */}
-            <div>
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
-                Laporan Kecurangan<span className="text-orange-500">.</span>
-              </h1>
+            {/* Header with Permission-Aware Action */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h1 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+                  Laporan Kecurangan<span className="text-orange-500">.</span>
+                </h1>
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
+                  Pengawasan integritas akademik &amp; investigasi pelanggaran praktikum ALPRO Telkom University.
+                </p>
+              </div>
+
+              {/* Action Button: Khusus Admin dan Komdis */}
+              {canReportCheating ? (
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(true)}
+                  className="px-5 py-2.5 rounded-full bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-2 cursor-pointer shrink-0 self-start sm:self-center"
+                >
+                  <AlertTriangle size={15} />
+                  <span>+ Buat Laporan Kecurangan</span>
+                </button>
+              ) : (
+                <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 text-xs font-mono font-medium shrink-0 self-start sm:self-center">
+                  <Lock size={13} />
+                  <span>Pelaporan: Khusus Admin &amp; Komdis</span>
+                </div>
+              )}
             </div>
 
-            {/* Filter Pill & Search Bar matching Image 5 */}
+            {/* Informational Banner for Asprak (if not Admin/Komdis) */}
+            {!canReportCheating && (
+              <div className="p-4 rounded-2xl bg-purple-50/70 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 text-xs text-purple-900 dark:text-purple-200 flex items-start sm:items-center gap-3">
+                <Shield size={18} className="text-purple-600 dark:text-purple-400 shrink-0 mt-0.5 sm:mt-0" />
+                <div className="text-[11px] leading-relaxed">
+                  <strong>Hak Akses Terbatas (Asisten Praktikum):</strong> Hak pembuatan dan penerbitan laporan investigasi kecurangan dibatasi hanya untuk <strong>Tim Compliance &amp; Integrity (Komdis)</strong> dan <strong>Administrator Laboratorium</strong>. Apabila Anda mendapati indikasi kecurangan di meja praktikan, segera laporkan ke PIC Shift atau Tim Komdis yang bertugas.
+                </div>
+              </div>
+            )}
+
+            {/* Filter Pill & Search Bar */}
             <div className="space-y-4">
               <div className="flex items-center gap-2">
                 <button
@@ -3231,7 +3387,7 @@ export default function AssistantDashboard() {
                 </button>
               </div>
 
-              {/* Search Bar matching Image 5 */}
+              {/* Search Bar */}
               <div className="flex items-center gap-2">
                 <div className="relative flex-1">
                   <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -3239,7 +3395,7 @@ export default function AssistantDashboard() {
                     type="text"
                     value={cheatingSearchQuery}
                     onChange={(e) => setCheatingSearchQuery(e.target.value)}
-                    placeholder="Nama, NIM, asisten..."
+                    placeholder="Nama mahasiswa, NIM, asisten pelapor, jenis pelanggaran..."
                     className="w-full pl-11 pr-10 py-2.5 bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 rounded-full text-xs text-slate-800 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500/20 shadow-xs"
                   />
                   <button
@@ -3254,60 +3410,106 @@ export default function AssistantDashboard() {
                   type="button"
                   onClick={() => setCheatingSearchQuery("")}
                   className="w-10 h-10 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 shadow-xs cursor-pointer shrink-0"
+                  title="Reset pencarian"
                 >
                   <RotateCw size={15} />
                 </button>
               </div>
             </div>
 
-            {/* Reports Grid matching Image 5 */}
+            {/* Reports Grid */}
             {cheatingReports.length === 0 ? (
-              <div className="bg-white dark:bg-[#120824] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-900/40 text-center space-y-2 shadow-xs">
-                <ShieldCheck size={32} className="text-emerald-500 mx-auto" />
-                <p className="text-xs font-bold text-slate-800 dark:text-white">
+              <div className="bg-white dark:bg-[#120824] rounded-2xl p-8 border border-slate-200/80 dark:border-purple-900/40 text-center space-y-3 shadow-xs">
+                <ShieldCheck size={36} className="text-emerald-500 mx-auto" />
+                <p className="text-sm font-bold text-slate-800 dark:text-white">
                   Tidak ada laporan kecurangan
                 </p>
-                <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans max-w-sm mx-auto">
-                  Sistem pengawasan praktikum ALPRO bersih. Belum ada catatan indikasi kecurangan atau pelanggaran integritas akademik.
+                <p className="text-xs text-slate-500 dark:text-neutral-400 font-sans max-w-md mx-auto">
+                  Sistem pengawasan praktikum ALPRO bersih. Belum ada catatan indikasi kecurangan atau pelanggaran integritas akademik terdaftar.
                 </p>
+                {canReportCheating && (
+                  <button
+                    type="button"
+                    onClick={() => setIsReportModalOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 hover:bg-purple-200 text-xs font-bold transition-all cursor-pointer mt-2"
+                  >
+                    <Plus size={14} />
+                    <span>Laporkan Pelanggaran Baru</span>
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {cheatingReports
-                  .filter((rep) =>
-                    !cheatingSearchQuery ||
-                    rep.name?.toLowerCase().includes(cheatingSearchQuery.toLowerCase()) ||
-                    rep.nim?.includes(cheatingSearchQuery) ||
-                    rep.reporter?.toLowerCase().includes(cheatingSearchQuery.toLowerCase())
-                  )
+                  .filter((rep) => {
+                    if (!cheatingSearchQuery) return true;
+                    const q = cheatingSearchQuery.toLowerCase();
+                    return (
+                      rep.name?.toLowerCase().includes(q) ||
+                      rep.nim?.includes(q) ||
+                      rep.reporter?.toLowerCase().includes(q) ||
+                      rep.viol?.toLowerCase().includes(q) ||
+                      rep.cls?.toLowerCase().includes(q)
+                    );
+                  })
                   .map((rep) => (
                     <div
                       key={rep.id || rep.nim}
-                      className="p-5 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all space-y-3"
+                      className="p-5 rounded-2xl bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:shadow-md transition-all space-y-3 relative group"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-mono text-slate-400 font-semibold uppercase">
-                          {rep.status || "Terbuka"}
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-900/50 uppercase">
+                          {rep.status || "Investigasi Komdis"}
+                        </span>
+                        <span className="text-[10px] font-mono text-slate-400">
+                          {rep.mod}
                         </span>
                       </div>
 
                       <div className="space-y-1">
-                        <div className="font-extrabold text-xs text-slate-900 dark:text-white uppercase tracking-tight leading-snug">
+                        <div className="font-extrabold text-sm text-slate-900 dark:text-white uppercase tracking-tight leading-snug">
                           {rep.name}
                         </div>
-                        <div className="text-[10px] font-mono text-slate-400">
-                          {rep.nim} · {rep.cls} · {rep.mod}
+                        <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                          NIM: {rep.nim} • Kelas {rep.cls}
                         </div>
                       </div>
 
-                      <div className="pt-2 border-t border-slate-100 dark:border-white/10 space-y-1">
-                        <div className="text-xs font-bold text-rose-600 dark:text-rose-400">
-                          {rep.viol}
+                      <div className="p-2.5 rounded-xl bg-rose-50/60 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 space-y-1">
+                        <div className="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
+                          <AlertTriangle size={13} className="shrink-0" />
+                          <span>{rep.viol}</span>
                         </div>
-                        <div className="text-[10px] font-mono text-slate-400">
-                          {rep.reporter} · {rep.time}
-                        </div>
+                        {rep.desc && (
+                          <p className="text-[11px] text-slate-600 dark:text-neutral-300 leading-relaxed">
+                            {rep.desc}
+                          </p>
+                        )}
+                        {rep.sanction && (
+                          <div className="text-[10px] font-mono font-bold text-amber-700 dark:text-amber-400 pt-1">
+                            Sanksi: {rep.sanction}
+                          </div>
+                        )}
                       </div>
+
+                      <div className="pt-2 border-t border-slate-100 dark:border-white/10 flex items-center justify-between text-[10px] font-mono text-slate-400">
+                        <span className="truncate max-w-[180px]">
+                          Pelapor: {rep.reporter}
+                        </span>
+                        <span>{rep.time}</span>
+                      </div>
+
+                      {/* Delete action for Admin / Komdis */}
+                      {canReportCheating && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCheatingReport(rep.id)}
+                          className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                          title="Hapus / Selesaikan Laporan"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
                   ))}
               </div>
@@ -3567,9 +3769,19 @@ export default function AssistantDashboard() {
                   <div className="space-y-2 text-xs">
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
                       <span className="text-slate-500 dark:text-neutral-400 font-mono">Kata Sandi Akun</span>
-                      <span className="font-mono font-semibold text-slate-900 dark:text-white tracking-widest">
-                        ••••••••••••
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono font-bold text-slate-900 dark:text-white tracking-wider">
+                          {showMyPassword ? getExpectedPassword(sessionUser) : "••••••••••••"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setShowMyPassword(!showMyPassword)}
+                          className="p-1 text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors cursor-pointer"
+                          title={showMyPassword ? "Sembunyikan Sandi" : "Lihat Kata Sandi"}
+                        >
+                          {showMyPassword ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </button>
+                      </div>
                     </div>
                     <div className="flex items-center justify-between py-1 border-b border-slate-50 dark:border-neutral-800/60">
                       <span className="text-slate-500 dark:text-neutral-400 font-mono">Status Sesi Jaringan</span>
@@ -3587,9 +3799,287 @@ export default function AssistantDashboard() {
               </div>
             </div>
 
+            {/* 1. PENGATURAN ADMIN BESAR: MASTER KREDENSIAL & PASSWORD ASISTEN (Khusus Admin Besar / MACY) */}
+            {isAdminBesar && (
+              <div className="rounded-3xl border-2 border-amber-300/80 dark:border-amber-600/40 bg-gradient-to-b from-amber-50/60 via-white to-purple-50/40 dark:from-[#1b102e] dark:via-[#0e071a] dark:to-[#16082c] p-6 sm:p-8 shadow-md space-y-6 transition-colors">
+                {/* Header Admin Besar */}
+                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-amber-200/80 dark:border-amber-900/40 pb-5">
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-slate-900 flex items-center justify-center font-black shadow-md ring-4 ring-amber-100 dark:ring-amber-950/60 shrink-0">
+                      <KeyRound size={22} className="text-slate-900" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white tracking-tight">
+                          Pengaturan Admin Besar • Master Kredensial Asisten
+                        </h3>
+                        <span className="text-[10px] font-mono font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-xs">
+                          SUPER_ADMIN (MACY)
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-neutral-300 font-mono mt-0.5">
+                        Hak akses eksklusif Admin Besar. Melihat, memantau, dan mengelola kata sandi login seluruh 32 asisten praktikum.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Global Toggle Button */}
+                  <div className="flex items-center gap-2.5 shrink-0 self-start lg:self-center">
+                    <button
+                      type="button"
+                      onClick={() => setShowAllPasswords(!showAllPasswords)}
+                      className="px-4 py-2 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-mono font-bold shadow-xs flex items-center gap-2 transition-all cursor-pointer"
+                    >
+                      {showAllPasswords ? <EyeOff size={14} /> : <Eye size={14} />}
+                      <span>{showAllPasswords ? "Sembunyikan Semua Sandi" : "Tampilkan Semua Sandi"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Telemetry Architecture Cards (Aturan Sandi Resmi) */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="p-3.5 rounded-2xl bg-amber-100/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-mono font-bold text-amber-900 dark:text-amber-300">
+                      <span>1. ADMIN BESAR (MACY)</span>
+                      <span className="px-1.5 py-0.2 rounded bg-amber-200 dark:bg-amber-900 text-[9px]">1 Akun</span>
+                    </div>
+                    <div className="font-mono font-extrabold text-sm text-slate-900 dark:text-white">
+                      MACY194545
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-sans">
+                      Super Admin Otoritas Penuh
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-purple-100/70 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800/60 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-mono font-bold text-purple-900 dark:text-purple-300">
+                      <span>2. ADMIN (EXEC &amp; CNI)</span>
+                      <span className="px-1.5 py-0.2 rounded bg-purple-200 dark:bg-purple-900 text-[9px]">10 Akun</span>
+                    </div>
+                    <div className="font-mono font-extrabold text-sm text-slate-900 dark:text-white">
+                      [KODE]ADMINR1
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-sans">
+                      Koordinator, Sekben, Komdis (CnI)
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 rounded-2xl bg-sky-100/70 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 space-y-1">
+                    <div className="flex items-center justify-between text-[10px] font-mono font-bold text-sky-900 dark:text-sky-300">
+                      <span>3. AKUN BIASA (ASPRAK)</span>
+                      <span className="px-1.5 py-0.2 rounded bg-sky-200 dark:bg-sky-900 text-[9px]">21 Akun</span>
+                    </div>
+                    <div className="font-mono font-extrabold text-sm text-slate-900 dark:text-white">
+                      [KODE]ALPRO123
+                    </div>
+                    <div className="text-[10px] text-slate-500 dark:text-neutral-400 font-sans">
+                      CnM, TnC, Module Development
+                    </div>
+                  </div>
+                </div>
+
+                {/* Filter & Search Bar */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+                  {/* Role filter badges */}
+                  <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                    {[
+                      { id: "ALL", label: "Semua (32)" },
+                      { id: "ADMIN_BESAR", label: "Admin Besar (1)" },
+                      { id: "ADMIN", label: "Administrator (10)" },
+                      { id: "ASPRAK", label: "Asprak Biasa (21)" },
+                    ].map((f) => (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => setPasswordRoleFilter(f.id as any)}
+                        className={`shrink-0 px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer ${
+                          passwordRoleFilter === f.id
+                            ? "bg-amber-500 text-slate-950 font-bold shadow-xs"
+                            : "bg-white dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-300 hover:bg-slate-50 dark:hover:bg-neutral-800"
+                        }`}
+                      >
+                        {f.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Search input */}
+                  <div className="relative min-w-[240px]">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari Nama / Kode / NIM..."
+                      value={passwordSearchQuery}
+                      onChange={(e) => setPasswordSearchQuery(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 bg-white dark:bg-neutral-900 border border-slate-300 dark:border-neutral-700 rounded-xl text-xs font-mono focus:outline-none focus:border-amber-500"
+                    />
+                  </div>
+                </div>
+
+                {/* Master Accounts & Passwords Table */}
+                <div className="border border-amber-200/90 dark:border-neutral-800 rounded-2xl overflow-x-auto scrollbar-thin max-h-[520px] bg-white dark:bg-[#0e071a]">
+                  <table className="w-full text-left text-xs whitespace-nowrap min-w-[900px]">
+                    <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
+                      <tr>
+                        <th className="px-4 py-3.5">Kode</th>
+                        <th className="px-4 py-3.5">Nama Asisten</th>
+                        <th className="px-4 py-3.5">NIM (Username)</th>
+                        <th className="px-4 py-3.5">Divisi &amp; Jabatan</th>
+                        <th className="px-4 py-3.5 text-center">Hak Akses</th>
+                        <th className="px-4 py-3.5">Kata Sandi (Password)</th>
+                        <th className="px-4 py-3.5 text-center">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
+                      {ALPRO_ASSISTANTS
+                        .filter((a) => {
+                          const level = getAssistantAccessLevel(a.code);
+                          const matchRole =
+                            passwordRoleFilter === "ALL" ||
+                            (passwordRoleFilter === "ADMIN_BESAR" && level === "ADMIN_BESAR") ||
+                            (passwordRoleFilter === "ADMIN" && level === "ADMIN") ||
+                            (passwordRoleFilter === "ASPRAK" && level === "ASPRAK");
+
+                          const q = passwordSearchQuery.toLowerCase();
+                          const matchSearch =
+                            !passwordSearchQuery ||
+                            a.name.toLowerCase().includes(q) ||
+                            a.code.toLowerCase().includes(q) ||
+                            a.nim.includes(q) ||
+                            a.division.toLowerCase().includes(q);
+
+                          return matchRole && matchSearch;
+                        })
+                        .map((asst) => {
+                          const level = getAssistantAccessLevel(asst.code);
+                          const pass = getExpectedPassword(asst.code);
+                          const isVisible = showAllPasswords || Boolean(visiblePasswordCodes[asst.code]);
+                          const isCopied = copiedCode === asst.code;
+                          const isCurrent = asst.code === sessionUser;
+
+                          return (
+                            <tr
+                              key={asst.code}
+                              className={`transition-colors ${
+                                isCurrent
+                                  ? "bg-amber-50/70 dark:bg-amber-950/20 font-semibold"
+                                  : "hover:bg-slate-50 dark:hover:bg-neutral-900/60"
+                              }`}
+                            >
+                              <td className="px-4 py-3">
+                                <span className="inline-flex items-center gap-1 font-mono font-black text-xs px-2.5 py-0.5 rounded bg-purple-100 dark:bg-purple-900/60 text-purple-800 dark:text-purple-300">
+                                  {asst.code}
+                                  {isCurrent && <span className="text-[10px] text-amber-500">★</span>}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 font-medium text-slate-900 dark:text-white">
+                                {asst.name}
+                              </td>
+                              <td className="px-4 py-3 font-mono text-slate-700 dark:text-neutral-300">
+                                {asst.nim}
+                              </td>
+                              <td className="px-4 py-3">
+                                <span className={`inline-flex items-center text-[10px] font-mono font-bold px-2 py-0.5 rounded ${
+                                  asst.division === "Koordinator"
+                                    ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300"
+                                    : asst.division === "Sekretaris & Bendahara"
+                                    ? "bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300"
+                                    : asst.division === "Compliance & Integrity"
+                                    ? "bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300"
+                                    : "bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300"
+                                }`}>
+                                  {asst.position}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className={`inline-block text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full ${
+                                  level === "ADMIN_BESAR"
+                                    ? "bg-gradient-to-r from-amber-400 to-yellow-500 text-slate-950 shadow-2xs"
+                                    : level === "ADMIN"
+                                    ? "bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                                    : "bg-slate-100 text-slate-600 dark:bg-neutral-800 dark:text-neutral-300"
+                                }`}>
+                                  {level === "ADMIN_BESAR" ? "ADMIN BESAR" : level}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  {isVisible ? (
+                                    <span className="font-mono font-black text-xs px-2.5 py-1 rounded-md bg-amber-100 dark:bg-amber-950/80 text-amber-950 dark:text-amber-200 border border-amber-300 dark:border-amber-700 tracking-wider select-all">
+                                      {pass}
+                                    </span>
+                                  ) : (
+                                    <span className="font-mono font-bold text-xs px-2.5 py-1 rounded-md bg-slate-100 dark:bg-neutral-800 text-slate-400 tracking-widest select-none">
+                                      ••••••••••••••
+                                    </span>
+                                  )}
+                                  <button
+                                    type="button"
+                                    onClick={() => togglePasswordVisibility(asst.code)}
+                                    className="p-1 rounded text-slate-400 hover:text-slate-700 dark:hover:text-white cursor-pointer"
+                                    title={isVisible ? "Sembunyikan Sandi" : "Lihat Kata Sandi"}
+                                  >
+                                    {isVisible ? <EyeOff size={13} /> : <Eye size={13} />}
+                                  </button>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyPassword(asst.code, pass)}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition-all cursor-pointer ${
+                                    isCopied
+                                      ? "bg-emerald-600 text-white"
+                                      : "bg-slate-100 hover:bg-slate-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-slate-700 dark:text-neutral-300"
+                                  }`}
+                                  title="Salin Password ke Clipboard"
+                                >
+                                  {isCopied ? (
+                                    <>
+                                      <Check size={11} />
+                                      <span>Tersalin!</span>
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Copy size={11} />
+                                      <span>Salin</span>
+                                    </>
+                                  )}
+                                </button>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
             {/* FULL 32-ASSISTANT DIRECTORY TABLE (Admin Only Access) */}
             {currentRole === "SUPER_ADMIN" || currentRole === "ADMIN" || currentRole === "KOMDIS" || currentRole === "SEKBEN" ? (
               <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-5 transition-colors">
+                {/* Security Banner Khusus Jika Login sebagai Admin Biasa (Bukan Admin Besar) */}
+                {!isAdminBesar && (
+                  <div className="p-4 rounded-2xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 flex items-center justify-center shrink-0">
+                        <Lock size={18} />
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-900 dark:text-white">
+                          Pengaturan Sandi: Khusus Admin Besar (MACY)
+                        </h4>
+                        <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
+                          Akun Admin biasa hanya dapat mengelola direktori kontak operasional. Visibilitas seluruh kata sandi akun asisten dilindungi dan hanya dapat diakses melalui Pengaturan Admin Besar (MACY).
+                        </p>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-md bg-amber-200/80 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 shrink-0 self-start sm:self-center">
+                      Password Dilindungi
+                    </span>
+                  </div>
+                )}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-4">
                   <div>
                     <div className="flex items-center gap-2">
@@ -3843,6 +4333,209 @@ export default function AssistantDashboard() {
                 Simpan &amp; Sinkronkan
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL BUAT LAPORAN KECURANGAN (Khusus Admin & Komdis) */}
+      {isReportModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#120824] rounded-3xl max-w-lg w-full border border-purple-200 dark:border-purple-900/60 shadow-2xl p-6 sm:p-7 space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center font-bold">
+                  <AlertTriangle size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                    Form Pelaporan Kecurangan
+                  </h3>
+                  <p className="text-[11px] font-mono text-purple-700 dark:text-purple-300">
+                    Otoritas Komdis (CnI) &amp; Administrator ALPRO
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReportModalOpen(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmitCheatingReport} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                    Kelas SI&apos;50:
+                  </label>
+                  <select
+                    value={reportForm.classCode}
+                    onChange={(e) => {
+                      const newCls = e.target.value;
+                      setReportForm((prev) => ({ ...prev, classCode: newCls }));
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 font-mono text-xs text-slate-900 dark:text-white"
+                  >
+                    {SI50_CLASSES.map((cls) => (
+                      <option key={cls.code} value={cls.code}>
+                        {cls.name} ({cls.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                    Sesi / Modul:
+                  </label>
+                  <select
+                    value={reportForm.module}
+                    onChange={(e) => setReportForm((prev) => ({ ...prev, module: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 font-mono text-xs text-slate-900 dark:text-white"
+                  >
+                    {["Modul 1", "Modul 2", "Modul 3", "Modul 4", "Modul 5", "Modul 6", "Kuis Moodle", "Ujian Praktikum"].map((m) => (
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                  Pilih Mahasiswa Terlapor:
+                </label>
+                <select
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val) {
+                      const [nim, ...nameParts] = val.split("|");
+                      setReportForm((prev) => ({
+                        ...prev,
+                        nim: nim.trim(),
+                        name: nameParts.join("|").trim(),
+                      }));
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 font-mono text-xs text-slate-900 dark:text-white cursor-pointer"
+                >
+                  <option value="">-- Pilih dari Daftar Mahasiswa Kelas {reportForm.classCode} --</option>
+                  {(MOODLE_STUDENTS_BY_CLASS[reportForm.classCode] || []).map((std) => (
+                    <option key={std.nim} value={`${std.nim}|${std.name}`}>
+                      {std.nim} — {std.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                    NIM Mahasiswa:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="102022600xxx"
+                    value={reportForm.nim}
+                    onChange={(e) => setReportForm((prev) => ({ ...prev, nim: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 font-mono text-xs text-slate-900 dark:text-white"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                    Nama Lengkap Mahasiswa:
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Nama mahasiswa..."
+                    value={reportForm.name}
+                    onChange={(e) => setReportForm((prev) => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 text-xs text-slate-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                    Jenis Pelanggaran:
+                  </label>
+                  <select
+                    value={reportForm.violationType}
+                    onChange={(e) => setReportForm((prev) => ({ ...prev, violationType: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 text-xs text-slate-900 dark:text-white"
+                  >
+                    <option value="Plagiarisme Kode Program">Plagiarisme Kode Program</option>
+                    <option value="Penggunaan AI Unsanctioned">Penggunaan AI Unsanctioned / Tab Terlarang</option>
+                    <option value="Joki Praktikum / Kuis">Joki Praktikum / Kuis</option>
+                    <option value="Kecurangan Jurnal">Kecurangan Jurnal</option>
+                    <option value="Pelanggaran Tata Tertib Lab">Pelanggaran Tata Tertib Lab</option>
+                    <option value="Lainnya">Lainnya</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                    Rekomendasi Sanksi:
+                  </label>
+                  <select
+                    value={reportForm.sanction}
+                    onChange={(e) => setReportForm((prev) => ({ ...prev, sanction: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 text-xs text-slate-900 dark:text-white"
+                  >
+                    <option value="Peringatan 1 (SP1)">Peringatan 1 (SP1)</option>
+                    <option value="Nilai Komponen Dibatalkan (0)">Nilai Komponen Dibatalkan (0)</option>
+                    <option value="Skorsing Shift Praktikum">Skorsing Shift Praktikum</option>
+                    <option value="Lapor Dosen Pengampu">Pelanggaran Berat (Lapor Dosen Pengampu)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-mono font-bold text-slate-700 dark:text-neutral-300">
+                  Kronologi &amp; Bukti Pelanggaran:
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  placeholder="Jelaskan kronologi kejadian kecurangan, PC yang digunakan, bukti temuan..."
+                  value={reportForm.description}
+                  onChange={(e) => setReportForm((prev) => ({ ...prev, description: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-700 text-xs text-slate-900 dark:text-white resize-none"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200/80 dark:border-purple-800/60 flex items-center justify-between text-[11px] font-mono">
+                <span className="text-slate-600 dark:text-neutral-300">
+                  Pelapor Resmi:
+                </span>
+                <span className="font-bold text-purple-800 dark:text-purple-300">
+                  [{currentAssistantProfile.code}] {currentAssistantProfile.name}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => setIsReportModalOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 dark:border-neutral-700 text-slate-600 dark:text-neutral-300 hover:bg-slate-100 dark:hover:bg-neutral-800 font-medium cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-700 hover:to-red-700 text-white font-bold shadow-md cursor-pointer flex items-center gap-1.5"
+                >
+                  <AlertTriangle size={13} />
+                  <span>Kirim Laporan Resmi Komdis</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
