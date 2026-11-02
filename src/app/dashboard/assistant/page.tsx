@@ -87,6 +87,7 @@ import {
   Copy,
   Gift,
   Paperclip,
+  XCircle,
 } from "lucide-react";
 import {
   PraktikanCardIllustration,
@@ -795,6 +796,26 @@ export default function AssistantDashboard() {
     setSwapNote("");
     setHibahProofPreview(null);
     setHibahProofFileName("");
+  };
+
+  const handleSetSwapStatus = (
+    id: string | number,
+    newStatus: "APPROVED" | "PENDING" | "REJECTED"
+  ) => {
+    setSwaps((prev) => {
+      const updated = prev.map((s) => {
+        if (s.id === id) {
+          return { ...s, status: newStatus };
+        }
+        return s;
+      });
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("alpro_official_swaps", JSON.stringify(updated));
+        } catch (err) {}
+      }
+      return updated;
+    });
   };
 
   const handleToggleSwapStatus = (id: string | number) => {
@@ -2476,12 +2497,20 @@ export default function AssistantDashboard() {
               </div>
 
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-bold flex items-center gap-2">
-                  <ShieldCheck size={14} />
-                  {swaps.filter((s) => s.status === "APPROVED").length} Disetujui
+                <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1.5">
+                  <CheckCircle2 size={13} />
+                  {swaps.filter((s) => s.status === "APPROVED").length} ACC Disetujui
                 </span>
-                <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 font-bold flex items-center gap-2">
-                  <Gift size={14} />
+                <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-300 font-bold flex items-center gap-1.5">
+                  <Clock size={13} />
+                  {swaps.filter((s) => s.status === "PENDING").length} ON HOLD Menunggu
+                </span>
+                <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-bold flex items-center gap-1.5">
+                  <XCircle size={13} />
+                  {swaps.filter((s) => s.status === "REJECTED").length} REJECT Ditolak
+                </span>
+                <span className="text-xs font-mono px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300 font-bold flex items-center gap-1.5">
+                  <Gift size={13} />
                   {swaps.filter((s) => s.swapType === "HIBAH").length} Hibah Terdata
                 </span>
               </div>
@@ -2881,7 +2910,7 @@ export default function AssistantDashboard() {
                         Asprak Pengganti / Penerima Hibah
                       </th>
                       <th
-                        colSpan={2}
+                        colSpan={5}
                         className="bg-slate-200 text-slate-800 dark:bg-neutral-800 dark:text-neutral-200 border-b border-slate-300 dark:border-neutral-700 py-2.5 px-4 text-center font-bold text-xs uppercase tracking-wider"
                       >
                         Status &amp; Validasi
@@ -2912,12 +2941,21 @@ export default function AssistantDashboard() {
                         Kode Asprak
                       </th>
 
-                      {/* Under Status & Validasi */}
-                      <th className="bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-300 border-r border-slate-300 dark:border-neutral-700 py-2 px-3 font-semibold text-xs text-center whitespace-nowrap min-w-[110px]">
+                      {/* Under Status & Validasi: Status tetap ditampilkan + 3 Kolom (ACC, ON HOLD, REJECT) + Hapus */}
+                      <th className="bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-300 border-r border-slate-300 dark:border-neutral-700 py-2 px-3 font-semibold text-xs text-center whitespace-nowrap min-w-[130px]">
                         Status
                       </th>
-                      <th className="bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-300 py-2 px-3 font-semibold text-xs text-center whitespace-nowrap min-w-[90px]">
-                        Aksi
+                      <th className="bg-emerald-100 text-emerald-900 dark:bg-emerald-950/80 dark:text-emerald-200 border-r border-slate-300 dark:border-neutral-700 py-2 px-2.5 font-bold text-xs text-center whitespace-nowrap min-w-[70px]">
+                        ACC
+                      </th>
+                      <th className="bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-200 border-r border-slate-300 dark:border-neutral-700 py-2 px-2.5 font-bold text-xs text-center whitespace-nowrap min-w-[85px]">
+                        ON HOLD
+                      </th>
+                      <th className="bg-rose-100 text-rose-900 dark:bg-rose-950/80 dark:text-rose-200 border-r border-slate-300 dark:border-neutral-700 py-2 px-2.5 font-bold text-xs text-center whitespace-nowrap min-w-[75px]">
+                        REJECT
+                      </th>
+                      <th className="bg-slate-100 text-slate-700 dark:bg-neutral-800 dark:text-neutral-300 py-2 px-2 font-semibold text-xs text-center whitespace-nowrap min-w-[50px]">
+                        Hapus
                       </th>
                     </tr>
                   </thead>
@@ -3036,41 +3074,87 @@ export default function AssistantDashboard() {
                             </span>
                           </td>
 
-                          {/* Status */}
+                          {/* 1. Status (Ditampilkan & Tidak Dihilangkan) */}
                           <td className="py-3 px-3 text-center border-r border-slate-200 dark:border-neutral-800">
                             {row.status === "APPROVED" ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                                <CheckCircle2 size={11} />
-                                Disetujui
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700 shadow-2xs">
+                                <CheckCircle2 size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                                <span>Disetujui</span>
+                              </span>
+                            ) : row.status === "PENDING" ? (
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300 dark:border-amber-700 shadow-2xs">
+                                <Clock size={12} className="text-amber-600 dark:text-amber-400 shrink-0" />
+                                <span>Menunggu</span>
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
-                                <Clock size={11} />
-                                Menunggu
+                              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-300 dark:border-rose-700 shadow-2xs">
+                                <XCircle size={12} className="text-rose-600 dark:text-rose-400 shrink-0" />
+                                <span>Ditolak</span>
                               </span>
                             )}
                           </td>
 
-                          {/* Aksi */}
-                          <td className="py-3 px-3 text-center">
-                            <div className="flex items-center justify-center gap-1.5">
-                              <button
-                                type="button"
-                                onClick={() => handleToggleSwapStatus(row.id)}
-                                title={row.status === "APPROVED" ? "Tandai sebagai Menunggu" : "Setujui Permohonan"}
-                                className="p-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 hover:bg-slate-100 dark:hover:bg-neutral-800 text-slate-700 dark:text-neutral-300 transition-colors cursor-pointer"
-                              >
-                                <Check size={13} className={row.status === "APPROVED" ? "text-emerald-600 dark:text-emerald-400" : "text-slate-400"} />
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => handleDeleteSwap(row.id)}
-                                title="Hapus catatan pertukaran / hibah"
-                                className="p-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
-                              >
-                                <X size={13} />
-                              </button>
-                            </div>
+                          {/* 2. Kolom ACC */}
+                          <td className="py-3 px-2 text-center border-r border-slate-200 dark:border-neutral-800">
+                            <button
+                              type="button"
+                              onClick={() => handleSetSwapStatus(row.id, "APPROVED")}
+                              title="Setujui (ACC)"
+                              className={`inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                                row.status === "APPROVED"
+                                  ? "bg-emerald-600 text-white shadow-xs ring-2 ring-emerald-300 dark:ring-emerald-700"
+                                  : "bg-emerald-50 hover:bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:hover:bg-emerald-900/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80"
+                              }`}
+                            >
+                              <Check size={12} />
+                              <span>ACC</span>
+                            </button>
+                          </td>
+
+                          {/* 3. Kolom ON HOLD */}
+                          <td className="py-3 px-2 text-center border-r border-slate-200 dark:border-neutral-800">
+                            <button
+                              type="button"
+                              onClick={() => handleSetSwapStatus(row.id, "PENDING")}
+                              title="Tunda (ON HOLD)"
+                              className={`inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                                row.status === "PENDING"
+                                  ? "bg-amber-500 text-slate-950 font-black shadow-xs ring-2 ring-amber-300 dark:ring-amber-700"
+                                  : "bg-amber-50 hover:bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:hover:bg-amber-900/60 dark:text-amber-300 border border-amber-200 dark:border-amber-800/80"
+                              }`}
+                            >
+                              <Clock size={12} />
+                              <span>ON HOLD</span>
+                            </button>
+                          </td>
+
+                          {/* 4. Kolom REJECT */}
+                          <td className="py-3 px-2 text-center border-r border-slate-200 dark:border-neutral-800">
+                            <button
+                              type="button"
+                              onClick={() => handleSetSwapStatus(row.id, "REJECTED")}
+                              title="Tolak (REJECT)"
+                              className={`inline-flex items-center justify-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                                row.status === "REJECTED"
+                                  ? "bg-rose-600 text-white shadow-xs ring-2 ring-rose-300 dark:ring-rose-700"
+                                  : "bg-rose-50 hover:bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800/80"
+                              }`}
+                            >
+                              <X size={12} />
+                              <span>REJECT</span>
+                            </button>
+                          </td>
+
+                          {/* 5. Kolom Hapus */}
+                          <td className="py-3 px-2 text-center">
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteSwap(row.id)}
+                              title="Hapus catatan pertukaran / hibah"
+                              className="p-1.5 rounded-lg border border-slate-200 dark:border-neutral-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors cursor-pointer"
+                            >
+                              <Trash2 size={13} />
+                            </button>
                           </td>
                         </tr>
                       );
