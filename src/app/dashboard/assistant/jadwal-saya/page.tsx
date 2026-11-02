@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
-import { ALPRO_15_SHIFTS, getAssistantShifts } from "@/data/alpro-schedule-plotting";
+import { ALPRO_15_SHIFTS, getAssistantShifts, ALL_SHIFT_PLOTTINGS } from "@/data/alpro-schedule-plotting";
 import {
   ArrowLeft,
   ArrowUpRight,
@@ -17,6 +17,7 @@ import {
 
 export default function JadwalSayaPage() {
   const [expandedShiftId, setExpandedShiftId] = useState<number | null>(null);
+  const [showAllStudentsInShift, setShowAllStudentsInShift] = useState<Record<number, boolean>>({});
   const [sessionUser, setSessionUser] = useState<string>("MACY");
 
   useEffect(() => {
@@ -53,6 +54,12 @@ export default function JadwalSayaPage() {
       pillColor = "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800";
     }
 
+    const shiftPlot = ALL_SHIFT_PLOTTINGS[shift.shiftNumber];
+    const groupStudents = (item.students && item.students.length > 0)
+      ? item.students
+      : (shiftPlot?.students.filter((s) => s.assistantCode === sessionUser || s.group === item.group) || []);
+    const allShiftStudents = shiftPlot?.students || [];
+
     return {
       shiftNum: shift.shiftNumber,
       classCode: shift.className,
@@ -62,7 +69,9 @@ export default function JadwalSayaPage() {
       timeDisplay: shift.timeDisplay,
       room: "Ruang R1 Lantai 8 TULT",
       group: item.group,
-      studentCount: item.studentCount,
+      studentCount: groupStudents.length || item.studentCount,
+      students: groupStudents,
+      allShiftStudents,
       status: "Terjadwal",
       isPindahan: false,
       pillColor,
@@ -211,7 +220,7 @@ export default function JadwalSayaPage() {
 
                   {/* Accordion Expansion Details */}
                   {isExpanded && (
-                    <div className="pt-3 border-t border-slate-200/70 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-300 space-y-2">
+                    <div className="pt-3 border-t border-slate-200/70 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-300 space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-[11px]">
                         <div className="flex items-center gap-1.5">
                           <MapPin size={13} className="text-[#7C3AED]" />
@@ -224,9 +233,82 @@ export default function JadwalSayaPage() {
                         <div className="flex items-center gap-1.5">
                           <Users size={13} className="text-[#7C3AED]" />
                           <span>
-                            Grup {item.group} • {item.studentCount} Praktikan
+                            Grup {item.group} • {item.students.length} Praktikan Binaan
                           </span>
                         </div>
+                      </div>
+
+                      {/* DAFTAR NAMA PRAKTIKAN DI DROPDOWN */}
+                      <div className="pt-3 border-t border-slate-200/60 dark:border-neutral-800/80 space-y-2.5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-900 dark:text-white">
+                              {showAllStudentsInShift[item.shiftNum]
+                                ? `Daftar Semua Praktikan Shift ${item.shiftNum}`
+                                : `Daftar Praktikan Binaan (Grup ${item.group})`}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">
+                              {showAllStudentsInShift[item.shiftNum]
+                                ? `${item.allShiftStudents.length} Mahasiswa`
+                                : `${item.students.length} Mahasiswa`}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {item.allShiftStudents.length > item.students.length && (
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  setShowAllStudentsInShift((prev) => ({
+                                    ...prev,
+                                    [item.shiftNum]: !prev[item.shiftNum],
+                                  }))
+                                }
+                                className="text-[11px] font-mono font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+                              >
+                                {showAllStudentsInShift[item.shiftNum]
+                                  ? `← Tampilkan Hanya Grup Saya (${item.students.length})`
+                                  : `Lihat Semua Shift (${item.allShiftStudents.length}) →`}
+                              </button>
+                            )}
+                            <span className="text-[10px] font-mono text-slate-400 dark:text-neutral-500">
+                              Asprak: [{sessionUser}]
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Student Grid Cards */}
+                        {(showAllStudentsInShift[item.shiftNum] ? item.allShiftStudents : item.students).length === 0 ? (
+                          <p className="text-xs text-slate-400 dark:text-neutral-500 italic py-2">
+                            Belum ada data praktikan pada shift ini.
+                          </p>
+                        ) : (
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 pt-1 max-h-[360px] overflow-y-auto scrollbar-thin pr-1">
+                            {(showAllStudentsInShift[item.shiftNum] ? item.allShiftStudents : item.students).map((std, idx) => (
+                              <div
+                                key={std.nim}
+                                className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-neutral-900/90 border border-slate-200/80 dark:border-neutral-800/80 hover:border-purple-300 dark:hover:border-purple-800 transition-all shadow-2xs"
+                              >
+                                <div className="flex items-center gap-2.5 min-w-0">
+                                  <span className="w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                                    {idx + 1}
+                                  </span>
+                                  <div className="min-w-0">
+                                    <p className="text-xs font-bold text-slate-800 dark:text-neutral-200 truncate">
+                                      {std.name}
+                                    </p>
+                                    <p className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
+                                      {std.nim}
+                                    </p>
+                                  </div>
+                                </div>
+                                <span className="text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 shrink-0">
+                                  Grup {std.group} {std.assistantCode && std.assistantCode !== sessionUser ? `• ${std.assistantCode}` : ""}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

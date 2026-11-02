@@ -21,6 +21,7 @@ import {
   getAssistantDutyStatus,
   getAssistantShifts,
   ALL_SHIFT_PLOTTINGS,
+  getAssistantCodeForStudent,
 } from "@/data/alpro-schedule-plotting";
 import { motion, AnimatePresence } from "motion/react";
 import Link from "next/link";
@@ -299,6 +300,12 @@ export default function AssistantDashboard() {
       pillColor = "bg-rose-100 text-rose-900 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800";
     }
 
+    const shiftPlot = ALL_SHIFT_PLOTTINGS[shift.shiftNumber];
+    const groupStudents = (item.students && item.students.length > 0)
+      ? item.students
+      : (shiftPlot?.students.filter((s) => s.assistantCode === sessionUser || s.group === item.group) || []);
+    const allShiftStudents = shiftPlot?.students || [];
+
     return {
       shiftNum: shift.shiftNumber,
       classCode: shift.className,
@@ -309,7 +316,9 @@ export default function AssistantDashboard() {
       timeDisplay: shift.timeDisplay,
       room: shift.room.startsWith("Ruang") ? shift.room : `Ruang ${shift.room}`,
       group: item.group,
-      studentCount: item.studentCount,
+      studentCount: groupStudents.length || item.studentCount,
+      students: groupStudents,
+      allShiftStudents,
       status: "Terjadwal",
       isPindahan: false,
       pillColor,
@@ -497,6 +506,7 @@ export default function AssistantDashboard() {
   const [replacementCode, setReplacementCode] = useState("MAYR");
   const [swapNote, setSwapNote] = useState("");
   const [expandedShiftId, setExpandedShiftId] = useState<number | null>(null);
+  const [showAllStudentsInShift, setShowAllStudentsInShift] = useState<Record<number, boolean>>({});
 
   const getShiftDetails = (shiftNum: number) => {
     const s = ALPRO_15_SHIFTS.find((shift) => shift.shiftNumber === shiftNum);
@@ -1184,11 +1194,15 @@ export default function AssistantDashboard() {
             {/* SUB-VIEW 1: ABSENSI PRAKTIKAN */}
             {absensiSubTab === "praktikan" && (() => {
               const classStudents = MOODLE_STUDENTS_BY_CLASS[selectedClassCode] || [];
-              const filteredStudents = classStudents.filter(
-                (std) =>
-                  std.name.toLowerCase().includes(attendanceSearchQuery.toLowerCase()) ||
-                  std.nim.includes(attendanceSearchQuery)
-              );
+              const filteredStudents = classStudents.filter((std) => {
+                const q = attendanceSearchQuery.toLowerCase();
+                const asprakCode = getAssistantCodeForStudent(std.nim, std.name).toLowerCase();
+                return (
+                  std.name.toLowerCase().includes(q) ||
+                  std.nim.includes(q) ||
+                  asprakCode.includes(q)
+                );
+              });
               const hadirCount = classStudents.filter((s) => (attendance[s.nim] || "Hadir") === "Hadir").length;
               const terlambatCount = classStudents.filter((s) => attendance[s.nim] === "Terlambat").length;
               const izinCount = classStudents.filter((s) => attendance[s.nim] === "Izin" || attendance[s.nim] === "Sakit").length;
@@ -1217,7 +1231,7 @@ export default function AssistantDashboard() {
                         <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                         <input
                           type="text"
-                          placeholder="Cari NIM / Nama..."
+                          placeholder="Cari NIM / Nama / Kode Asprak..."
                           value={attendanceSearchQuery}
                           onChange={(e) => setAttendanceSearchQuery(e.target.value)}
                           className="w-full pl-8 pr-3 py-1 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:border-purple-500"
@@ -1235,12 +1249,13 @@ export default function AssistantDashboard() {
 
                   {/* Table Presensi Praktikan */}
                   <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[500px]">
-                    <table className="w-full text-left text-xs whitespace-nowrap min-w-[650px]">
+                    <table className="w-full text-left text-xs whitespace-nowrap min-w-[700px]">
                       <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
                         <tr>
                           <th className="px-5 py-3.5">NIM</th>
                           <th className="px-5 py-3.5">Nama Mahasiswa</th>
                           <th className="px-5 py-3.5">Kelas</th>
+                          <th className="px-4 py-3.5 text-center">Asprak</th>
                           <th className="px-5 py-3.5">Status Kehadiran</th>
                           <th className="px-5 py-3.5 text-center">Catatan Komdis</th>
                         </tr>
@@ -1248,18 +1263,24 @@ export default function AssistantDashboard() {
                       <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                         {filteredStudents.length === 0 ? (
                           <tr>
-                            <td colSpan={5} className="text-center py-8 text-slate-400 font-mono">
+                            <td colSpan={6} className="text-center py-8 text-slate-400 font-mono">
                               Tidak ada mahasiswa yang cocok dengan pencarian &quot;{attendanceSearchQuery}&quot;
                             </td>
                           </tr>
                         ) : (
                           filteredStudents.map((std) => {
                             const status = attendance[std.nim] || "Hadir";
+                            const asprakCode = getAssistantCodeForStudent(std.nim, std.name);
                             return (
                               <tr key={std.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
                                 <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{std.nim}</td>
                                 <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{std.name}</td>
                                 <td className="px-5 py-3 font-mono text-purple-700 dark:text-purple-400 font-bold">{selectedClass.code}</td>
+                                <td className="px-4 py-3 text-center">
+                                  <span className="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-mono font-extrabold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60">
+                                    {asprakCode}
+                                  </span>
+                                </td>
                                 <td className="px-5 py-3">
                                   <div className="flex gap-1.5">
                                     {(["Hadir", "Terlambat", "Izin", "Sakit", "Alpa"] as const).map((st) => (
@@ -1321,34 +1342,43 @@ export default function AssistantDashboard() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { role: "LEAD PIC (KORPRAK)", code: "DEVO", name: "Devin Octavian", time: "07:15 WIB", status: "Tepat Waktu", roleType: "ASPRAK", division: "Koordinator" },
-                    { role: "KOOR CNI (KOMDIS)", code: "MACY", name: "Maurellio Christopher Yonathan", time: "07:18 WIB", status: "Tepat Waktu", roleType: "KOMDIS", division: "Compliance & Integrity" },
-                    { role: "SEKRETARIS 1 (BPH)", code: "GRGS", name: "Gracia Gebriella Sianturi", time: "07:22 WIB", status: "Tepat Waktu", roleType: "SEKBEN", division: "Sekretaris & Bendahara" },
-                    { role: "BENDAHARA (BPH)", code: "SYOW", name: "Syalfa Oktaviana Wijaya", time: "07:24 WIB", status: "Tepat Waktu", roleType: "SEKBEN", division: "Sekretaris & Bendahara" },
-                    { role: "KOOR MD (MODUL)", code: "MUDI", name: "Muhammad Daffa Izzati", time: "07:25 WIB", status: "Tepat Waktu", roleType: "ASPRAK", division: "Module Development" },
-                    { role: "KOOR TNC (SYSTEM)", code: "FIAG", name: "Figo Al Ghifari", time: "07:26 WIB", status: "Tepat Waktu", roleType: "ASPRAK", division: "Tech & Systems" },
-                  ].map((asp) => (
-                    <div key={asp.code} className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0e071a] shadow-xs flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-purple-700 dark:bg-purple-900 text-white flex items-center justify-center font-mono font-bold text-sm">
-                          {asp.code}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-slate-900 dark:text-white">{asp.name}</span>
-                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400 font-bold">
-                              {asp.roleType}
-                            </span>
+                  {(() => {
+                    const shiftPlot = ALL_SHIFT_PLOTTINGS[selectedClass.shiftNumber];
+                    const shiftAssistants = shiftPlot?.assistants || [];
+                    if (shiftAssistants.length === 0) {
+                      return (
+                        <p className="text-xs text-slate-400 col-span-2 font-mono p-4">Belum ada asisten terplotting pada shift ini.</p>
+                      );
+                    }
+                    return shiftAssistants.map((ast) => {
+                      const profile = ALPRO_ASSISTANTS.find((a) => a.code === ast.assistantCode);
+                      return (
+                        <div key={ast.assistantCode} className="p-4 rounded-xl border border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#0e071a] shadow-xs flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-purple-700 dark:bg-purple-900 text-white flex items-center justify-center font-mono font-bold text-sm">
+                              {ast.assistantCode}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                  {profile?.name || ast.assistantCode}
+                                </span>
+                                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 font-bold">
+                                  Grup {ast.group}
+                                </span>
+                              </div>
+                              <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">
+                                {ast.studentCount} Praktikan Binaan • {profile?.division || "Asisten Praktikum"}
+                              </div>
+                            </div>
                           </div>
-                          <div className="text-[11px] font-mono text-slate-500 dark:text-neutral-400">{asp.role} • Masuk: {asp.time}</div>
+                          <span className="text-[10px] font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded">
+                            Tepat Waktu
+                          </span>
                         </div>
-                      </div>
-                      <span className="text-[10px] font-mono text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 px-2.5 py-1 rounded-md font-bold border border-emerald-200 dark:border-emerald-800">
-                        ✓ {asp.status}
-                      </span>
-                    </div>
-                  ))}
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             )}
@@ -2125,7 +2155,7 @@ export default function AssistantDashboard() {
 
                         {/* Accordion Expansion Details */}
                         {isExpanded && (
-                          <div className="pt-3 border-t border-slate-200/70 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-300 space-y-2">
+                          <div className="pt-3 border-t border-slate-200/70 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-300 space-y-3">
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-[11px]">
                               <div className="flex items-center gap-1.5">
                                 <MapPin size={13} className="text-[#7C3AED]" />
@@ -2138,9 +2168,82 @@ export default function AssistantDashboard() {
                               <div className="flex items-center gap-1.5">
                                 <Users size={13} className="text-[#7C3AED]" />
                                 <span>
-                                  Grup {item.group} • {item.studentCount} Praktikan
+                                  Grup {item.group} • {item.students.length} Praktikan Binaan
                                 </span>
                               </div>
+                            </div>
+
+                            {/* DAFTAR NAMA PRAKTIKAN DI DROPDOWN */}
+                            <div className="pt-3 border-t border-slate-200/60 dark:border-neutral-800/80 space-y-2.5">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs font-bold text-slate-900 dark:text-white">
+                                    {showAllStudentsInShift[item.shiftNum]
+                                      ? `Daftar Semua Praktikan Shift ${item.shiftNum}`
+                                      : `Daftar Praktikan Binaan (Grup ${item.group})`}
+                                  </span>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-950/80 text-purple-700 dark:text-purple-300">
+                                    {showAllStudentsInShift[item.shiftNum]
+                                      ? `${item.allShiftStudents.length} Mahasiswa`
+                                      : `${item.students.length} Mahasiswa`}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  {item.allShiftStudents.length > item.students.length && (
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setShowAllStudentsInShift((prev) => ({
+                                          ...prev,
+                                          [item.shiftNum]: !prev[item.shiftNum],
+                                        }))
+                                      }
+                                      className="text-[11px] font-mono font-bold text-purple-600 dark:text-purple-400 hover:underline cursor-pointer"
+                                    >
+                                      {showAllStudentsInShift[item.shiftNum]
+                                        ? `← Tampilkan Hanya Grup Saya (${item.students.length})`
+                                        : `Lihat Semua Shift (${item.allShiftStudents.length}) →`}
+                                    </button>
+                                  )}
+                                  <span className="text-[10px] font-mono text-slate-400 dark:text-neutral-500">
+                                    Asprak: [{sessionUser}]
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* Student Grid Cards */}
+                              {(showAllStudentsInShift[item.shiftNum] ? item.allShiftStudents : item.students).length === 0 ? (
+                                <p className="text-xs text-slate-400 dark:text-neutral-500 italic py-2">
+                                  Belum ada data praktikan pada shift ini.
+                                </p>
+                              ) : (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 pt-1 max-h-[360px] overflow-y-auto scrollbar-thin pr-1">
+                                  {(showAllStudentsInShift[item.shiftNum] ? item.allShiftStudents : item.students).map((std, idx) => (
+                                    <div
+                                      key={std.nim}
+                                      className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-neutral-900/90 border border-slate-200/80 dark:border-neutral-800/80 hover:border-purple-300 dark:hover:border-purple-800 transition-all shadow-2xs"
+                                    >
+                                      <div className="flex items-center gap-2.5 min-w-0">
+                                        <span className="w-5 h-5 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                                          {idx + 1}
+                                        </span>
+                                        <div className="min-w-0">
+                                          <p className="text-xs font-bold text-slate-800 dark:text-neutral-200 truncate">
+                                            {std.name}
+                                          </p>
+                                          <p className="text-[10px] font-mono text-slate-500 dark:text-neutral-400">
+                                            {std.nim}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <span className="text-[9px] font-mono font-extrabold px-1.5 py-0.5 rounded bg-slate-100 dark:bg-neutral-800 text-slate-600 dark:text-neutral-300 shrink-0">
+                                        Grup {std.group} {std.assistantCode && std.assistantCode !== sessionUser ? `• ${std.assistantCode}` : ""}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}

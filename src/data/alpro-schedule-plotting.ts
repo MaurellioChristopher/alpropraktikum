@@ -1533,3 +1533,30 @@ export function getAssistantDutyStatus(assistantCode: string, nowDate: Date = ne
     systemOngoingShift: ongoing.activeShift,
   };
 }
+
+// Lookup Cache for fast student -> assistant lookup
+const STUDENT_ASSISTANT_MAP = new Map<string, string>();
+const STUDENT_NAME_ASSISTANT_MAP = new Map<string, string>();
+
+Object.values(ALL_SHIFT_PLOTTINGS).forEach((shift) => {
+  shift.students.forEach((s) => {
+    if (s.nim) STUDENT_ASSISTANT_MAP.set(s.nim.trim(), s.assistantCode);
+    if (s.name) STUDENT_NAME_ASSISTANT_MAP.set(s.name.toUpperCase().trim(), s.assistantCode);
+  });
+});
+
+/**
+ * Mendapatkan kode asisten pengampu untuk praktikan berdasarkan NIM atau nama (e.g. "MACY", "MUDI", "INTC")
+ */
+export function getAssistantCodeForStudent(nim: string, name?: string): string {
+  if (nim) {
+    const code = STUDENT_ASSISTANT_MAP.get(nim.trim());
+    if (code) return code;
+  }
+  if (name) {
+    const code = STUDENT_NAME_ASSISTANT_MAP.get(name.toUpperCase().trim());
+    if (code) return code;
+  }
+  return "-";
+}
+
