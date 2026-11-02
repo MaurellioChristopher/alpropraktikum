@@ -73,9 +73,12 @@ import {
   User,
   Calendar,
   Key,
+  KeyRound,
   Filter,
   Flag,
   RotateCw,
+  Image as ImageIcon,
+  Trash2,
 } from "lucide-react";
 import {
   PraktikanCardIllustration,
@@ -340,19 +343,151 @@ export default function AssistantDashboard() {
   });
   const [gradeLocked, setGradeLocked] = useState(false);
 
-  // State Dokumentasi Ruangan
-  const [roomChecklist, setRoomChecklist] = useState({
-    cleanliness: true,
-    pc_shutdown: true,
-    ac_off: false,
-    projector_off: true,
-    mouse_keyboard_tidy: true,
+  // Live LMS Sync & Token Management
+  const [lmsToken, setLmsToken] = useState<string>("fc6d5658f31cb68d90907134703b5694");
+  const [isLmsSyncing, setIsLmsSyncing] = useState<boolean>(false);
+  const [lmsLastSyncTime, setLmsLastSyncTime] = useState<string>("Tersinkronisasi");
+  const [lmsSyncMessage, setLmsSyncMessage] = useState<string | null>(null);
+  const [isLmsTokenModalOpen, setIsLmsTokenModalOpen] = useState<boolean>(false);
+  const [inputToken, setInputToken] = useState<string>("fc6d5658f31cb68d90907134703b5694");
+
+  // State Dokumentasi 3 Section: Sebelum, Sedang, Sesudah
+  const [docPhase, setDocPhase] = useState<"sebelum" | "sedang" | "sesudah">("sebelum");
+  const [docShiftNumber, setDocShiftNumber] = useState<number>(4);
+  const [docRoomNumber, setDocRoomNumber] = useState<string>("Ruang R1 Lantai 8 TULT");
+  const [docZoomPhoto, setDocZoomPhoto] = useState<string | null>(null);
+
+  const [docChecklists, setDocChecklists] = useState({
+    sebelum: {
+      pc_ready: true,
+      lab_clean_start: true,
+      projector_screen_on: true,
+      air_conditioner_on: true,
+      whiteboard_ready: true,
+    },
+    sedang: {
+      student_attendance_verified: true,
+      active_group_mentoring: true,
+      lab_code_of_conduct: true,
+      lms_network_stable: true,
+      health_safety_clean: true,
+    },
+    sesudah: {
+      pc_shutdown_all: true,
+      peripherals_tidy: true,
+      trash_cleared: true,
+      projector_off: true,
+      ac_lights_off: false,
+    },
   });
-  const [roomNote, setRoomNote] = useState("PC 14 mouse wireless baterai lemah, sudah diganti cadangan.");
-  const [uploadedPhotos, setUploadedPhotos] = useState<string[]>([
-    "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop",
-    "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&h=400&fit=crop",
-  ]);
+
+  const [docNotes, setDocNotes] = useState({
+    sebelum: "Laboratorium R1 telah siap, 45 unit workstation menyala normal.",
+    sedang: "Praktikum Modul 1 berjalan kondusif, praktikan aktif mengerjakan modul.",
+    sesudah: "Seluruh PC praktikan dimatikan, meja bersih rapi, mouse cadangan diganti di PC 14.",
+  });
+
+  const [docPhotos, setDocPhotos] = useState<{
+    sebelum: { id: string; url: string; time: string; note: string }[];
+    sedang: { id: string; url: string; time: string; note: string }[];
+    sesudah: { id: string; url: string; time: string; note: string }[];
+  }>({
+    sebelum: [
+      {
+        id: "seb-1",
+        url: "/images/asprak-draft-1.jpg",
+        time: "07.15 WIB",
+        note: "Kesiapan PC & Lab R1 sebelum praktikum",
+      },
+    ],
+    sedang: [
+      {
+        id: "sed-1",
+        url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&h=400&fit=crop",
+        time: "08.45 WIB",
+        note: "Asistensi modul pengerjaan praktikan",
+      },
+    ],
+    sesudah: [
+      {
+        id: "ses-1",
+        url: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&h=400&fit=crop",
+        time: "09.35 WIB",
+        note: "Lab rapi dan PC mati setelah praktikum",
+      },
+    ],
+  });
+
+  // Helper untuk menambah foto dokumentasi
+  const handleAddDocPhoto = (file: File, phase: "sebelum" | "sedang" | "sesudah") => {
+    if (file.size > 10 * 1024 * 1024) {
+      alert("Ukuran foto maksimal 10 MB.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2, "0")}.${now.getMinutes().toString().padStart(2, "0")} WIB`;
+        const newPhoto = {
+          id: `photo-${Date.now()}`,
+          url: result,
+          time: timeStr,
+          note: `Dokumentasi ${phase} praktikum Shift ${docShiftNumber}`,
+        };
+        setDocPhotos((prev) => ({
+          ...prev,
+          [phase]: [newPhoto, ...prev[phase]],
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDeleteDocPhoto = (phase: "sebelum" | "sedang" | "sesudah", photoId: string) => {
+    setDocPhotos((prev) => ({
+      ...prev,
+      [phase]: prev[phase].filter((p) => p.id !== photoId),
+    }));
+  };
+
+  // Fungsi Sinkronisasi Nilai LMS
+  const syncLiveGrades = async (targetClass?: string) => {
+    setIsLmsSyncing(true);
+    setLmsSyncMessage("Menghubungkan ke LMS Telkom University...");
+    try {
+      const cls = targetClass || selectedClassCode;
+      const res = await fetch("/api/lms/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: lmsToken, classCode: cls }),
+      });
+      const data = await res.json();
+      if (data.success && data.updatedGrades) {
+        setGradesByClass((prev) => {
+          const next = { ...prev, ...data.updatedGrades };
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem("EDM_LIVE_GRADES_CACHE", JSON.stringify(next));
+            } catch (e) {}
+          }
+          return next;
+        });
+        const now = new Date();
+        const timeStr = `${now.getHours().toString().padStart(2, "0")}.${now.getMinutes().toString().padStart(2, "0")} WIB`;
+        setLmsLastSyncTime(timeStr);
+        setLmsSyncMessage(`✓ Berhasil diperbarui (${timeStr})`);
+        setTimeout(() => setLmsSyncMessage(null), 4000);
+      } else {
+        setLmsSyncMessage(data.error || "Gagal memperbarui nilai dari LMS.");
+      }
+    } catch (err: any) {
+      setLmsSyncMessage("Koneksi ke API LMS terputus.");
+    } finally {
+      setIsLmsSyncing(false);
+    }
+  };
 
   // State Pertukaran Jadwal (Official EDM Shift Swap Engine)
   const [swaps, setSwaps] = useState<OfficialSwapItem[]>(INITIAL_OFFICIAL_SWAPS);
@@ -538,36 +673,17 @@ export default function AssistantDashboard() {
           </div>
         )}
 
-        {/* MOBILE & TABLET TOP ACTION BAR (< lg) */}
-        <div className="lg:hidden bg-white dark:bg-[#0e071a] rounded-2xl p-3 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-2.5 transition-colors">
-          <div className="flex items-center justify-between gap-3">
-            <span className="text-xs font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/70 border border-purple-200/60 dark:border-purple-800/60 px-2.5 py-1 rounded-lg">
-              {activeTab === "dashboard" || activeTab === "beranda" ? "🏠 Beranda" :
-               activeTab === "praktikan" || activeTab === "absensi" ? "📋 Praktikan" :
-               activeTab === "informasi" || activeTab === "modul" ? "👥 Informasi Praktikan" :
-               activeTab === "komdis" ? "🚩 Laporan Kecurangan" :
-               activeTab === "dokumentasi" ? "📷 Dokumentasi" :
-               activeTab === "jadwal" || activeTab === "jadwal_saya" ? "📅 Jadwal" : "👤 Profil Akun"}
-            </span>
-
-            <button
-              type="button"
-              onClick={() => setIsMobileMenuOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-700 text-white text-xs font-bold font-mono shadow-xs hover:bg-purple-800 transition-colors shrink-0 cursor-pointer"
-            >
-              <Menu size={14} />
-              <span>Menu</span>
-            </button>
-          </div>
-
-          {/* Quick horizontal tap switcher */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none touch-pan-x">
+        {/* MOBILE & TABLET SLEEK TAB BAR (< lg) - Clean single-row, no duplicate clutter */}
+        <div className="lg:hidden bg-white/95 dark:bg-[#0e071a]/95 backdrop-blur-md rounded-2xl p-2 border border-slate-200/80 dark:border-purple-950/60 shadow-xs transition-colors">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-none touch-pan-x px-1">
             {[
               { id: "dashboard", label: "Beranda", icon: Home },
               { id: "absensi", label: "Praktikan", icon: CheckSquare },
-              { id: "modul", label: "Silabus", icon: BookOpen },
-              { id: "jadwal", label: "Jadwal", icon: Calendar },
+              { id: "penilaian", label: "Penilaian", icon: Award },
               { id: "dokumentasi", label: "Dokumentasi", icon: Camera },
+              { id: "jadwal_saya", label: "Jadwal Saya", icon: Calendar },
+              { id: "modul", label: "Informasi", icon: Users },
+              { id: "komdis", label: "Laporan", icon: Flag },
             ].map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id || (tab.id === "dashboard" && activeTab === "beranda");
@@ -590,35 +706,26 @@ export default function AssistantDashboard() {
           </div>
         </div>
         
-        {/* 1. BERANDA / DASHBOARD TAB (Faithfully matching Image 1) */}
+        {/* 1. BERANDA / DASHBOARD TAB */}
         {(activeTab === "dashboard" || activeTab === "beranda") && (
           <div className="space-y-6">
 
-            {/* HERO GREETING BANNER WITH OFFICIAL Hero_Background_EDM_3Maskot */}
-            <div className="relative rounded-[2.5rem] border border-purple-200/80 dark:border-purple-900/40 p-6 sm:p-8 lg:p-9 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-6 transition-all min-h-[250px]">
-              {/* Background: Official Hero_Background_EDM_3Maskot.png Panorama */}
-              <div className="absolute inset-0 z-0 pointer-events-none select-none">
-                <Image
-                  src="/images/hero-bg-edm-3maskot.png"
-                  alt="Hero Background EDM 3 Maskot"
-                  fill
-                  priority
-                  className="object-cover object-center"
-                />
-                {/* Subtle dark mode filter to keep text contrast perfect */}
-                <div className="absolute inset-0 bg-transparent dark:bg-[#0e071a]/75" />
-              </div>
+            {/* HERO GREETING BANNER WITH OFFICIAL EDM 3 MASCOTS */}
+            <div className="relative rounded-[2.5rem] border border-purple-200/80 dark:border-purple-900/40 p-5 sm:p-7 lg:p-8 shadow-sm overflow-hidden flex flex-col lg:flex-row lg:items-center justify-between gap-5 bg-gradient-to-r from-[#EDE8F8] via-[#E4DBF8] to-[#DDD2F6] dark:from-[#1E0E38] dark:via-[#16082C] dark:to-[#0E041C] transition-all">
+              
+              {/* Subtle background decorative stars and soft clouds */}
+              <div className="absolute inset-0 z-0 pointer-events-none opacity-40 dark:opacity-20 bg-[radial-gradient(#9333ea_1px,transparent_1px)] [background-size:20px_20px]" />
 
               {/* Left Column: Greeting, Real SI'50 Class Chips & Action Button */}
-              <div className="space-y-4 max-w-lg relative z-10">
+              <div className="space-y-3.5 max-w-md relative z-10">
                 <div className="text-[11px] font-mono font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300">
                   ALPRO • Peringatan • Modul 1
                 </div>
 
                 <div className="space-y-1">
-                  <h1 className="text-3xl sm:text-4xl lg:text-[2.6rem] font-black text-slate-900 dark:text-white tracking-tight leading-[1.15]">
+                  <h1 className="text-2xl sm:text-3xl lg:text-[2.2rem] font-black text-slate-900 dark:text-white tracking-tight leading-[1.15]">
                     Semangat, {currentAssistantProfile.name.split(" ")[0]}!<br />
-                    <span className="font-extrabold text-slate-800 dark:text-neutral-100">
+                    <span className="font-extrabold text-slate-800 dark:text-neutral-100 text-lg sm:text-2xl lg:text-[1.8rem]">
                       {duty.allMyShifts.reduce((acc, s) => acc + s.studentCount, 0) || 24} praktikan di kelas binaanmu.
                     </span>
                   </h1>
@@ -666,11 +773,32 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Center spacer so the 3 mascots on the background panorama shine through */}
-              <div className="hidden lg:block flex-1 min-h-[140px] pointer-events-none" />
+              {/* Center Column: Dedicated 3 Mascots Illustration - Sits cleanly between text & card without crashing */}
+              <div className="hidden lg:flex items-end justify-center flex-1 h-full min-h-[160px] pointer-events-none select-none px-2 -mb-8 z-10">
+                <Image
+                  src="/images/edm-3maskot-cutout.png"
+                  alt="EDM 3 Mascots"
+                  width={320}
+                  height={170}
+                  priority
+                  className="object-contain object-bottom drop-shadow-md max-h-[175px] w-auto transition-transform hover:scale-105"
+                />
+              </div>
+
+              {/* Mobile Mascot View (Cleanly positioned between text and card) */}
+              <div className="lg:hidden flex justify-center py-1 pointer-events-none select-none z-10">
+                <Image
+                  src="/images/edm-3maskot-cutout.png"
+                  alt="EDM 3 Mascots"
+                  width={240}
+                  height={130}
+                  priority
+                  className="object-contain drop-shadow-sm max-h-32 w-auto"
+                />
+              </div>
 
               {/* Right: Floating Status Card with Real Duty Telemetry */}
-              <div className="relative z-10 w-full lg:w-80 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3.5 lg:self-center shrink-0">
+              <div className="relative z-10 w-full lg:w-72 rounded-3xl bg-white/95 dark:bg-[#120824]/90 backdrop-blur-md p-4 sm:p-5 border border-white/80 dark:border-purple-900/50 shadow-[0_10px_30px_rgba(109,40,217,0.06)] space-y-3 lg:self-center shrink-0">
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-mono uppercase tracking-wider text-purple-700 dark:text-purple-300 font-bold">
                     MINGGU INI • MODUL 1
@@ -1257,27 +1385,56 @@ export default function AssistantDashboard() {
                     <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-900/40 text-purple-900 dark:text-purple-300 px-2 py-0.5 rounded">
                       LMS Telkom University
                     </span>
-                    <span className="text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-                      ✓ Course {LMS_ALPRO_METADATA.courseId} Synced
+                    <span className="text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Course {LMS_ALPRO_METADATA.courseId} Synced ({lmsLastSyncTime})</span>
                     </span>
+                    {lmsSyncMessage && (
+                      <span className="text-[10px] font-mono font-bold bg-purple-50 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-800 animate-fade-in">
+                        {lmsSyncMessage}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
                     5 Komponen Resmi: Warming Up (10%), Pre Test (15%), Practice (30%), Jurnal (30%), Post Test (15%).
                   </p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  {/* Tombol Sinkronisasi Live LMS */}
+                  <button
+                    type="button"
+                    onClick={() => syncLiveGrades(selectedClassCode)}
+                    disabled={isLmsSyncing}
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-mono font-bold shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                    title="Tarik nilai terbaru langsung dari LMS CeLOE Telkom University"
+                  >
+                    <RotateCw size={13} className={isLmsSyncing ? "animate-spin" : ""} />
+                    <span>{isLmsSyncing ? "Menyinkronkan..." : "Sinkronkan LMS"}</span>
+                  </button>
+
+                  {/* Tombol Pengaturan Token LMS */}
+                  <button
+                    type="button"
+                    onClick={() => setIsLmsTokenModalOpen(true)}
+                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer"
+                    title="Atur token Moodle LMS"
+                  >
+                    <KeyRound size={13} className="text-purple-600 dark:text-purple-400" />
+                    <span>Token LMS</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={() => switchTab("absensi")}
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700 rounded-xl text-xs font-mono font-bold transition-colors cursor-pointer"
                   >
                     <span>← Presensi</span>
                   </button>
 
                   <Link
                     href="/dashboard/assistant/grading"
-                    className="flex items-center gap-1.5 px-3.5 py-2 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 rounded-xl text-xs font-mono font-bold border border-purple-200 dark:border-purple-800/60 transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-2 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/60 rounded-xl text-xs font-mono font-bold border border-purple-200 dark:border-purple-800/60 transition-colors"
                   >
                     <span>Spreadsheet Lengkap</span>
                     <ArrowUpRight size={14} />
@@ -1286,7 +1443,7 @@ export default function AssistantDashboard() {
                   <button
                     type="button"
                     onClick={() => setGradeLocked(!gradeLocked)}
-                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold font-mono uppercase transition-colors cursor-pointer ${
+                    className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold font-mono uppercase transition-colors cursor-pointer ${
                       gradeLocked
                         ? "bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200"
                         : "bg-slate-100 dark:bg-neutral-800 text-slate-700 dark:text-neutral-300 hover:bg-slate-200 dark:hover:bg-neutral-700"
@@ -1299,7 +1456,7 @@ export default function AssistantDashboard() {
                   <button
                     type="button"
                     onClick={handleExportCSV}
-                    className="flex items-center gap-1.5 px-4 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase shadow-sm cursor-pointer transition-all"
+                    className="flex items-center gap-1.5 px-3.5 py-2 bg-[#7C3AED] hover:bg-[#6D28D9] text-white rounded-xl text-xs font-bold font-mono uppercase shadow-sm cursor-pointer transition-all"
                   >
                     <Download size={13} />
                     Export .csv
@@ -1429,127 +1586,420 @@ export default function AssistantDashboard() {
           );
         })()}
 
-        {/* 4. DOKUMENTASI RUANGAN TAB */}
+        {/* 4. DOKUMENTASI RUANGAN TAB - 3 SECTION: SEBELUM, SEDANG, SESUDAH PRAKTIKUM */}
         {activeTab === "dokumentasi" && (
-          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+          <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-5 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
+            
+            {/* Header Dokumentasi */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-neutral-800 pb-5">
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Dokumentasi & Kondisi Ruangan Lab</h2>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
+                    Dokumentasi Standarisasi Ruang Lab
+                  </h2>
+                  <span className="text-[10px] font-mono font-bold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 px-2 py-0.5 rounded border border-purple-200 dark:border-purple-900/60">
+                    3 Fase Operasional
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 dark:text-neutral-400 font-mono mt-1">
-                  Upload bukti kebersihan, checklist PC, dan kepatuhan fasilitas ruang lab sesudah praktikum.
+                  Pencatatan kondisi fisik &amp; aktivitas lab R1 Lantai 8 TULT: Sebelum, Sedang, dan Sesudah praktikum.
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-xs font-mono font-semibold text-slate-700 dark:text-neutral-300">Lab Ready: 45 Workstations</span>
+              {/* Shift Selector & Lab Status */}
+              <div className="flex flex-wrap items-center gap-2.5">
+                <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 text-xs font-mono font-medium text-slate-700 dark:text-neutral-300">
+                  <MapPin size={13} className="text-purple-600 dark:text-purple-400" />
+                  <span>R1 Lt. 8 TULT</span>
+                </div>
+
+                <select
+                  value={docShiftNumber}
+                  onChange={(e) => setDocShiftNumber(Number(e.target.value))}
+                  className="px-3 py-1.5 rounded-xl bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-900/60 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
+                >
+                  {ALPRO_15_SHIFTS.map((s) => (
+                    <option key={s.shiftNumber} value={s.shiftNumber}>
+                      Shift {s.shiftNumber} ({s.className})
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Checklist Fisik Ruangan */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
-                  Checklist Kebersihan & Peralatan Shift:
-                </h3>
+            {/* 3 Section Selector Tabs: Sebelum, Sedang, Sesudah */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {[
+                {
+                  id: "sebelum" as const,
+                  title: "1. SEBELUM PRAKTIKUM",
+                  subtitle: "Kesiapan Lab & 45 PC",
+                  badge: `${docPhotos.sebelum.length} Foto`,
+                  color: "emerald",
+                  icon: Sparkles,
+                },
+                {
+                  id: "sedang" as const,
+                  title: "2. SEDANG PRAKTIKUM",
+                  subtitle: "Asistensi & Modul",
+                  badge: `${docPhotos.sedang.length} Foto`,
+                  color: "purple",
+                  icon: Users,
+                },
+                {
+                  id: "sesudah" as const,
+                  title: "3. SESUDAH PRAKTIKUM",
+                  subtitle: "Penutupan & Audit Lab",
+                  badge: `${docPhotos.sesudah.length} Foto`,
+                  color: "amber",
+                  icon: CheckSquare,
+                },
+              ].map((phase) => {
+                const Icon = phase.icon;
+                const isActive = docPhase === phase.id;
+                return (
+                  <button
+                    key={phase.id}
+                    type="button"
+                    onClick={() => setDocPhase(phase.id)}
+                    className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer relative ${
+                      isActive
+                        ? "bg-purple-50/80 dark:bg-purple-950/50 border-purple-400 dark:border-purple-700 shadow-sm"
+                        : "bg-slate-50/60 dark:bg-neutral-900/40 border-slate-200/80 dark:border-neutral-800 hover:border-slate-300 dark:hover:border-neutral-700"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+                            isActive
+                              ? "bg-purple-600 text-white"
+                              : "bg-slate-200 dark:bg-neutral-800 text-slate-600 dark:text-neutral-400"
+                          }`}
+                        >
+                          <Icon size={14} />
+                        </div>
+                        <span className="font-bold text-xs text-slate-900 dark:text-white font-mono">
+                          {phase.title}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 text-purple-700 dark:text-purple-300">
+                        {phase.badge}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans mt-2 pl-9">
+                      {phase.subtitle}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
 
-                <div className="space-y-2.5">
-                  {[
-                    { key: "cleanliness", label: "Kebersihan meja & lantai laboratorium bebas sampah" },
-                    { key: "pc_shutdown", label: "Seluruh PC praktikan (1 s.d. 45) mati setelah praktikum" },
-                    { key: "mouse_keyboard_tidy", label: "Keyboard, mouse & headset tertata rapi di tiap meja" },
-                    { key: "projector_off", label: "Proyektor utama & papan tulis telah dibersihkan" },
-                    { key: "ac_off", label: "AC dan lampu ruangan dimatikan (jika shift terakhir)" },
+            {/* Active Section Content (Checklist + Photo Camera Zone) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start pt-1">
+              
+              {/* Left Column: Checklist & Catatan (5 Cols) */}
+              <div className="lg:col-span-5 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-slate-700 dark:text-neutral-300">
+                    Checklist {docPhase === "sebelum" ? "Kesiapan Awal" : docPhase === "sedang" ? "Saat Praktikum" : "Penutupan Lab"}
+                  </h3>
+                  <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+                    Standar Operasional Lab
+                  </span>
+                </div>
+
+                <div className="space-y-2">
+                  {docPhase === "sebelum" && [
+                    { key: "pc_ready", label: "45 Unit PC praktikan menyala & siap pakai" },
+                    { key: "lab_clean_start", label: "Kebersihan meja & lantai laboratorium bebas sampah" },
+                    { key: "projector_screen_on", label: "Proyektor utama & slide modul telah menyala" },
+                    { key: "air_conditioner_on", label: "AC ruangan laboratorium telah dinyalakan" },
+                    { key: "whiteboard_ready", label: "Papan tulis bersih & spidol whiteboard tersedia" },
                   ].map((item) => {
-                    const isChecked = roomChecklist[item.key as keyof typeof roomChecklist];
+                    const isChecked = (docChecklists.sebelum as any)[item.key];
                     return (
                       <button
                         key={item.key}
                         type="button"
                         onClick={() =>
-                          setRoomChecklist((prev) => ({ ...prev, [item.key]: !prev[item.key as keyof typeof roomChecklist] }))
+                          setDocChecklists((prev) => ({
+                            ...prev,
+                            sebelum: { ...prev.sebelum, [item.key]: !isChecked },
+                          }))
                         }
-                        className={`w-full p-3.5 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
-                          isChecked ? "bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-300 dark:border-emerald-800 text-slate-900 dark:text-white" : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400"
+                        className={`w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
+                          isChecked
+                            ? "bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800/80 text-slate-900 dark:text-white"
+                            : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400"
                         }`}
                       >
                         <span className="text-xs font-medium">{item.label}</span>
-                        <div className={`w-5 h-5 rounded-md flex items-center justify-center ${isChecked ? "bg-emerald-600 text-white" : "border border-slate-300 dark:border-neutral-700"}`}>
-                          {isChecked && <Check size={14} />}
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                            isChecked
+                              ? "bg-emerald-600 text-white"
+                              : "border border-slate-300 dark:border-neutral-700"
+                          }`}
+                        >
+                          {isChecked && <Check size={13} />}
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {docPhase === "sedang" && [
+                    { key: "student_attendance_verified", label: "Seluruh praktikan diverifikasi presensi resminya" },
+                    { key: "active_group_mentoring", label: "Asistensi aktif berjalan merata di tiap kelompok" },
+                    { key: "lab_code_of_conduct", label: "Tata tertib lab ditegakkan (ID card, pakaian, no snack)" },
+                    { key: "lms_network_stable", label: "Akses LMS CeLOE dan jaringan lab lancar tanpa kendala" },
+                    { key: "health_safety_clean", label: "Kondisi ruang praktikum tertib dan kondusif" },
+                  ].map((item) => {
+                    const isChecked = (docChecklists.sedang as any)[item.key];
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() =>
+                          setDocChecklists((prev) => ({
+                            ...prev,
+                            sedang: { ...prev.sedang, [item.key]: !isChecked },
+                          }))
+                        }
+                        className={`w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
+                          isChecked
+                            ? "bg-purple-50/70 dark:bg-purple-950/40 border-purple-300 dark:border-purple-800/80 text-slate-900 dark:text-white"
+                            : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400"
+                        }`}
+                      >
+                        <span className="text-xs font-medium">{item.label}</span>
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                            isChecked
+                              ? "bg-purple-600 text-white"
+                              : "border border-slate-300 dark:border-neutral-700"
+                          }`}
+                        >
+                          {isChecked && <Check size={13} />}
+                        </div>
+                      </button>
+                    );
+                  })}
+
+                  {docPhase === "sesudah" && [
+                    { key: "pc_shutdown_all", label: "Seluruh PC praktikan (1 s.d. 45) dimatikan (shutdown)" },
+                    { key: "peripherals_tidy", label: "Keyboard, mouse & headset tertata rapi di atas meja" },
+                    { key: "trash_cleared", label: "Meja & lantai laboratorium bersih bebas sampah sisa" },
+                    { key: "projector_off", label: "Proyektor utama & papan tulis telah dibersihkan" },
+                    { key: "ac_lights_off", label: "AC dan lampu ruangan dimatikan (jika shift terakhir)" },
+                  ].map((item) => {
+                    const isChecked = (docChecklists.sesudah as any)[item.key];
+                    return (
+                      <button
+                        key={item.key}
+                        type="button"
+                        onClick={() =>
+                          setDocChecklists((prev) => ({
+                            ...prev,
+                            sesudah: { ...prev.sesudah, [item.key]: !isChecked },
+                          }))
+                        }
+                        className={`w-full p-3 rounded-xl border flex items-center justify-between text-left transition-all cursor-pointer ${
+                          isChecked
+                            ? "bg-amber-50/70 dark:bg-amber-950/40 border-amber-300 dark:border-amber-800/80 text-slate-900 dark:text-white"
+                            : "bg-slate-50 dark:bg-neutral-900/50 border-slate-200 dark:border-neutral-800 text-slate-600 dark:text-neutral-400"
+                        }`}
+                      >
+                        <span className="text-xs font-medium">{item.label}</span>
+                        <div
+                          className={`w-5 h-5 rounded-md flex items-center justify-center shrink-0 ${
+                            isChecked
+                              ? "bg-amber-600 text-white"
+                              : "border border-slate-300 dark:border-neutral-700"
+                          }`}
+                        >
+                          {isChecked && <Check size={13} />}
                         </div>
                       </button>
                     );
                   })}
                 </div>
 
-                {/* Catatan Logistik */}
+                {/* Catatan Khusus Fase Ini */}
                 <div className="pt-2">
-                  <label className="text-[11px] font-mono uppercase tracking-wider text-slate-500 dark:text-neutral-400 font-bold block mb-1.5">
-                    Catatan Asisten / Logistik Sekben:
+                  <label className="text-[11px] font-mono uppercase tracking-wider text-slate-600 dark:text-neutral-400 font-bold block mb-1.5">
+                    Catatan Fase {docPhase.toUpperCase()}:
                   </label>
                   <textarea
                     rows={3}
-                    value={roomNote}
-                    onChange={(e) => setRoomNote(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl p-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                    value={docNotes[docPhase]}
+                    onChange={(e) =>
+                      setDocNotes((prev) => ({ ...prev, [docPhase]: e.target.value }))
+                    }
+                    className="w-full bg-slate-50/90 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl p-3 text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                    placeholder={`Tambahkan catatan untuk fase ${docPhase}...`}
                   />
                 </div>
               </div>
 
-              {/* Upload & Bukti Foto Ruangan */}
-              <div className="space-y-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-neutral-800 pb-2">
-                  <div>
-                    <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wide">
-                      Foto Bukti Kondisi Ruangan:
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-mono mt-0.5">
-                      Format: JPG, PNG, WebP • Maks. ukuran: <span className="font-bold text-purple-700 dark:text-purple-300">5 MB per foto</span> (Disarankan rasio 16:9)
+              {/* Right Column: Kamera HP & Galeri Foto (7 Cols) */}
+              <div className="lg:col-span-7 space-y-4">
+                
+                {/* Action Bar: Kamera HP, Upload, & Draft */}
+                <div className="p-4 rounded-2xl bg-purple-50/50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/40 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h4 className="text-xs font-bold font-mono text-purple-950 dark:text-purple-200 uppercase tracking-wide flex items-center gap-1.5">
+                        <Camera size={14} className="text-purple-600 dark:text-purple-400" />
+                        <span>Bukti Foto: {docPhase.toUpperCase()} PRAKTIKUM</span>
+                      </h4>
+                      <p className="text-[11px] text-slate-500 dark:text-neutral-400 font-sans mt-0.5">
+                        Ambil langsung via kamera HP atau unggah dari galeri perangkat.
+                      </p>
+                    </div>
+
+                    <span className="text-[10px] font-mono text-purple-700 dark:text-purple-300 font-bold">
+                      {docPhotos[docPhase].length} Foto Tersimpan
+                    </span>
+                  </div>
+
+                  {/* Buttons: Direct Phone Camera + Gallery + Draft */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* 1. TOMBOL BUKA KAMERA HP (capture="environment" langsung buka kamera belakang di smartphone) */}
+                    <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold shadow-md hover:shadow-lg cursor-pointer transition-all active:scale-95">
+                      <Camera size={15} />
+                      <span>Buka Kamera HP</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleAddDocPhoto(file, docPhase);
+                        }}
+                      />
+                    </label>
+
+                    {/* 2. TOMBOL UNGGAH DARI GALERI / FILE */}
+                    <label className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white dark:bg-neutral-800 text-slate-700 dark:text-neutral-200 border border-slate-200 dark:border-neutral-700 hover:bg-slate-50 dark:hover:bg-neutral-700 text-xs font-bold shadow-2xs cursor-pointer transition-all">
+                      <Upload size={14} />
+                      <span>Galeri / File</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleAddDocPhoto(file, docPhase);
+                        }}
+                      />
+                    </label>
+
+                    {/* 3. DRAFT FOTO LAB CEPAT */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const now = new Date();
+                        const timeStr = `${now.getHours().toString().padStart(2, "0")}.${now.getMinutes().toString().padStart(2, "0")} WIB`;
+                        setDocPhotos((prev) => ({
+                          ...prev,
+                          [docPhase]: [
+                            {
+                              id: `draft-${Date.now()}`,
+                              url: prev[docPhase].length % 2 === 0 ? "/images/asprak-draft-1.jpg" : "/images/asprak-draft-2.jpg",
+                              time: timeStr,
+                              note: `Foto kondisi ${docPhase} shift ${docShiftNumber}`,
+                            },
+                            ...prev[docPhase],
+                          ],
+                        }));
+                      }}
+                      className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 text-xs font-mono font-medium hover:bg-purple-200 transition-colors cursor-pointer"
+                      title="Gunakan draft foto lab instan"
+                    >
+                      <ImageIcon size={13} />
+                      <span>Draft Foto Lab</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Grid Foto Bukti untuk Fase Ini */}
+                {docPhotos[docPhase].length === 0 ? (
+                  <div className="p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-neutral-800 bg-slate-50/50 dark:bg-neutral-900/30 text-center space-y-2">
+                    <Camera size={28} className="text-slate-400 mx-auto" />
+                    <p className="text-xs font-bold text-slate-700 dark:text-neutral-300">
+                      Belum ada foto bukti untuk fase {docPhase}
+                    </p>
+                    <p className="text-[11px] text-slate-400 font-sans max-w-xs mx-auto">
+                      Gunakan tombol <strong>Buka Kamera HP</strong> di atas untuk memotret kondisi laboratorium.
                     </p>
                   </div>
-                  <label className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 dark:bg-purple-950/60 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 text-xs font-bold transition-all cursor-pointer shrink-0">
-                    <Camera size={14} />
-                    <span>Unggah Foto</span>
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp"
-                      className="hidden"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > 5 * 1024 * 1024) {
-                            alert("Ukuran foto melebihi batas maksimal 5 MB. Harap unggah foto dengan ukuran lebih kecil.");
-                            return;
-                          }
-                          const url = URL.createObjectURL(file);
-                          setUploadedPhotos((prev) => [url, ...prev]);
-                        }
-                      }}
-                    />
-                  </label>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {uploadedPhotos.map((url, i) => (
-                    <div key={i} className="group relative rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 bg-slate-100 dark:bg-neutral-900 aspect-video shadow-xs">
-                      <img src={url} alt={`Dokumentasi ${i + 1}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-2 text-white text-[10px] font-mono">
-                        Shift {selectedClass.code} • Foto {i + 1}
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {docPhotos[docPhase].map((photo) => (
+                      <div
+                        key={photo.id}
+                        className="group relative rounded-xl overflow-hidden border border-slate-200 dark:border-neutral-800 bg-slate-100 dark:bg-neutral-900 aspect-video shadow-xs"
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.note}
+                          onClick={() => setDocZoomPhoto(photo.url)}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 cursor-pointer"
+                        />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-2 text-white flex items-center justify-between text-[10px] font-mono">
+                          <span className="truncate pr-1">{photo.time}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteDocPhoto(docPhase, photo.id)}
+                            className="p-1 rounded bg-rose-600/80 hover:bg-rose-600 text-white shrink-0 transition-colors cursor-pointer"
+                            title="Hapus foto ini"
+                          >
+                            <Trash2 size={11} />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
 
-                <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40 text-xs text-slate-600 dark:text-neutral-400 space-y-1">
-                  <div className="font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
-                    <Info size={14} /> Wajib untuk Lead PIC & Sekben:
+                {/* Info SOP Lab Standar */}
+                <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-neutral-900/40 border border-slate-200/80 dark:border-neutral-800 text-xs text-slate-600 dark:text-neutral-400 space-y-1">
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-1.5 font-mono text-[11px]">
+                    <ShieldCheck size={14} className="text-emerald-500" />
+                    <span>Standar Audit Dokumentasi Shift EDM</span>
                   </div>
                   <p className="text-[11px] leading-relaxed">
-                    Setiap akhir sesi shift praktikum, asisten wajib mengunggah minimal 1 foto sudut pandang penuh ruang laboratorium untuk keperluan audit inventaris. Format yang diterima JPG, PNG, atau WebP dengan batas maksimal 5 MB per foto.
+                    Setiap shift praktikum wajib melampirkan minimal 1 foto kesiapan awal, 1 foto asistensi aktif, dan 1 foto penutupan lab sebelum shift asisten berikutnya dimulai.
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* Modal Zoom Foto */}
+            {docZoomPhoto && (
+              <div
+                className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+                onClick={() => setDocZoomPhoto(null)}
+              >
+                <div className="relative max-w-4xl max-h-[90vh] bg-slate-950 rounded-2xl overflow-hidden border border-white/20 p-2">
+                  <button
+                    type="button"
+                    onClick={() => setDocZoomPhoto(null)}
+                    className="absolute top-4 right-4 p-2 rounded-full bg-black/60 hover:bg-black text-white cursor-pointer z-10"
+                  >
+                    <X size={18} />
+                  </button>
+                  <img
+                    src={docZoomPhoto}
+                    alt="Zoom Dokumentasi"
+                    className="max-w-full max-h-[85vh] object-contain rounded-xl"
+                  />
+                </div>
+              </div>
+            )}
+
           </div>
         )}
 
@@ -3211,6 +3661,100 @@ export default function AssistantDashboard() {
           </div>
         )}
       </div>
+
+      {/* MODAL PENGATURAN TOKEN LMS MOODLE */}
+      {isLmsTokenModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-[#120824] w-full max-w-md rounded-3xl p-6 border border-slate-200 dark:border-purple-900/60 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-neutral-800 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 flex items-center justify-center">
+                  <KeyRound size={16} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+                    Pengaturan Token LMS Tel-U
+                  </h3>
+                  <p className="text-[11px] text-slate-500 font-mono">
+                    CeLOE Course {LMS_ALPRO_METADATA.courseId}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsLmsTokenModalOpen(false)}
+                className="p-1.5 rounded-full hover:bg-slate-100 dark:hover:bg-neutral-800 text-slate-400 hover:text-slate-600 cursor-pointer"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <p className="text-xs text-slate-600 dark:text-neutral-300 leading-relaxed">
+                Token WebService Moodle digunakan untuk menarik otomatis seluruh nilai praktikan (Warming Up, Pre Test, Practice, Jurnal, Post Test) secara real-time dari LMS.
+              </p>
+
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-mono font-bold uppercase tracking-wider text-slate-600 dark:text-neutral-400">
+                  Webservice Token:
+                </label>
+                <input
+                  type="text"
+                  value={inputToken}
+                  onChange={(e) => setInputToken(e.target.value.trim())}
+                  placeholder="Masukkan 32 karakter token Moodle..."
+                  className="w-full bg-slate-50 dark:bg-neutral-900 border border-slate-200 dark:border-neutral-800 rounded-xl px-3.5 py-2.5 font-mono text-xs text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-purple-500/30"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-[11px] font-mono text-emerald-800 dark:text-emerald-300 space-y-1">
+                <div className="font-bold flex items-center gap-1.5">
+                  <CheckCircle2 size={13} className="text-emerald-600" />
+                  <span>Token Aktif Resmi:</span>
+                </div>
+                <div className="text-[10px] break-all opacity-90">
+                  fc6d5658f31cb68d90907134703b5694
+                </div>
+                <div className="text-[10px] opacity-75">
+                  Pemilik: MAURELLIO CHRISTOPHER YONATHAN
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-neutral-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setInputToken("fc6d5658f31cb68d90907134703b5694");
+                  setLmsToken("fc6d5658f31cb68d90907134703b5694");
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("EDM_LMS_TOKEN", "fc6d5658f31cb68d90907134703b5694");
+                  }
+                  setIsLmsTokenModalOpen(false);
+                  syncLiveGrades();
+                }}
+                className="px-3.5 py-2 rounded-xl text-xs font-mono font-semibold text-slate-600 dark:text-neutral-400 hover:bg-slate-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer"
+              >
+                Reset Default
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLmsToken(inputToken);
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("EDM_LMS_TOKEN", inputToken);
+                  }
+                  setIsLmsTokenModalOpen(false);
+                  syncLiveGrades();
+                }}
+                className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold font-mono shadow-sm transition-all cursor-pointer"
+              >
+                Simpan &amp; Sinkronkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* MOBILE BOTTOM NAVIGATION BAR (Phones: sm:hidden) */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-[#0e071a]/95 backdrop-blur-md border-t border-slate-200/90 dark:border-purple-950/60 px-3 pt-2 pb-2 safe-pb flex items-center justify-around shadow-lg">

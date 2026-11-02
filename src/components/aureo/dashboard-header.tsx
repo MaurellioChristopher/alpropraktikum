@@ -62,19 +62,20 @@ export function DashboardHeader({
   };
 
   return (
-    <header className="w-full flex items-center justify-between gap-3 py-2 sm:py-3 mb-4 select-none min-w-0 pr-1">
+    <header className="w-full flex items-center justify-between gap-2 sm:gap-3 py-2 sm:py-3 mb-3 sm:mb-4 select-none min-w-0 pr-0.5">
       {/* Left: Breadcrumb / Subject badge matching Image 1 */}
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
         {/* Mobile menu toggle */}
         <button
           type="button"
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-2 rounded-xl bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-900/40 text-slate-700 dark:text-neutral-200 shadow-2xs cursor-pointer"
+          className="lg:hidden p-2 rounded-xl bg-white dark:bg-[#120824] border border-slate-200 dark:border-purple-900/40 text-slate-700 dark:text-neutral-200 shadow-2xs cursor-pointer shrink-0"
+          title="Buka Menu"
         >
-          <Menu size={18} />
+          <Menu size={17} />
         </button>
 
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs shrink-0">
+        <div className="inline-flex items-center gap-2 px-2.5 sm:px-3.5 py-1.5 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs shrink-0">
           <div className="w-5 h-5 rounded-md bg-white dark:bg-purple-950/50 border border-slate-200/80 dark:border-purple-800/60 flex items-center justify-center p-0.5 shadow-2xs shrink-0">
             <Image
               src="/images/edm-ribbon-logo.png"
@@ -85,37 +86,40 @@ export function DashboardHeader({
               priority
             />
           </div>
-          <span className="text-xs font-bold text-slate-800 dark:text-white">
+          <span className="hidden sm:inline text-xs font-bold text-slate-800 dark:text-white whitespace-nowrap">
             Praktikum ALPRO
+          </span>
+          <span className="sm:hidden text-[11px] font-bold text-slate-800 dark:text-white font-mono">
+            ALPRO
           </span>
         </div>
 
-        <span className="hidden sm:inline-block text-xs font-mono font-medium text-slate-500 dark:text-neutral-400">
+        <span className="hidden md:inline-block text-xs font-mono font-medium text-slate-500 dark:text-neutral-400">
           2026/2027 Ganjil
         </span>
       </div>
 
       {/* Right Action Icons matching Image 1 */}
-      <div className="flex items-center gap-2 sm:gap-2.5">
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
         {/* Refresh button */}
         <button
           type="button"
           onClick={handleRefresh}
-          className="w-9 h-9 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-xs transition-colors cursor-pointer"
+          className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-xs transition-colors cursor-pointer shrink-0"
           title="Sinkronisasi Data"
         >
-          <RotateCw size={15} className={isRefreshing ? "animate-spin text-purple-600" : ""} />
+          <RotateCw size={14} className={isRefreshing ? "animate-spin text-purple-600" : ""} />
         </button>
 
         {/* Notification Bell with red counter badge '4' matching Image 1 */}
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             type="button"
             onClick={() => setNotificationCount(0)}
-            className="w-9 h-9 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-xs transition-colors cursor-pointer"
+            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 flex items-center justify-center text-slate-600 dark:text-neutral-300 hover:text-purple-600 dark:hover:text-purple-400 shadow-xs transition-colors cursor-pointer"
             title="Pemberitahuan Praktikum"
           >
-            <Bell size={15} />
+            <Bell size={14} />
             {notificationCount > 0 && (
               <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold flex items-center justify-center shadow-xs">
                 {notificationCount}
@@ -125,7 +129,7 @@ export function DashboardHeader({
         </div>
 
         {/* Theme Toggle */}
-        <div className="bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 rounded-full p-1 shadow-xs">
+        <div className="bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 rounded-full p-0.5 sm:p-1 shadow-xs shrink-0">
           <ThemeToggle />
         </div>
 
@@ -134,15 +138,15 @@ export function DashboardHeader({
           <button
             type="button"
             onClick={() => setShowDropdown(!showDropdown)}
-            className="flex items-center gap-2 pl-1.5 pr-3 py-1 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer shrink-0"
+            className="flex items-center gap-1.5 sm:gap-2 pl-1 pr-2 sm:pr-3 py-1 rounded-full bg-white dark:bg-[#120824] border border-slate-200/80 dark:border-purple-900/40 shadow-xs hover:border-purple-300 dark:hover:border-purple-700 transition-all cursor-pointer shrink-0"
           >
-            <div className="w-7 h-7 rounded-full bg-amber-400 text-slate-900 font-mono font-bold text-xs flex items-center justify-center shadow-xs shrink-0">
+            <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-amber-400 text-slate-900 font-mono font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs shrink-0">
               {currentAsst.code.slice(0, 2)}
             </div>
             <span className="text-xs font-bold text-slate-800 dark:text-white whitespace-nowrap">
               {currentAsst.name.split(" ")[0]}
             </span>
-            <ChevronDown size={13} className="text-slate-400 shrink-0" />
+            <ChevronDown size={12} className="text-slate-400 shrink-0 hidden sm:block" />
           </button>
 
           {/* User Dropdown */}

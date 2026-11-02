@@ -41,6 +41,39 @@ export default function GradingDashboard() {
   });
   const [locked, setLocked] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+
+  const handleSyncLMS = async () => {
+    setIsSyncing(true);
+    setSyncStatus("Menghubungkan ke LMS...");
+    try {
+      const res = await fetch("/api/lms/sync", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ classCode: selectedClass }),
+      });
+      const data = await res.json();
+      if (data.success && data.updatedGrades && data.updatedGrades[selectedClass]) {
+        const liveList = data.updatedGrades[selectedClass].map((s: any) => ({
+          ...s,
+          status: "saved" as const,
+        }));
+        setClassDataStore((prev) => ({
+          ...prev,
+          [selectedClass]: liveList,
+        }));
+        setSyncStatus("✓ Berhasil disinkronkan");
+        setTimeout(() => setSyncStatus(null), 3500);
+      } else {
+        setSyncStatus(data.error || "Gagal sinkronisasi");
+      }
+    } catch (e) {
+      setSyncStatus("Koneksi gagal");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const currentGrades = classDataStore[selectedClass] || getStudentsByClassCode(selectedClass);
 
@@ -145,6 +178,17 @@ export default function GradingDashboard() {
             </div>
 
             <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleSyncLMS}
+                disabled={isSyncing}
+                className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs font-bold font-mono shadow-xs transition-all cursor-pointer disabled:opacity-60"
+                title="Tarik nilai terbaru langsung dari LMS CeLOE"
+              >
+                <RefreshCw size={13} className={isSyncing ? "animate-spin" : ""} />
+                <span>{isSyncing ? "Menyinkronkan..." : "Sinkronkan LMS"}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={exportCSV}
