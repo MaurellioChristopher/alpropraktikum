@@ -5,6 +5,8 @@ import { Download, Search, CheckCircle2, Lock, ArrowLeft, ChevronDown, Graduatio
 import { DashboardSidebar } from "@/components/aureo/dashboard-sidebar";
 import { SI50_CLASSES } from "@/lib/si-classes";
 import { MOODLE_STUDENTS_BY_CLASS, LMS_ALPRO_METADATA, MoodleStudentGrade } from "@/data/moodle-alpro-students";
+import { getAssistantCodeForStudent } from "@/data/alpro-schedule-plotting";
+import { getAssistantByCode, ALPRO_ASSISTANTS } from "@/data/assistants-roster";
 import Link from "next/link";
 
 interface GradeRow {
@@ -131,6 +133,7 @@ export default function GradingDashboard() {
       "NIM",
       "Nama Mahasiswa",
       "Kelas",
+      "Asprak",
       "Warming Up/TP (5%)",
       "Pre-Test (20%)",
       "Practice (15%)",
@@ -142,10 +145,12 @@ export default function GradingDashboard() {
       const vPre = parseFloat(r.preTest) || 0;
       const vWU = parseFloat(r.warmingUp) || 0;
       const effectiveWU = vPre <= 50 ? 0 : vWU;
+      const asprakCode = getAssistantCodeForStudent(r.nim, r.name);
       return [
         `"${r.nim}"`,
         `"${r.name}"`,
         `"${selectedClass}"`,
+        `"${asprakCode}"`,
         effectiveWU,
         r.preTest || "0",
         r.practice || "0",
@@ -167,10 +172,15 @@ export default function GradingDashboard() {
 
   const currentClassInfo = SI50_CLASSES.find(c => c.code === selectedClass) || SI50_CLASSES[0];
 
-  const filteredGrades = currentGrades.filter(g => 
-    g.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    g.nim.includes(searchQuery)
-  );
+  const filteredGrades = currentGrades.filter(g => {
+    const asprak = getAssistantCodeForStudent(g.nim, g.name).toLowerCase();
+    const q = searchQuery.toLowerCase();
+    return (
+      g.name.toLowerCase().includes(q) || 
+      g.nim.includes(q) ||
+      asprak.includes(q)
+    );
+  });
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 items-start pb-12">
@@ -343,10 +353,11 @@ export default function GradingDashboard() {
 
           {/* Table matching Image 3 */}
           <div className="overflow-x-auto pt-1">
-            <table className="w-full text-left text-xs whitespace-nowrap min-w-[760px]">
+            <table className="w-full text-left text-xs whitespace-nowrap min-w-[820px]">
               <thead>
                 <tr className="border-b border-slate-100 dark:border-white/10 text-[11px] font-mono text-slate-400">
                   <th className="pb-3 font-medium">Praktikan</th>
+                  <th className="pb-3 text-center w-20">Asprak</th>
                   <th className="pb-3 text-center w-24">Warming Up<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">5%</span></th>
                   <th className="pb-3 text-center w-20">Pre-Test<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">20%</span></th>
                   <th className="pb-3 text-center w-20">Practice<br /><span className="text-[10px] font-bold text-purple-600 dark:text-purple-400">15%</span></th>
@@ -363,6 +374,8 @@ export default function GradingDashboard() {
                   const vPre = parseFloat(row.preTest) || 0;
                   const vWU = parseFloat(row.warmingUp) || 0;
                   const isWuVoid = vPre <= 50 && vWU > 0;
+                  const asprakCode = getAssistantCodeForStudent(row.nim, row.name);
+                  const asstProfile = getAssistantByCode(asprakCode);
 
                   return (
                     <tr key={row.nim} className="hover:bg-slate-50/80 dark:hover:bg-white/5 transition-colors">
@@ -380,6 +393,16 @@ export default function GradingDashboard() {
                             </div>
                           </div>
                         </div>
+                      </td>
+
+                      {/* Asprak Pengampu */}
+                      <td className="py-3.5 px-2 text-center">
+                        <span
+                          className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-extrabold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60 shadow-2xs"
+                          title={asstProfile ? `${asstProfile.name} (${asstProfile.position})` : `Asprak Pengampu: ${asprakCode}`}
+                        >
+                          {asprakCode}
+                        </span>
                       </td>
 
                       {/* Warming Up / TP */}

@@ -389,6 +389,7 @@ export default function AssistantDashboard() {
   const [absensiSubTab, setAbsensiSubTab] = useState<"praktikan" | "asprak">("praktikan");
   const [attendanceSearchQuery, setAttendanceSearchQuery] = useState("");
   const [gradeSearchQuery, setGradeSearchQuery] = useState("");
+  const [selectedGradeAsprak, setSelectedGradeAsprak] = useState<string>("ALL");
 
   // State Absensi Praktikan per class (key: NIM)
   const [attendance, setAttendance] = useState<Record<string, "Hadir" | "Terlambat" | "Izin" | "Sakit" | "Alpa">>({});
@@ -722,6 +723,7 @@ export default function AssistantDashboard() {
       "NIM",
       "Nama Mahasiswa",
       "Kelas",
+      "Asprak",
       "Warming Up/TP (5%)",
       "Pre-Test (20%)",
       "Practice (15%)",
@@ -733,10 +735,12 @@ export default function AssistantDashboard() {
       const preVal = parseFloat(r.preTest) || 0;
       const wuVal = parseFloat(r.warmingUp) || 0;
       const effectiveWU = preVal <= 50 ? 0 : wuVal;
+      const asprakCode = getAssistantCodeForStudent(r.nim, r.name);
       return [
         `"${r.nim}"`,
         `"${r.name}"`,
         `"${selectedClassCode}"`,
+        `"${asprakCode}"`,
         effectiveWU,
         r.preTest || "0",
         r.practice || "0",
@@ -1620,11 +1624,28 @@ export default function AssistantDashboard() {
         {/* 3. PENILAIAN PRAKTIKAN TAB (5 KOMPONEN LMS CE-LOE) */}
         {activeTab === "penilaian" && (() => {
           const currentGrades = gradesByClass[selectedClassCode] || getStudentsByClass(selectedClassCode);
-          const filteredRows = currentGrades.filter(
-            (r) =>
-              r.name.toLowerCase().includes(gradeSearchQuery.toLowerCase()) ||
-              r.nim.includes(gradeSearchQuery)
-          );
+          
+          // List asprak yang mengampu di kelas ini
+          const currentClassAspraks = Array.from(
+            new Set(
+              currentGrades
+                .map((r) => getAssistantCodeForStudent(r.nim, r.name))
+                .filter((c) => c && c !== "-")
+            )
+          ).sort();
+
+          const filteredRows = currentGrades.filter((r) => {
+            const asprakCode = getAssistantCodeForStudent(r.nim, r.name);
+            if (selectedGradeAsprak !== "ALL" && asprakCode !== selectedGradeAsprak) {
+              return false;
+            }
+            const q = gradeSearchQuery.toLowerCase();
+            return (
+              r.name.toLowerCase().includes(q) ||
+              r.nim.includes(q) ||
+              asprakCode.toLowerCase().includes(q)
+            );
+          });
 
           return (
             <div className="bg-white dark:bg-[#0e071a] rounded-2xl p-6 sm:p-7 border border-slate-200/80 dark:border-purple-950/60 shadow-xs space-y-6 transition-colors">
@@ -1714,28 +1735,72 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Class switcher & search bar */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 shrink-0">Filter Kelas SI&apos;50:</span>
-                  <select
-                    value={selectedClassCode}
-                    onChange={(e) => setSelectedClassCode(e.target.value)}
-                    className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
-                  >
-                    {SI50_CLASSES.map((cls) => (
-                      <option key={cls.code} value={cls.code}>
-                        {cls.code} ({cls.name}) • {cls.totalStudents} Mhs
-                      </option>
-                    ))}
-                  </select>
+              {/* Class switcher & search bar & Asprak filter */}
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-50 dark:bg-neutral-900/50 border border-slate-200 dark:border-neutral-800">
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 shrink-0">Kelas:</span>
+                    <select
+                      value={selectedClassCode}
+                      onChange={(e) => {
+                        setSelectedClassCode(e.target.value);
+                        setSelectedGradeAsprak("ALL");
+                      }}
+                      className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
+                    >
+                      {SI50_CLASSES.map((cls) => (
+                        <option key={cls.code} value={cls.code}>
+                          {cls.code} ({cls.name}) • {cls.totalStudents} Mhs
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Filter Asprak Pengampu */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-mono font-bold text-slate-700 dark:text-neutral-300 shrink-0">Asprak:</span>
+                    <select
+                      value={selectedGradeAsprak}
+                      onChange={(e) => setSelectedGradeAsprak(e.target.value)}
+                      className="bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg px-3 py-1.5 text-xs font-mono font-bold text-purple-700 dark:text-purple-300 cursor-pointer"
+                    >
+                      <option value="ALL">Semua Asprak ({currentGrades.length} Mhs)</option>
+                      {currentClassAspraks.map((code) => {
+                        const asst = getAssistantByCode(code);
+                        const count = currentGrades.filter(
+                          (r) => getAssistantCodeForStudent(r.nim, r.name) === code
+                        ).length;
+                        return (
+                          <option key={code} value={code}>
+                            [{code}] {asst ? asst.name.split(" ").slice(0, 2).join(" ") : code} ({count} Mhs)
+                          </option>
+                        );
+                      })}
+                    </select>
+                  </div>
+
+                  {/* Quick Filter: Binaan Saya */}
+                  {currentClassAspraks.includes(sessionUser) && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedGradeAsprak(selectedGradeAsprak === sessionUser ? "ALL" : sessionUser)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                        selectedGradeAsprak === sessionUser
+                          ? "bg-purple-600 text-white shadow-xs"
+                          : "bg-purple-100 hover:bg-purple-200 text-purple-800 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-800"
+                      }`}
+                      title={`Tampilkan hanya praktikan binaan ${sessionUser}`}
+                    >
+                      Binaan Saya ({sessionUser})
+                    </button>
+                  )}
                 </div>
 
                 <div className="relative min-w-[220px]">
                   <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input
                     type="text"
-                    placeholder="Cari praktikan (NIM/Nama)..."
+                    placeholder="Cari praktikan / asprak..."
                     value={gradeSearchQuery}
                     onChange={(e) => setGradeSearchQuery(e.target.value)}
                     className="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-neutral-800 border border-slate-300 dark:border-neutral-700 rounded-lg text-xs font-mono placeholder:text-slate-400 focus:outline-none focus:border-purple-500"
@@ -1743,13 +1808,14 @@ export default function AssistantDashboard() {
                 </div>
               </div>
 
-              {/* Spreadsheet Table with 5 Components */}
+              {/* Spreadsheet Table with 5 Components + Asprak Pengampu */}
               <div className="border border-slate-200 dark:border-neutral-800 rounded-xl overflow-x-auto scrollbar-thin max-h-[520px]">
-                <table className="w-full text-left text-xs whitespace-nowrap min-w-[880px]">
+                <table className="w-full text-left text-xs whitespace-nowrap min-w-[940px]">
                   <thead className="bg-[#0e071a] dark:bg-[#140826] text-white text-[10px] font-mono uppercase tracking-wider sticky top-0 z-10">
                     <tr>
                       <th className="px-5 py-3.5">NIM</th>
                       <th className="px-5 py-3.5">Nama Mahasiswa</th>
+                      <th className="px-3 py-3.5 text-center text-purple-200 w-24">Asprak</th>
                       <th className="px-2 py-3.5 text-right w-24 text-purple-200">Warming Up/TP (5%)</th>
                       <th className="px-2 py-3.5 text-right w-24 text-purple-200">Pre-Test (20%)</th>
                       <th className="px-2 py-3.5 text-right w-24 text-purple-200">Practice (15%)</th>
@@ -1761,8 +1827,8 @@ export default function AssistantDashboard() {
                   <tbody className="divide-y divide-slate-100 dark:divide-neutral-800/80">
                     {filteredRows.length === 0 ? (
                       <tr>
-                        <td colSpan={8} className="text-center py-8 text-slate-400 font-mono">
-                          Tidak ada mahasiswa yang cocok dengan pencarian &quot;{gradeSearchQuery}&quot;
+                        <td colSpan={9} className="text-center py-8 text-slate-400 font-mono">
+                          Tidak ada mahasiswa yang cocok dengan filter pencarian &quot;{gradeSearchQuery}&quot;
                         </td>
                       </tr>
                     ) : (
@@ -1771,11 +1837,21 @@ export default function AssistantDashboard() {
                         const vPre = parseFloat(row.preTest) || 0;
                         const vWU = parseFloat(row.warmingUp) || 0;
                         const isWuVoid = vPre <= 50 && vWU > 0;
+                        const asprakCode = getAssistantCodeForStudent(row.nim, row.name);
+                        const asstProfile = getAssistantByCode(asprakCode);
 
                         return (
                           <tr key={row.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
                             <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{row.nim}</td>
                             <td className="px-5 py-3 font-medium text-slate-900 dark:text-white">{row.name}</td>
+                            <td className="px-3 py-3 text-center">
+                              <span
+                                className="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-mono font-extrabold bg-purple-100 dark:bg-purple-950/70 text-purple-700 dark:text-purple-300 border border-purple-200/80 dark:border-purple-800/60 shadow-2xs"
+                                title={asstProfile ? `${asstProfile.name} (${asstProfile.position})` : `Asprak Pengampu: ${asprakCode}`}
+                              >
+                                {asprakCode}
+                              </span>
+                            </td>
                             <td className="px-2 py-2">
                               <input
                                 type="text"
