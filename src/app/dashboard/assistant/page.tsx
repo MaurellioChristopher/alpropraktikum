@@ -104,6 +104,8 @@ interface StudentGradeRow {
   practice: string;
   jurnal: string;
   postTest: string;
+  assistantCode?: string;
+  group?: string;
 }
 
 const getStudentsByClass = (classCode: string): StudentGradeRow[] => {
@@ -116,6 +118,8 @@ const getStudentsByClass = (classCode: string): StudentGradeRow[] => {
     practice: s.practice !== null && s.practice !== undefined ? s.practice.toString() : "",
     jurnal: s.jurnal !== null && s.jurnal !== undefined ? s.jurnal.toString() : "",
     postTest: s.postTest !== null && s.postTest !== undefined ? s.postTest.toString() : "",
+    assistantCode: s.assistantCode,
+    group: s.group,
   }));
 };
 
@@ -1432,7 +1436,7 @@ export default function AssistantDashboard() {
               const classStudents = MOODLE_STUDENTS_BY_CLASS[selectedClassCode] || [];
               const filteredStudents = classStudents.filter((std) => {
                 const q = attendanceSearchQuery.toLowerCase();
-                const asprakCode = getAssistantCodeForStudent(std.nim, std.name).toLowerCase();
+                const asprakCode = ((std as any).assistantCode || getAssistantCodeForStudent(std.nim, std.name)).toLowerCase();
                 return (
                   std.name.toLowerCase().includes(q) ||
                   std.nim.includes(q) ||
@@ -1506,7 +1510,7 @@ export default function AssistantDashboard() {
                         ) : (
                           filteredStudents.map((std) => {
                             const status = attendance[std.nim] || "Hadir";
-                            const asprakCode = getAssistantCodeForStudent(std.nim, std.name);
+                            const asprakCode = (std as any).assistantCode || getAssistantCodeForStudent(std.nim, std.name);
                             return (
                               <tr key={std.nim} className="hover:bg-slate-50 dark:hover:bg-neutral-900/60">
                                 <td className="px-5 py-3 font-mono font-semibold text-slate-700 dark:text-neutral-300">{std.nim}</td>
@@ -1629,13 +1633,13 @@ export default function AssistantDashboard() {
           const currentClassAspraks = Array.from(
             new Set(
               currentGrades
-                .map((r) => getAssistantCodeForStudent(r.nim, r.name))
+                .map((r) => r.assistantCode || getAssistantCodeForStudent(r.nim, r.name))
                 .filter((c) => c && c !== "-")
             )
           ).sort();
 
           const filteredRows = currentGrades.filter((r) => {
-            const asprakCode = getAssistantCodeForStudent(r.nim, r.name);
+            const asprakCode = r.assistantCode || getAssistantCodeForStudent(r.nim, r.name);
             if (selectedGradeAsprak !== "ALL" && asprakCode !== selectedGradeAsprak) {
               return false;
             }
@@ -1768,7 +1772,7 @@ export default function AssistantDashboard() {
                       {currentClassAspraks.map((code) => {
                         const asst = getAssistantByCode(code);
                         const count = currentGrades.filter(
-                          (r) => getAssistantCodeForStudent(r.nim, r.name) === code
+                          (r) => (r.assistantCode || getAssistantCodeForStudent(r.nim, r.name)) === code
                         ).length;
                         return (
                           <option key={code} value={code}>
@@ -1837,7 +1841,7 @@ export default function AssistantDashboard() {
                         const vPre = parseFloat(row.preTest) || 0;
                         const vWU = parseFloat(row.warmingUp) || 0;
                         const isWuVoid = vPre <= 50 && vWU > 0;
-                        const asprakCode = getAssistantCodeForStudent(row.nim, row.name);
+                        const asprakCode = row.assistantCode || getAssistantCodeForStudent(row.nim, row.name);
                         const asstProfile = getAssistantByCode(asprakCode);
 
                         return (

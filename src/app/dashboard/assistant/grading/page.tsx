@@ -18,6 +18,8 @@ interface GradeRow {
   jurnal: string;
   postTest: string;
   status: "saved" | "saving" | "error" | "idle";
+  assistantCode?: string;
+  group?: string;
 }
 
 // Convert Moodle student data to GradeRow
@@ -32,6 +34,8 @@ const getStudentsByClassCode = (classCode: string): GradeRow[] => {
     jurnal: s.jurnal !== null && s.jurnal !== undefined ? s.jurnal.toString() : "",
     postTest: s.postTest !== null && s.postTest !== undefined ? s.postTest.toString() : "",
     status: "idle",
+    assistantCode: s.assistantCode,
+    group: s.group,
   }));
 };
 
@@ -145,7 +149,7 @@ export default function GradingDashboard() {
       const vPre = parseFloat(r.preTest) || 0;
       const vWU = parseFloat(r.warmingUp) || 0;
       const effectiveWU = vPre <= 50 ? 0 : vWU;
-      const asprakCode = getAssistantCodeForStudent(r.nim, r.name);
+      const asprakCode = r.assistantCode || getAssistantCodeForStudent(r.nim, r.name);
       return [
         `"${r.nim}"`,
         `"${r.name}"`,
@@ -173,7 +177,7 @@ export default function GradingDashboard() {
   const currentClassInfo = SI50_CLASSES.find(c => c.code === selectedClass) || SI50_CLASSES[0];
 
   const filteredGrades = currentGrades.filter(g => {
-    const asprak = getAssistantCodeForStudent(g.nim, g.name).toLowerCase();
+    const asprak = (g.assistantCode || getAssistantCodeForStudent(g.nim, g.name)).toLowerCase();
     const q = searchQuery.toLowerCase();
     return (
       g.name.toLowerCase().includes(q) || 
@@ -374,7 +378,7 @@ export default function GradingDashboard() {
                   const vPre = parseFloat(row.preTest) || 0;
                   const vWU = parseFloat(row.warmingUp) || 0;
                   const isWuVoid = vPre <= 50 && vWU > 0;
-                  const asprakCode = getAssistantCodeForStudent(row.nim, row.name);
+                  const asprakCode = row.assistantCode || getAssistantCodeForStudent(row.nim, row.name);
                   const asstProfile = getAssistantByCode(asprakCode);
 
                   return (

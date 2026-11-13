@@ -161,6 +161,8 @@ export async function POST(req: NextRequest) {
                   practice: parsed.practice !== null ? parsed.practice.toString() : (student.practice?.toString() || ""),
                   jurnal: parsed.jurnal !== null ? parsed.jurnal.toString() : (student.jurnal?.toString() || ""),
                   postTest: parsed.postTest !== null ? parsed.postTest.toString() : (student.postTest?.toString() || ""),
+                  assistantCode: student.assistantCode,
+                  group: student.group,
                 };
               }
             }
@@ -176,6 +178,8 @@ export async function POST(req: NextRequest) {
             practice: student.practice?.toString() || "",
             jurnal: student.jurnal?.toString() || "",
             postTest: student.postTest?.toString() || "",
+            assistantCode: student.assistantCode,
+            group: student.group,
           };
         })
       );
